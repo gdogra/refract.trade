@@ -1,0 +1,413 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Management
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String?
+  name      String?
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Subscription info
+  subscriptionTier String @default("basic") // basic, pro, elite
+  subscriptionExpiry DateTime?
+  
+  // Profile data
+  profile   UserProfile?
+  accounts  Account[]
+  positions Position[]
+  strategies Strategy[]
+  portfolioSnapshots PortfolioSnapshot[]
+  riskAlerts RiskAlert[]
+  taxRecords TaxRecord[]
+  washSales WashSale[]
+  learningProgress LearningProgress[]
+  communityProfile CommunityProfile?
+
+  @@map("users")
+}
+
+model UserProfile {
+  id              String @id @default(cuid())
+  userId          String @unique
+  user            User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Risk assessment
+  riskTolerance   String // conservative, moderate, aggressive
+  experienceLevel String // beginner, intermediate, advanced
+  tradingGoals    String[] // income, speculation, hedging
+  
+  // Preferences
+  dashboardLayout Json?
+  notificationSettings Json?
+  tradingHours    Json? // preferred trading times
+  
+  // KYC data
+  dateOfBirth     DateTime?
+  phoneNumber     String?
+  address         Json?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("user_profiles")
+}
+
+// Brokerage Integration
+model Account {
+  id            String @id @default(cuid())
+  userId        String
+  user          User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  broker        String // "interactive_brokers", "schwab", "tastytrade"
+  accountNumber String
+  accountType   String // "margin", "cash", "ira"
+  isActive      Boolean @default(true)
+  
+  // Balances
+  cashBalance   Decimal @default(0)
+  buyingPower   Decimal @default(0)
+  totalValue    Decimal @default(0)
+  
+  // API credentials (encrypted)
+  apiCredentials Json?
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  positions     Position[]
+
+  @@unique([userId, accountNumber, broker])
+  @@map("accounts")
+}
+
+// Trading Data
+model Position {
+  id          String @id @default(cuid())
+  userId      String
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId   String
+  account     Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  
+  // Position details
+  symbol      String
+  strategyType String // "covered_call", "put_spread", "iron_condor", etc.
+  quantity    Int
+  entryDate   DateTime
+  exitDate    DateTime?
+  
+  // Financial data
+  entryPrice  Decimal
+  exitPrice   Decimal?
+  unrealizedPnl Decimal?
+  realizedPnl   Decimal?
+  
+  // Risk metrics
+  delta       Decimal?
+  gamma       Decimal?
+  theta       Decimal?
+  vega        Decimal?
+  
+  // Position legs (for complex strategies)
+  legs        PositionLeg[]
+  
+  // AI analysis
+  aiScore     Decimal? // AI confidence score
+  aiNotes     String?
+  
+  isActive    Boolean @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  transactions Transaction[]
+
+  @@map("positions")
+}
+
+model PositionLeg {
+  id         String @id @default(cuid())
+  positionId String
+  position   Position @relation(fields: [positionId], references: [id], onDelete: Cascade)
+  
+  // Option details
+  symbol     String
+  optionType String // "call", "put"
+  strike     Decimal
+  expiry     DateTime
+  quantity   Int
+  side       String // "buy", "sell"
+  
+  // Pricing
+  entryPrice Decimal
+  exitPrice  Decimal?
+  
+  // Greeks at entry
+  delta      Decimal?
+  gamma      Decimal?
+  theta      Decimal?
+  vega       Decimal?
+  iv         Decimal? // implied volatility
+  
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("position_legs")
+}
+
+model Transaction {
+  id         String @id @default(cuid())
+  positionId String
+  position   Position @relation(fields: [positionId], references: [id], onDelete: Cascade)
+  
+  type       String // "buy", "sell", "exercise", "assignment"
+  symbol     String
+  quantity   Int
+  price      Decimal
+  fees       Decimal @default(0)
+  timestamp  DateTime
+  
+  // Tax implications
+  washSale   Boolean @default(false)
+  
+  createdAt  DateTime @default(now())
+
+  @@map("transactions")
+}
+
+// Strategy System
+model Strategy {
+  id          String @id @default(cuid())
+  userId      String
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  name        String
+  description String?
+  strategyType String
+  parameters  Json // strategy-specific parameters
+  
+  // Backtesting results
+  backtestData Json?
+  successRate  Decimal?
+  avgReturn    Decimal?
+  maxDrawdown  Decimal?
+  sharpeRatio  Decimal?
+  
+  // AI analysis
+  aiScore     Decimal?
+  
+  isPublic    Boolean @default(false)
+  isActive    Boolean @default(true)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("strategies")
+}
+
+// Risk Management
+model PortfolioSnapshot {
+  id         String @id @default(cuid())
+  userId     String
+  user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  timestamp  DateTime
+  totalValue Decimal
+  
+  // Risk metrics
+  totalDelta Decimal
+  totalGamma Decimal
+  totalTheta Decimal
+  totalVega  Decimal
+  
+  // Stress test results
+  stressTests Json
+  
+  // VaR calculations
+  var95      Decimal? // 95% Value at Risk
+  var99      Decimal? // 99% Value at Risk
+  
+  createdAt  DateTime @default(now())
+
+  @@map("portfolio_snapshots")
+}
+
+model RiskAlert {
+  id         String @id @default(cuid())
+  userId     String
+  user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  alertType  String // "position_risk", "portfolio_risk", "market_event"
+  severity   String // "low", "medium", "high", "critical"
+  message    String
+  data       Json? // alert-specific data
+  
+  isRead     Boolean @default(false)
+  isResolved Boolean @default(false)
+  
+  createdAt  DateTime @default(now())
+
+  @@map("risk_alerts")
+}
+
+// Tax Optimization
+model TaxRecord {
+  id         String @id @default(cuid())
+  userId     String
+  user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  year       Int
+  symbol     String
+  quantity   Decimal
+  costBasis  Decimal
+  dateAcquired DateTime
+  dateSold   DateTime?
+  salePrice  Decimal?
+  
+  // Tax treatment
+  isShortTerm Boolean?
+  isWashSale Boolean @default(false)
+  
+  // Optimization opportunities
+  harvestable Boolean @default(false)
+  
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("tax_records")
+}
+
+model WashSale {
+  id             String @id @default(cuid())
+  userId         String
+  user           User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  symbol         String
+  lossDate       DateTime
+  lossAmount     Decimal
+  washPeriodEnd  DateTime
+  
+  isActive       Boolean @default(true)
+  
+  createdAt      DateTime @default(now())
+
+  @@map("wash_sales")
+}
+
+// Learning System
+model LearningProgress {
+  id         String @id @default(cuid())
+  userId     String
+  user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  moduleId   String
+  moduleName String
+  progress   Int @default(0) // 0-100
+  completed  Boolean @default(false)
+  score      Int?
+  
+  // Adaptive learning data
+  weaknesses String[] // areas that need improvement
+  strengths  String[] // areas of strength
+  
+  lastAccessed DateTime?
+  completedAt  DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([userId, moduleId])
+  @@map("learning_progress")
+}
+
+// Community Features
+model CommunityProfile {
+  id         String @id @default(cuid())
+  userId     String @unique
+  user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  username   String @unique
+  bio        String?
+  
+  // Performance metrics (anonymized)
+  successRate    Decimal?
+  avgReturn      Decimal?
+  riskAdjReturn  Decimal?
+  totalTrades    Int @default(0)
+  
+  // Community metrics
+  reputation     Int @default(0)
+  contributions  Int @default(0)
+  
+  // Privacy settings
+  sharePerformance Boolean @default(false)
+  shareStrategies  Boolean @default(false)
+  
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("community_profiles")
+}
+
+// Market Data Cache
+model OptionChain {
+  id         String @id @default(cuid())
+  symbol     String
+  expiry     DateTime
+  strike     Decimal
+  optionType String // "call", "put"
+  
+  // Pricing data
+  bid        Decimal?
+  ask        Decimal?
+  lastPrice  Decimal?
+  volume     Int?
+  openInterest Int?
+  
+  // Greeks
+  delta      Decimal?
+  gamma      Decimal?
+  theta      Decimal?
+  vega       Decimal?
+  rho        Decimal?
+  
+  // Other metrics
+  impliedVolatility Decimal?
+  
+  timestamp  DateTime
+  createdAt  DateTime @default(now())
+
+  @@unique([symbol, expiry, strike, optionType])
+  @@map("option_chains")
+}
+
+model MarketData {
+  id         String @id @default(cuid())
+  symbol     String
+  
+  // Price data
+  price      Decimal
+  change     Decimal
+  changePercent Decimal
+  volume     BigInt?
+  
+  // Additional metrics
+  beta       Decimal?
+  marketCap  BigInt?
+  
+  timestamp  DateTime
+  createdAt  DateTime @default(now())
+
+  @@unique([symbol, timestamp])
+  @@map("market_data")
+}
