@@ -1,5 +1,4 @@
 import { NextAuthOptions } from 'next-auth'
-import { SupabaseAdapter } from '@next-auth/supabase-adapter'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { createSupabaseAdmin } from './supabase'
 import bcrypt from 'bcryptjs'
