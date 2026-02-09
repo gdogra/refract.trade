@@ -2,6 +2,31 @@
 
 A revolutionary options trading application that combines predictive AI, visual risk management, and tax optimization in a mobile-first design.
 
+## 📁 Repository Structure
+
+```
+Refract.trade/
+├── src/                   # Next.js application source code
+│   ├── app/              # App router pages and API routes
+│   ├── components/       # Reusable UI components
+│   ├── lib/             # Core utilities and configurations
+│   ├── types/           # TypeScript type definitions
+│   └── utils/           # Helper functions and calculations
+├── prisma/              # Database schema and migrations
+├── docs/                # Complete design documentation
+│   ├── app-architecture.md
+│   ├── user-flows.md
+│   ├── wireframes.md
+│   ├── technical-stack.md
+│   ├── monetization-strategy.md
+│   ├── competitive-analysis.md
+│   ├── rollout-plan.md
+│   └── regulatory-compliance.md
+├── package.json         # Dependencies and scripts
+├── index.html          # Static landing page for Netlify
+└── README.md           # This file
+```
+
 ## 🚀 Features
 
 ### Core Functionality
@@ -52,7 +77,7 @@ A revolutionary options trading application that combines predictive AI, visual 
 1. Clone the repository:
 ```bash
 git clone https://github.com/gdogra/Refract.trade.git
-cd Refract.trade/app
+cd Refract.trade
 ```
 
 2. Install dependencies:
