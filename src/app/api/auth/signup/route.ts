@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
-import { prisma } from '@/lib/prisma'
+import { createSupabaseAdmin } from '@/lib/supabase'
 import { z } from 'zod'
 
 const signupSchema = z.object({
@@ -14,10 +14,14 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { name, email, password } = signupSchema.parse(body)
 
+    const supabase = createSupabaseAdmin()
+
     // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email }
-    })
+    const { data: existingUser } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', email)
+      .single()
 
     if (existingUser) {
       return NextResponse.json(
@@ -29,24 +33,36 @@ export async function POST(request: NextRequest) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 12)
 
-    // Create user with profile
-    const user = await prisma.user.create({
-      data: {
+    // Create user
+    const { data: user, error: userError } = await supabase
+      .from('users')
+      .insert({
         name,
         email,
         password: hashedPassword,
-        profile: {
-          create: {
-            riskTolerance: 'moderate',
-            experienceLevel: 'beginner',
-            tradingGoals: [],
-          }
-        }
-      },
-      include: {
-        profile: true
-      }
-    })
+        subscription_tier: 'basic'
+      })
+      .select()
+      .single()
+
+    if (userError) {
+      throw userError
+    }
+
+    // Create user profile
+    const { error: profileError } = await supabase
+      .from('user_profiles')
+      .insert({
+        user_id: user.id,
+        risk_tolerance: 'moderate',
+        experience_level: 'beginner',
+        trading_goals: []
+      })
+
+    if (profileError) {
+      console.error('Profile creation error:', profileError)
+      // Don't fail the signup if profile creation fails
+    }
 
     // Remove password from response
     const { password: _, ...userWithoutPassword } = user

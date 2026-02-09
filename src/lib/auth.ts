@@ -1,11 +1,10 @@
 import { NextAuthOptions } from 'next-auth'
-import { PrismaAdapter } from '@next-auth/prisma-adapter'
+import { SupabaseAdapter } from '@next-auth/supabase-adapter'
 import CredentialsProvider from 'next-auth/providers/credentials'
+import { createSupabaseAdmin } from './supabase'
 import bcrypt from 'bcryptjs'
-import { prisma } from './prisma'
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
   providers: [
     CredentialsProvider({
       name: 'credentials',
@@ -18,16 +17,19 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email
-          },
-          include: {
-            profile: true
-          }
-        })
+        const supabase = createSupabaseAdmin()
+        
+        // Get user from Supabase
+        const { data: user, error } = await supabase
+          .from('users')
+          .select(`
+            *,
+            user_profiles(*)
+          `)
+          .eq('email', credentials.email)
+          .single()
 
-        if (!user || !user.password) {
+        if (error || !user || !user.password) {
           return null
         }
 
@@ -44,8 +46,8 @@ export const authOptions: NextAuthOptions = {
           id: user.id,
           email: user.email,
           name: user.name,
-          subscriptionTier: user.subscriptionTier,
-          profile: user.profile
+          subscriptionTier: user.subscription_tier,
+          profile: user.user_profiles?.[0]
         }
       }
     })

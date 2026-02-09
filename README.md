@@ -56,10 +56,10 @@ Refract.trade/
 
 ### Backend
 - **Runtime**: Node.js with TypeScript
-- **Database**: PostgreSQL with Prisma ORM
-- **Authentication**: NextAuth.js
-- **API**: REST + WebSocket for real-time data
-- **Caching**: Redis (planned)
+- **Database**: Supabase (PostgreSQL) with Prisma ORM
+- **Authentication**: NextAuth.js + Supabase Auth
+- **API**: REST + Supabase real-time subscriptions
+- **Real-time**: Supabase WebSocket connections
 
 ### External Services
 - **Market Data**: IEX Cloud, Polygon.io, Intrinio
@@ -70,8 +70,8 @@ Refract.trade/
 
 ### Prerequisites
 - Node.js 18+ 
-- PostgreSQL database
-- API keys for market data providers
+- Supabase account and project
+- API keys for market data providers (optional)
 
 ### Setup
 1. Clone the repository:
@@ -85,24 +85,31 @@ cd Refract.trade
 npm install
 ```
 
-3. Set up environment variables:
+3. Set up Supabase database:
 ```bash
-cp .env.example .env
-# Edit .env with your configuration
+# Follow the detailed guide in SUPABASE_SETUP.md
+# Run the SQL script in your Supabase SQL Editor
 ```
 
-4. Set up the database:
+4. Set up environment variables:
 ```bash
-npx prisma migrate dev
+cp .env.example .env.local
+# Edit .env.local with your Supabase credentials
+```
+
+5. Generate Prisma client:
+```bash
 npx prisma generate
 ```
 
-5. Run the development server:
+6. Run the development server:
 ```bash
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) to view the application.
+
+**📖 For detailed setup instructions, see [SUPABASE_SETUP.md](./SUPABASE_SETUP.md)**
 
 ## 🗃 Database Schema
 
