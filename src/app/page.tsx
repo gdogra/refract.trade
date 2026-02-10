@@ -7,21 +7,13 @@ export const dynamic = 'force-dynamic'
 
 export default async function Home() {
   try {
-    // Only attempt to get session if auth is properly configured
-    const hasAuthConfig = process.env.NEXTAUTH_SECRET && 
-                         process.env.NEXT_PUBLIC_SUPABASE_URL && 
-                         process.env.SUPABASE_SERVICE_ROLE_KEY
-
     let session = null
     
-    if (hasAuthConfig) {
-      try {
-        session = await getServerSession(authOptions)
-      } catch (authError) {
-        console.error('Auth session error:', authError)
-        // Continue without session rather than crashing
-        session = null
-      }
+    try {
+      session = await getServerSession(authOptions)
+    } catch (authError) {
+      // Auth not configured or failed - show landing page
+      session = null
     }
 
     // If user is authenticated, redirect to dashboard

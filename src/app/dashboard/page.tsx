@@ -13,21 +13,7 @@ export const metadata: Metadata = {
 
 export default async function DashboardPage() {
   try {
-    // Check if auth is properly configured
-    const hasAuthConfig = process.env.NEXTAUTH_SECRET && 
-                         process.env.NEXT_PUBLIC_SUPABASE_URL && 
-                         process.env.SUPABASE_SERVICE_ROLE_KEY
-
-    let session = null
-    
-    if (hasAuthConfig) {
-      try {
-        session = await getServerSession(authOptions)
-      } catch (authError) {
-        console.error('Dashboard auth error:', authError)
-        session = null
-      }
-    }
+    const session = await getServerSession(authOptions)
     
     if (!session) {
       redirect('/auth/signin')
