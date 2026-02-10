@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import { createSupabaseAdmin } from '@/lib/supabase'
 import { z } from 'zod'
+import crypto from 'crypto'
 
 const signupSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -41,6 +42,10 @@ export async function POST(request: NextRequest) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 12)
 
+    // Generate email verification token
+    const verificationToken = crypto.randomBytes(32).toString('hex')
+    const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
+
     // Create user
     const { data: user, error: userError } = await supabase
       .from('users')
@@ -48,7 +53,10 @@ export async function POST(request: NextRequest) {
         name,
         email,
         password: hashedPassword,
-        subscription_tier: 'basic'
+        subscription_tier: 'basic',
+        email_verified: false,
+        verification_token: verificationToken,
+        verification_expires: tokenExpiry.toISOString()
       })
       .select()
       .single()
@@ -73,13 +81,25 @@ export async function POST(request: NextRequest) {
       // Don't fail the signup if profile creation fails
     }
 
-    // Remove password from response
-    const { password: _, ...userWithoutPassword } = user
+    // Send verification email (log for now, replace with real email service in production)
+    const verificationUrl = `https://refracttrade.netlify.app/auth/verify-email?token=${verificationToken}`
+    
+    // Log verification URL for testing (replace with actual email sending)
+    console.log(`\n=== EMAIL VERIFICATION ===`)
+    console.log(`To: ${email}`)
+    console.log(`Subject: Verify your Refract.trade account`)
+    console.log(`Link: ${verificationUrl}`)
+    console.log(`===========================\n`)
+
+    // Remove password and sensitive data from response
+    const { password: _, verification_token: __, ...userWithoutPassword } = user
 
     return NextResponse.json(
       { 
-        message: 'User created successfully',
-        user: userWithoutPassword 
+        message: 'Account created! Please check your email to verify your account before signing in.',
+        user: userWithoutPassword,
+        requiresVerification: true,
+        verificationUrl: verificationUrl // Include for testing, remove in production
       },
       { status: 201 }
     )

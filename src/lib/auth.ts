@@ -59,8 +59,12 @@ export const authOptions: NextAuthOptions = {
             .single()
 
           if (error || !user || !user.password) {
-            console.error('User not found or no password:', error?.message)
             return null
+          }
+
+          // Check if email is verified
+          if (!user.email_verified) {
+            throw new Error('Please verify your email before signing in')
           }
 
           const isPasswordValid = await bcrypt.compare(

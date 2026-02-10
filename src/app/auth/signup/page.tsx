@@ -16,6 +16,8 @@ export default function SignUp() {
   })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState(false)
+  const [verificationUrl, setVerificationUrl] = useState('')
   const router = useRouter()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,8 +58,13 @@ export default function SignUp() {
         throw new Error(data.error || 'Failed to create account')
       }
 
-      // Redirect to sign in page
-      router.push('/auth/signin?message=Account created successfully')
+      if (data.requiresVerification) {
+        setSuccess(true)
+        setVerificationUrl(data.verificationUrl) // For testing - remove in production
+      } else {
+        // Redirect to sign in page
+        router.push('/auth/signin?message=Account created successfully')
+      }
     } catch (error: any) {
       setError(error.message || 'An error occurred. Please try again.')
     } finally {
@@ -78,6 +85,55 @@ export default function SignUp() {
           <p className="text-gray-600">Join the future of options trading</p>
         </CardHeader>
         <CardContent>
+          {success ? (
+            <div className="text-center space-y-4">
+              <div className="text-green-600 text-6xl mb-4">✓</div>
+              <div className="space-y-2">
+                <h3 className="text-lg font-medium text-gray-900">Check your email!</h3>
+                <p className="text-gray-600">
+                  We've sent a verification link to <strong>{formData.email}</strong>
+                </p>
+                <p className="text-sm text-gray-500">
+                  Please check your email and click the verification link to complete your registration.
+                </p>
+                {/* Development only - remove in production */}
+                {verificationUrl && (
+                  <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                    <p className="text-xs text-yellow-800 mb-2">Development Mode - Direct verification link:</p>
+                    <a 
+                      href={verificationUrl} 
+                      className="text-blue-600 hover:underline text-sm break-all"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Click to verify email
+                    </a>
+                  </div>
+                )}
+              </div>
+              <Button
+                onClick={() => {
+                  setSuccess(false)
+                  setFormData({
+                    name: '',
+                    email: '',
+                    password: '',
+                    confirmPassword: '',
+                  })
+                  setVerificationUrl('')
+                }}
+                variant="outline"
+                className="w-full"
+              >
+                Create Another Account
+              </Button>
+              <div className="text-center">
+                <Link href="/auth/signin" className="text-primary-600 hover:underline text-sm">
+                  Already verified? Sign in
+                </Link>
+              </div>
+            </div>
+          ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
@@ -159,6 +215,7 @@ export default function SignUp() {
               </Link>
             </p>
           </div>
+          )}
         </CardContent>
       </Card>
     </div>
