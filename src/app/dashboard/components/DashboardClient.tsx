@@ -1,8 +1,9 @@
 'use client'
 
-import { useSession } from 'next-auth/react'
+import { useSession, signOut } from 'next-auth/react'
 import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
+import { Button } from '@/components/ui/Button'
 import PortfolioOverview from './PortfolioOverview'
 import RiskMetricsPanel from './RiskMetricsPanel'
 import PositionsList from './PositionsList'
@@ -57,6 +58,13 @@ export default function DashboardClient() {
                 </span>
               </div>
             </div>
+            <Button
+              onClick={() => signOut({ callbackUrl: '/' })}
+              variant="outline"
+              className="bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700"
+            >
+              Sign Out
+            </Button>
           </div>
         </motion.div>
 
