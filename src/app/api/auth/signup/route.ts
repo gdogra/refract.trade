@@ -14,6 +14,18 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { name, email, password } = signupSchema.parse(body)
 
+    // Check if Supabase is properly configured
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      console.error('Missing Supabase environment variables:', {
+        url: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+        serviceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY
+      })
+      return NextResponse.json(
+        { error: 'Server configuration error' },
+        { status: 500 }
+      )
+    }
+
     const supabase = createSupabaseAdmin()
 
     // Check if user already exists
@@ -46,6 +58,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (userError) {
+      console.error('User creation error:', userError)
       throw userError
     }
 
