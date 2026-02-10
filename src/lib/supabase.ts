@@ -8,7 +8,6 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 // Client-side Supabase client
 export const createSupabaseClient = () => {
   if (!supabaseUrl || !supabaseAnonKey) {
-    console.error('Missing Supabase environment variables')
     throw new Error('Supabase configuration is missing')
   }
   
@@ -23,7 +22,6 @@ export const createSupabaseClient = () => {
 // Server-side Supabase client
 export const createSupabaseServerClient = () => {
   if (!supabaseUrl || !supabaseAnonKey) {
-    console.error('Missing Supabase environment variables for server client')
     throw new Error('Supabase configuration is missing')
   }
   
@@ -38,10 +36,6 @@ export const createSupabaseServerClient = () => {
 // Admin Supabase client with service role key
 export const createSupabaseAdmin = () => {
   if (!supabaseUrl || !supabaseServiceKey) {
-    console.error('Missing Supabase admin environment variables:', {
-      url: !!supabaseUrl,
-      serviceKey: !!supabaseServiceKey
-    })
     throw new Error('Supabase admin configuration is missing')
   }
   

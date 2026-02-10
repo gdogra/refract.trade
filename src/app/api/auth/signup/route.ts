@@ -16,10 +16,6 @@ export async function POST(request: NextRequest) {
 
     // Check if Supabase is properly configured
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      console.error('Missing Supabase environment variables:', {
-        url: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-        serviceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY
-      })
       return NextResponse.json(
         { error: 'Server configuration error' },
         { status: 500 }
