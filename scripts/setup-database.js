@@ -9,7 +9,7 @@ const path = require('path')
 
 // Supabase configuration
 const SUPABASE_URL = 'https://pfeikjkqqotksxwijcwh.supabase.co'
-const SUPABASE_SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmZWlramtxcW90a3N4d2lqY3doIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDY2Njk4OSwiZXhwIjoyMDg2MjQyOTg5fQ.n4cv1s6tqumaLEOOJ2tg7eyowzkjx9TfoNpSrSlAW3s'
+const SUPABASE_SERVICE_KEY = 'your-supabase-key-here
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
 

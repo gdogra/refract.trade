@@ -84,8 +84,8 @@ Your `.env.local` file has been created with your actual credentials:
 ```env
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL="https://pfeikjkqqotksxwijcwh.supabase.co"
-NEXT_PUBLIC_SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmZWlramtxcW90a3N4d2lqY3doIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NjY5ODksImV4cCI6MjA4NjI0Mjk4OX0.lvT1NGzFjmdMixFv3HY7dKKSakqWtL60q-3fQN4P2kg"
-SUPABASE_SERVICE_ROLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmZWlramtxcW90a3N4d2lqY3doIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDY2Njk4OSwiZXhwIjoyMDg2MjQyOTg5fQ.n4cv1s6tqumaLEOOJ2tg7eyowzkjx9TfoNpSrSlAW3s"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="your-supabase-key-here"
+SUPABASE_SERVICE_ROLE_KEY="your-supabase-key-here"
 ```
 
 **⚠️ You still need to add your database password to DATABASE_URL in .env.local**
