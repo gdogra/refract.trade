@@ -3,6 +3,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { TrendingUp, TrendingDown, DollarSign, Target, BarChart3, Activity } from 'lucide-react'
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts'
 
 interface PortfolioStats {
   totalValue: number
@@ -12,6 +13,11 @@ interface PortfolioStats {
   totalPnLPercent: number
   buyingPower: number
   riskUtilization: number
+  performanceHistory: Array<{
+    date: string
+    value: number
+    benchmark: number
+  }>
 }
 
 export default function PortfolioOverview() {
@@ -19,6 +25,24 @@ export default function PortfolioOverview() {
     queryKey: ['portfolio-overview'],
     queryFn: async () => {
       // Mock data for now - will connect to API later
+      const generatePerformanceHistory = () => {
+        let portfolioValue = 110000
+        let benchmarkValue = 110000
+        return Array.from({ length: 30 }, (_, i) => {
+          const portfolioChange = (Math.random() - 0.45) * 0.02 // Slightly positive bias
+          const benchmarkChange = (Math.random() - 0.5) * 0.015 // Market movement
+          
+          portfolioValue *= (1 + portfolioChange)
+          benchmarkValue *= (1 + benchmarkChange)
+          
+          return {
+            date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            value: portfolioValue,
+            benchmark: benchmarkValue
+          }
+        })
+      }
+
       return {
         totalValue: 125840.32,
         dailyChange: 2340.50,
@@ -26,7 +50,8 @@ export default function PortfolioOverview() {
         totalPnL: 15840.32,
         totalPnLPercent: 14.39,
         buyingPower: 45600.00,
-        riskUtilization: 0.68
+        riskUtilization: 0.68,
+        performanceHistory: generatePerformanceHistory()
       }
     }
   })
@@ -161,19 +186,76 @@ export default function PortfolioOverview() {
           </div>
         </motion.div>
 
-        {/* Performance Chart Placeholder */}
+        {/* Performance Chart */}
         <motion.div 
           className="md:col-span-2 bg-gray-50 dark:bg-gray-700 rounded-lg p-4"
           whileHover={{ scale: 1.01 }}
           transition={{ type: "spring", stiffness: 300 }}
         >
-          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-            30-Day Performance
-          </h3>
-          <div className="h-20 bg-gradient-to-r from-brand-500/20 to-purple-500/20 rounded flex items-center justify-center">
-            <span className="text-sm text-gray-600 dark:text-gray-400">
-              Chart visualization coming soon
-            </span>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              30-Day Performance vs S&P 500
+            </h3>
+            <div className="flex items-center space-x-3 text-xs">
+              <div className="flex items-center space-x-1">
+                <div className="w-3 h-0.5 bg-brand-500"></div>
+                <span className="text-gray-600 dark:text-gray-400">Portfolio</span>
+              </div>
+              <div className="flex items-center space-x-1">
+                <div className="w-3 h-0.5 bg-gray-400"></div>
+                <span className="text-gray-600 dark:text-gray-400">S&P 500</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="h-24">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={portfolio?.performanceHistory || []}>
+                <XAxis 
+                  dataKey="date" 
+                  tick={false}
+                  axisLine={false}
+                />
+                <YAxis hide />
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: '#1f2937',
+                    border: 'none',
+                    borderRadius: '8px',
+                    color: '#f9fafb',
+                    fontSize: '12px'
+                  }}
+                  formatter={(value: number, name: string) => [
+                    `$${value.toLocaleString()}`, 
+                    name === 'value' ? 'Portfolio' : 'S&P 500'
+                  ]}
+                  labelFormatter={(label) => `Date: ${label}`}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="#667eea"
+                  strokeWidth={2}
+                  dot={false}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="benchmark"
+                  stroke="#9ca3af"
+                  strokeWidth={1}
+                  strokeDasharray="3 3"
+                  dot={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+          
+          <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+            <span className={`font-medium ${
+              (portfolio?.totalPnLPercent || 0) >= 0 ? 'text-green-600' : 'text-red-600'
+            }`}>
+              {formatPercentage(portfolio?.totalPnLPercent || 0)}
+            </span> vs benchmark this month
           </div>
         </motion.div>
       </div>

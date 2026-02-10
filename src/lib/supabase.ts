@@ -1,19 +1,49 @@
-import { createClientComponentClient, createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { createClient } from '@supabase/supabase-js'
-import { cookies } from 'next/headers'
+
+// Get environment variables with fallbacks
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 
 // Client-side Supabase client
-export const createSupabaseClient = () => 
-  createClientComponentClient()
+export const createSupabaseClient = () => {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.error('Missing Supabase environment variables')
+    throw new Error('Supabase configuration is missing')
+  }
+  
+  return createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+    },
+  })
+}
 
 // Server-side Supabase client
-export const createSupabaseServerClient = () => 
-  createServerComponentClient({ cookies })
+export const createSupabaseServerClient = () => {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.error('Missing Supabase environment variables for server client')
+    throw new Error('Supabase configuration is missing')
+  }
+  
+  return createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  })
+}
 
 // Admin Supabase client with service role key
 export const createSupabaseAdmin = () => {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+  if (!supabaseUrl || !supabaseServiceKey) {
+    console.error('Missing Supabase admin environment variables:', {
+      url: !!supabaseUrl,
+      serviceKey: !!supabaseServiceKey
+    })
+    throw new Error('Supabase admin configuration is missing')
+  }
   
   return createClient(supabaseUrl, supabaseServiceKey, {
     auth: {
