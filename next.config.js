@@ -2,7 +2,9 @@
 const nextConfig = {
   images: {
     domains: ['localhost'],
+    unoptimized: true, // Required for Netlify static export
   },
+  trailingSlash: true, // Helps with Netlify routing
   env: {
     DATABASE_URL: process.env.DATABASE_URL,
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
