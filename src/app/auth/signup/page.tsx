@@ -134,6 +134,7 @@ export default function SignUp() {
               </div>
             </div>
           ) : (
+          <>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
@@ -215,7 +216,8 @@ export default function SignUp() {
               </Link>
             </p>
           </div>
-          }
+          </>
+          )}
         </CardContent>
       </Card>
     </div>
