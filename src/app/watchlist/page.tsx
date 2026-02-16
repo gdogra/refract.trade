@@ -19,46 +19,46 @@ interface WatchlistItem {
   added: Date
 }
 
+// Default watchlist items
+const defaultWatchlistItems: WatchlistItem[] = [
+  {
+    symbol: 'AAPL',
+    name: 'Apple Inc.',
+    price: 189.95,
+    change: 2.45,
+    changePercent: 1.31,
+    volume: 45234567,
+    marketCap: 2950000000000,
+    pe: 28.5,
+    added: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
+  },
+  {
+    symbol: 'NVDA',
+    name: 'NVIDIA Corporation',
+    price: 489.33,
+    change: 12.45,
+    changePercent: 2.61,
+    volume: 56789012,
+    marketCap: 1200000000000,
+    pe: 65.2,
+    added: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
+  },
+  {
+    symbol: 'TSLA',
+    name: 'Tesla, Inc.',
+    price: 248.42,
+    change: -5.67,
+    changePercent: -2.23,
+    volume: 67890123,
+    marketCap: 790000000000,
+    pe: 45.8,
+    added: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+  }
+]
+
 export default function Watchlist() {
   const router = useRouter()
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>([])
-
-  // Initialize with default items if empty
-  const defaultWatchlistItems = [
-    {
-      symbol: 'AAPL',
-      name: 'Apple Inc.',
-      price: 189.95,
-      change: 2.45,
-      changePercent: 1.31,
-      volume: 45234567,
-      marketCap: 2950000000000,
-      pe: 28.5,
-      added: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
-    },
-    {
-      symbol: 'NVDA',
-      name: 'NVIDIA Corporation',
-      price: 489.33,
-      change: 12.45,
-      changePercent: 2.61,
-      volume: 56789012,
-      marketCap: 1200000000000,
-      pe: 65.2,
-      added: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
-    },
-    {
-      symbol: 'TSLA',
-      name: 'Tesla, Inc.',
-      price: 248.42,
-      change: -5.67,
-      changePercent: -2.23,
-      volume: 67890123,
-      marketCap: 790000000000,
-      pe: 45.8,
-      added: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-    }
-  ])
 
   // Load watchlist from localStorage
   useEffect(() => {
