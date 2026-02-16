@@ -1,7 +1,8 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Plus, Search, BarChart3, BookOpen, Settings, Zap } from 'lucide-react'
+import { Plus, Search, BarChart3, BookOpen, Settings, Zap, TrendingUp } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 const actions = [
   {
@@ -10,7 +11,7 @@ const actions = [
     description: 'Open a new position',
     icon: Plus,
     color: 'bg-brand-500 hover:bg-brand-600',
-    href: '/trade'
+    href: '/options'
   },
   {
     id: 'analyze',
@@ -18,15 +19,15 @@ const actions = [
     description: 'Options chain analysis',
     icon: Search,
     color: 'bg-purple-500 hover:bg-purple-600',
-    href: '/analyze'
+    href: '/options'
   },
   {
     id: 'charts',
-    title: 'Charts',
-    description: 'Technical analysis',
-    icon: BarChart3,
+    title: 'Portfolio',
+    description: 'View your positions',
+    icon: TrendingUp,
     color: 'bg-blue-500 hover:bg-blue-600',
-    href: '/charts'
+    href: '/portfolio'
   },
   {
     id: 'learn',
@@ -42,7 +43,7 @@ const actions = [
     description: 'Get recommendations',
     icon: Zap,
     color: 'bg-yellow-500 hover:bg-yellow-600',
-    href: '/ai'
+    href: '/analytics'
   },
   {
     id: 'settings',
@@ -55,6 +56,12 @@ const actions = [
 ]
 
 export default function QuickActions() {
+  const router = useRouter()
+
+  const handleActionClick = (href: string) => {
+    router.push(href)
+  }
+
   return (
     <motion.div 
       className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700"
@@ -73,6 +80,7 @@ export default function QuickActions() {
           return (
             <motion.button
               key={action.id}
+              onClick={() => handleActionClick(action.href)}
               className="group relative overflow-hidden rounded-lg p-4 text-left transition-all hover:shadow-lg"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
