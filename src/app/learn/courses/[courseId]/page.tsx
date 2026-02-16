@@ -212,6 +212,215 @@ const courses = {
         `
       }
     ]
+  },
+  'risk-management': {
+    title: 'Risk Management',
+    description: 'Essential risk management techniques to protect your capital.',
+    duration: '1.5 hours',
+    difficulty: 'Intermediate',
+    lessons: [
+      {
+        id: 1,
+        title: 'Position Sizing Fundamentals',
+        duration: '18 min',
+        content: `
+          <h2>Position Sizing Fundamentals</h2>
+          
+          <p>Position sizing is the <strong>most critical aspect</strong> of risk management. It determines how much of your capital you risk on each trade.</p>
+          
+          <h3>The 1% Rule</h3>
+          <p>Never risk more than 1-2% of your total account on a single trade. This simple rule can save your account from catastrophic losses.</p>
+          
+          <h3>Position Size Calculation</h3>
+          <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+            <p><strong>Formula:</strong></p>
+            <p>Position Size = (Account Size × Risk %) ÷ Risk per Share</p>
+            <br>
+            <p><strong>Example:</strong></p>
+            <ul>
+              <li>Account Size: $50,000</li>
+              <li>Risk Tolerance: 1% = $500</li>
+              <li>Option Premium: $2.50</li>
+              <li>Position Size: $500 ÷ $2.50 = 2 contracts maximum</li>
+            </ul>
+          </div>
+          
+          <h3>Risk Categories</h3>
+          <ul>
+            <li><strong>Conservative:</strong> 0.5-1% per trade</li>
+            <li><strong>Moderate:</strong> 1-2% per trade</li>
+            <li><strong>Aggressive:</strong> 2-3% per trade (not recommended for beginners)</li>
+          </ul>
+          
+          <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg mt-4">
+            <h4>⚠️ Warning Signs</h4>
+            <ul>
+              <li>Risking more than 5% on any single trade</li>
+              <li>All your positions are in the same sector</li>
+              <li>You're "betting the farm" on one trade</li>
+            </ul>
+          </div>
+        `
+      },
+      {
+        id: 2,
+        title: 'Stop Loss Strategies',
+        duration: '15 min',
+        content: `
+          <h2>Stop Loss Strategies for Options</h2>
+          
+          <p>Traditional stop losses don't work well with options due to volatility. Here are better approaches.</p>
+          
+          <h3>Percentage-Based Stops</h3>
+          <ul>
+            <li><strong>25% Stop:</strong> Exit when position loses 25% of premium paid</li>
+            <li><strong>50% Stop:</strong> More room for volatility, but larger losses</li>
+            <li><strong>75% Stop:</strong> Only for very high-probability trades</li>
+          </ul>
+          
+          <h3>Time-Based Stops</h3>
+          <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+            <p><strong>Rules:</strong></p>
+            <ul>
+              <li>Exit when 50% of time has passed with no profit</li>
+              <li>Always exit with 1 week to expiration</li>
+              <li>Never hold through earnings if unintended</li>
+            </ul>
+          </div>
+          
+          <h3>Technical Stop Losses</h3>
+          <ul>
+            <li>Exit when underlying breaks key support/resistance</li>
+            <li>Use moving averages as dynamic stops</li>
+            <li>Monitor volume for potential reversals</li>
+          </ul>
+          
+          <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg mt-4">
+            <h4>✅ Best Practices</h4>
+            <ul>
+              <li>Set your stop loss BEFORE entering the trade</li>
+              <li>Stick to your plan - emotions lead to losses</li>
+              <li>Consider partial exits to lock in profits</li>
+            </ul>
+          </div>
+        `
+      }
+    ]
+  },
+  'technical-analysis': {
+    title: 'Technical Analysis',
+    description: 'Use charts and indicators to make better trading decisions.',
+    duration: '2.5 hours',
+    difficulty: 'Intermediate',
+    lessons: [
+      {
+        id: 1,
+        title: 'Reading Price Charts',
+        duration: '20 min',
+        content: `
+          <h2>Reading Price Charts for Options Trading</h2>
+          
+          <p>Chart analysis is essential for timing your options entries and exits. Unlike stock trading, options have time decay, making timing critical.</p>
+          
+          <h3>Key Chart Patterns</h3>
+          <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mb-4">
+            <h4>Support and Resistance</h4>
+            <ul>
+              <li><strong>Support:</strong> Price level where buying pressure typically emerges</li>
+              <li><strong>Resistance:</strong> Price level where selling pressure typically emerges</li>
+              <li><strong>Breakouts:</strong> When price moves beyond these levels with volume</li>
+            </ul>
+          </div>
+          
+          <h3>Trend Identification</h3>
+          <ul>
+            <li><strong>Uptrend:</strong> Higher highs and higher lows - consider call options</li>
+            <li><strong>Downtrend:</strong> Lower highs and lower lows - consider put options</li>
+            <li><strong>Sideways:</strong> Range-bound - consider selling strategies</li>
+          </ul>
+          
+          <h3>Volume Analysis</h3>
+          <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+            <h4>Volume Confirms Price Action</h4>
+            <ul>
+              <li>Breakouts with high volume are more reliable</li>
+              <li>Price moves on low volume often reverse</li>
+              <li>Unusual volume can signal major moves</li>
+            </ul>
+          </div>
+          
+          <h3>Time Frames for Options</h3>
+          <ul>
+            <li><strong>Daily Charts:</strong> Best for swing trading (weeks to months)</li>
+            <li><strong>4-Hour Charts:</strong> Good for shorter-term plays</li>
+            <li><strong>Weekly Charts:</strong> For longer-term LEAPS strategies</li>
+          </ul>
+          
+          <div class="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg mt-4">
+            <h4>💡 Pro Tips</h4>
+            <ul>
+              <li>Always check multiple timeframes before trading</li>
+              <li>Wait for clear patterns - unclear setups are losers</li>
+              <li>Consider the overall market trend (SPY/QQQ)</li>
+            </ul>
+          </div>
+        `
+      },
+      {
+        id: 2,
+        title: 'Key Indicators for Options',
+        duration: '22 min',
+        content: `
+          <h2>Essential Indicators for Options Trading</h2>
+          
+          <p>While there are hundreds of indicators, these few are most valuable for options trading timing.</p>
+          
+          <h3>Moving Averages</h3>
+          <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg mb-4">
+            <p><strong>Most Important:</strong></p>
+            <ul>
+              <li><strong>20 EMA:</strong> Short-term trend direction</li>
+              <li><strong>50 SMA:</strong> Medium-term trend</li>
+              <li><strong>200 SMA:</strong> Long-term trend (bull/bear market)</li>
+            </ul>
+          </div>
+          
+          <h3>RSI (Relative Strength Index)</h3>
+          <ul>
+            <li><strong>Above 70:</strong> Potentially overbought - consider puts</li>
+            <li><strong>Below 30:</strong> Potentially oversold - consider calls</li>
+            <li><strong>50 Level:</strong> Neutral - wait for clear direction</li>
+          </ul>
+          
+          <h3>MACD (Moving Average Convergence Divergence)</h3>
+          <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+            <h4>Key Signals:</h4>
+            <ul>
+              <li><strong>Bullish Crossover:</strong> MACD line crosses above signal line</li>
+              <li><strong>Bearish Crossover:</strong> MACD line crosses below signal line</li>
+              <li><strong>Divergence:</strong> Price makes new highs/lows but MACD doesn't</li>
+            </ul>
+          </div>
+          
+          <h3>Bollinger Bands</h3>
+          <ul>
+            <li><strong>Price at Upper Band:</strong> Potential resistance, consider puts</li>
+            <li><strong>Price at Lower Band:</strong> Potential support, consider calls</li>
+            <li><strong>Band Squeeze:</strong> Low volatility, big move coming</li>
+          </ul>
+          
+          <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg mt-4">
+            <h4>⚠️ Common Mistakes</h4>
+            <ul>
+              <li>Using too many indicators (analysis paralysis)</li>
+              <li>Ignoring the overall trend</li>
+              <li>Trading against major support/resistance</li>
+              <li>Not waiting for confirmation</li>
+            </ul>
+          </div>
+        `
+      }
+    ]
   }
 }
 

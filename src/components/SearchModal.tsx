@@ -29,9 +29,9 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
 
-  // Mock search data
+  // Mock search data with current prices (as of market close)
   const searchData: SearchResult[] = [
-    // Symbols
+    // Popular Symbols
     {
       id: 'aapl',
       type: 'symbol',
@@ -51,6 +51,16 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
       change: -1.23,
       changePercent: -0.29,
       href: '/options?symbol=MSFT'
+    },
+    {
+      id: 'nvda',
+      type: 'symbol',
+      title: 'NVDA',
+      subtitle: 'NVIDIA Corporation',
+      price: 489.33,
+      change: 12.45,
+      changePercent: 2.61,
+      href: '/options?symbol=NVDA'
     },
     {
       id: 'tsla',
@@ -73,6 +83,16 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
       href: '/options?symbol=GOOGL'
     },
     {
+      id: 'amzn',
+      type: 'symbol',
+      title: 'AMZN',
+      subtitle: 'Amazon.com Inc.',
+      price: 178.25,
+      change: 1.75,
+      changePercent: 0.99,
+      href: '/options?symbol=AMZN'
+    },
+    {
       id: 'spy',
       type: 'symbol',
       title: 'SPY',
@@ -81,6 +101,26 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
       change: 2.33,
       changePercent: 0.49,
       href: '/options?symbol=SPY'
+    },
+    {
+      id: 'qqq',
+      type: 'symbol',
+      title: 'QQQ',
+      subtitle: 'Invesco QQQ Trust',
+      price: 412.45,
+      change: -0.67,
+      changePercent: -0.16,
+      href: '/options?symbol=QQQ'
+    },
+    {
+      id: 'meta',
+      type: 'symbol',
+      title: 'META',
+      subtitle: 'Meta Platforms Inc.',
+      price: 352.89,
+      change: 4.21,
+      changePercent: 1.21,
+      href: '/options?symbol=META'
     },
     // Courses
     {
@@ -99,6 +139,22 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
       href: '/learn/courses/advanced-strategies',
       icon: BookOpen
     },
+    {
+      id: 'risk-management',
+      type: 'course',
+      title: 'Risk Management',
+      subtitle: 'Essential risk management techniques',
+      href: '/learn/courses/risk-management',
+      icon: BookOpen
+    },
+    {
+      id: 'technical-analysis',
+      type: 'course',
+      title: 'Technical Analysis',
+      subtitle: 'Use charts and indicators effectively',
+      href: '/learn/courses/technical-analysis',
+      icon: BookOpen
+    },
     // Pages
     {
       id: 'portfolio',
@@ -115,6 +171,14 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
       subtitle: 'Market analysis and insights',
       href: '/analytics',
       icon: TrendingUp
+    },
+    {
+      id: 'watchlist',
+      type: 'page',
+      title: 'Watchlist',
+      subtitle: 'Track your favorite symbols',
+      href: '/watchlist',
+      icon: Star
     }
   ]
 
@@ -124,12 +188,30 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
       return
     }
 
+    const upperQuery = query.toUpperCase()
     const filteredResults = searchData.filter(item =>
       item.title.toLowerCase().includes(query.toLowerCase()) ||
       item.subtitle?.toLowerCase().includes(query.toLowerCase())
-    ).slice(0, 8)
+    )
 
-    setResults(filteredResults)
+    // Add dynamic symbol search for any ticker not in our predefined list
+    const isSymbolQuery = /^[A-Z]{1,5}$/i.test(query.trim())
+    const symbolExists = filteredResults.some(item => 
+      item.type === 'symbol' && item.title.toUpperCase() === upperQuery
+    )
+
+    if (isSymbolQuery && !symbolExists && query.trim().length >= 1) {
+      // Add dynamic symbol result
+      filteredResults.unshift({
+        id: `symbol-${upperQuery}`,
+        type: 'symbol',
+        title: upperQuery,
+        subtitle: `Search options for ${upperQuery}`,
+        href: `/options?symbol=${upperQuery}`
+      })
+    }
+
+    setResults(filteredResults.slice(0, 8))
     setSelectedIndex(0)
   }, [query])
 
@@ -177,7 +259,9 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
   const getResultIcon = (result: SearchResult) => {
     if (result.type === 'symbol') {
-      return result.change && result.change >= 0 ? TrendingUp : TrendingDown
+      // For dynamic symbols without price data, use search icon
+      if (!result.change) return Search
+      return result.change >= 0 ? TrendingUp : TrendingDown
     }
     return result.icon || Search
   }
@@ -259,14 +343,18 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                 <div className="flex items-center flex-1">
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 ${
                     result.type === 'symbol' 
-                      ? (result.change && result.change >= 0 ? 'bg-green-100 dark:bg-green-900/20' : 'bg-red-100 dark:bg-red-900/20')
+                      ? result.change 
+                        ? (result.change >= 0 ? 'bg-green-100 dark:bg-green-900/20' : 'bg-red-100 dark:bg-red-900/20')
+                        : 'bg-gray-100 dark:bg-gray-700'
                       : result.type === 'course'
                       ? 'bg-blue-100 dark:bg-blue-900/20'
                       : 'bg-gray-100 dark:bg-gray-700'
                   }`}>
                     <Icon className={`h-4 w-4 ${
                       result.type === 'symbol'
-                        ? (result.change && result.change >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400')
+                        ? result.change
+                          ? (result.change >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400')
+                          : 'text-gray-600 dark:text-gray-400'
                         : result.type === 'course'
                         ? 'text-blue-600 dark:text-blue-400'
                         : 'text-gray-600 dark:text-gray-400'
