@@ -39,9 +39,9 @@ export default function MarketDataPanel({ symbol }: MarketDataPanelProps) {
       // Mock market data - will connect to real API later
       return {
         symbol,
-        price: 189.95,
-        change: 2.45,
-        changePercent: 1.31,
+        price: 196.89,
+        change: 1.84,
+        changePercent: 0.94,
         dayRange: { low: 186.50, high: 191.20 },
         volume: 45234567,
         avgVolume: 52000000,

@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useUser } from '@/contexts/UserContext'
 import { motion } from 'framer-motion'
 import { 
   User, 
@@ -25,24 +26,57 @@ import { Button } from '@/components/ui/Button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 
 export default function Profile() {
+  const { user, setUser, isLoggedIn } = useUser()
   const [isEditing, setIsEditing] = useState(false)
   const [profileData, setProfileData] = useState({
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john.doe@example.com',
-    phone: '+1 (555) 123-4567',
-    location: 'New York, NY',
-    joinDate: '2023-01-15',
-    accountType: 'Pro',
+    firstName: user?.firstName || 'John',
+    lastName: user?.lastName || 'Doe',
+    email: user?.email || 'john.doe@example.com',
+    phone: user?.phone || '+1 (555) 123-4567',
+    location: user?.location || 'New York, NY',
+    joinDate: user?.joinDate || '2023-01-15',
+    accountType: user?.accountType || 'Pro',
     tradingExperience: 'Advanced',
     bio: 'Experienced options trader with a focus on volatility strategies and risk management.'
   })
+
+  useEffect(() => {
+    if (user) {
+      setProfileData({
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phone: user.phone,
+        location: user.location,
+        joinDate: user.joinDate,
+        accountType: user.accountType,
+        tradingExperience: 'Advanced',
+        bio: 'Experienced options trader with a focus on volatility strategies and risk management.'
+      })
+    }
+  }, [user])
 
   const [editedData, setEditedData] = useState(profileData)
   const [activeTab, setActiveTab] = useState<'personal' | 'trading' | 'security' | 'preferences'>('personal')
 
   const handleSave = () => {
     setProfileData(editedData)
+    
+    // Update user context
+    if (user) {
+      const updatedUser = {
+        ...user,
+        firstName: editedData.firstName,
+        lastName: editedData.lastName,
+        email: editedData.email,
+        phone: editedData.phone,
+        location: editedData.location,
+        accountType: editedData.accountType as 'Basic' | 'Pro' | 'Premium'
+      }
+      setUser(updatedUser)
+      localStorage.setItem('user', JSON.stringify(updatedUser))
+    }
+    
     setIsEditing(false)
   }
 

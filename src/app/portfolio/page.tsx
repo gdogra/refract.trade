@@ -218,10 +218,23 @@ export default function Portfolio() {
               <CardTitle>Portfolio Performance</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-64 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-lg">
+              <div className="h-80 flex items-center justify-center bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-800 dark:to-blue-900/20 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600">
                 <div className="text-center">
-                  <Activity className="h-12 w-12 text-gray-400 mx-auto mb-2" />
-                  <p className="text-gray-500">Performance chart coming soon</p>
+                  <div className="flex items-center justify-center space-x-3 mb-4">
+                    <Activity className="h-16 w-16 text-blue-500" />
+                    <TrendingUp className="h-12 w-12 text-green-500" />
+                  </div>
+                  <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                    Performance Chart Coming Soon
+                  </h4>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4 max-w-md">
+                    Interactive charts showing your portfolio performance over time, with customizable timeframes and detailed analytics.
+                  </p>
+                  <div className="flex justify-center space-x-4 text-sm text-gray-500">
+                    <span>• Historical Performance</span>
+                    <span>• Risk Metrics</span>
+                    <span>• Benchmark Comparison</span>
+                  </div>
                 </div>
               </div>
             </CardContent>

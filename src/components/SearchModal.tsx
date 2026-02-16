@@ -37,9 +37,9 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
       type: 'symbol',
       title: 'AAPL',
       subtitle: 'Apple Inc.',
-      price: 189.95,
-      change: 2.45,
-      changePercent: 1.31,
+      price: 196.89,
+      change: 1.84,
+      changePercent: 0.94,
       href: '/options?symbol=AAPL'
     },
     {
@@ -47,9 +47,9 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
       type: 'symbol',
       title: 'MSFT',
       subtitle: 'Microsoft Corporation',
-      price: 415.67,
-      change: -1.23,
-      changePercent: -0.29,
+      price: 421.32,
+      change: 3.47,
+      changePercent: 0.83,
       href: '/options?symbol=MSFT'
     },
     {
@@ -57,9 +57,9 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
       type: 'symbol',
       title: 'NVDA',
       subtitle: 'NVIDIA Corporation',
-      price: 489.33,
-      change: 12.45,
-      changePercent: 2.61,
+      price: 875.28,
+      change: 28.91,
+      changePercent: 3.42,
       href: '/options?symbol=NVDA'
     },
     {
@@ -67,9 +67,9 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
       type: 'symbol',
       title: 'TSLA',
       subtitle: 'Tesla, Inc.',
-      price: 248.42,
-      change: -5.67,
-      changePercent: -2.23,
+      price: 251.75,
+      change: 7.34,
+      changePercent: 3.00,
       href: '/options?symbol=TSLA'
     },
     {

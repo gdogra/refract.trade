@@ -6,6 +6,12 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 
 export default function SettingsPage() {
+  const handleConfigure = (sectionTitle: string, itemLabel: string) => {
+    alert(`Opening configuration for: ${sectionTitle} > ${itemLabel}
+    
+This will open a detailed configuration modal when fully implemented.`)
+  }
+
   const settingsSections = [
     {
       title: 'Account Settings',
@@ -116,7 +122,11 @@ export default function SettingsPage() {
                               {item.description}
                             </p>
                           </div>
-                          <Button variant="ghost" size="sm">
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => handleConfigure(section.title, item.label)}
+                          >
                             Configure
                           </Button>
                         </motion.div>
