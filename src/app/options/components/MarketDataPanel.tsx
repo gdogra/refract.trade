@@ -91,6 +91,21 @@ export default function MarketDataPanel({ symbol }: MarketDataPanelProps) {
     return `${Math.abs(diffDays)} days ago`
   }
 
+  const handleQuickTrade = () => {
+    alert(`Opening quick trade interface for ${symbol}...`)
+    // TODO: Implement quick trade modal
+  }
+
+  const handleBuyCall = () => {
+    alert(`Buy Call for ${symbol} - Opening order entry...`)
+    // TODO: Implement call order entry
+  }
+
+  const handleBuyPut = () => {
+    alert(`Buy Put for ${symbol} - Opening order entry...`)
+    // TODO: Implement put order entry
+  }
+
   return (
     <motion.div 
       className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 sticky top-6"
@@ -238,6 +253,7 @@ export default function MarketDataPanel({ symbol }: MarketDataPanelProps) {
       {/* Action Buttons */}
       <div className="mt-6 space-y-3">
         <motion.button 
+          onClick={handleQuickTrade}
           className="w-full bg-brand-500 hover:bg-brand-600 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
@@ -247,6 +263,7 @@ export default function MarketDataPanel({ symbol }: MarketDataPanelProps) {
         
         <div className="grid grid-cols-2 gap-2">
           <motion.button 
+            onClick={handleBuyCall}
             className="bg-green-100 hover:bg-green-200 dark:bg-green-900/20 dark:hover:bg-green-900/30 text-green-700 dark:text-green-400 py-2 px-3 rounded-lg text-sm font-medium transition-colors"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -255,6 +272,7 @@ export default function MarketDataPanel({ symbol }: MarketDataPanelProps) {
           </motion.button>
           
           <motion.button 
+            onClick={handleBuyPut}
             className="bg-red-100 hover:bg-red-200 dark:bg-red-900/20 dark:hover:bg-red-900/30 text-red-700 dark:text-red-400 py-2 px-3 rounded-lg text-sm font-medium transition-colors"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}

@@ -6,6 +6,11 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 
 export default function Learn() {
+  const handleStartCourse = (courseTitle: string) => {
+    alert(`Starting course: "${courseTitle}"\n\nThis will redirect to the course content when implemented.`)
+    // TODO: Implement actual course navigation
+  }
+
   const courses = [
     {
       id: 1,
@@ -176,7 +181,11 @@ export default function Learn() {
                             {course.difficulty}
                           </span>
                           
-                          <Button size="sm" variant="ghost">
+                          <Button 
+                            size="sm" 
+                            variant="ghost"
+                            onClick={() => handleStartCourse(course.title)}
+                          >
                             Start Course
                           </Button>
                         </div>

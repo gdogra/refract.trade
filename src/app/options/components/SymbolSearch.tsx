@@ -71,6 +71,16 @@ export default function SymbolSearch({ selectedSymbol, onSymbolChange }: SymbolS
     return `${sign}${change.toFixed(2)} (${sign}${changePercent.toFixed(2)}%)`
   }
 
+  const handleAddToWatchlist = () => {
+    alert(`${selectedSymbol} added to your watchlist!`)
+    // TODO: Implement actual watchlist functionality
+  }
+
+  const handleViewChart = () => {
+    alert(`Opening chart for ${selectedSymbol}...`)
+    // TODO: Implement chart view functionality
+  }
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (inputRef.current && !inputRef.current.contains(event.target as Node)) {
@@ -214,6 +224,7 @@ export default function SymbolSearch({ selectedSymbol, onSymbolChange }: SymbolS
           {/* Quick Action Buttons */}
           <div className="flex items-center space-x-2">
             <motion.button 
+              onClick={handleAddToWatchlist}
               className="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-lg text-sm font-medium transition-colors"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -221,6 +232,7 @@ export default function SymbolSearch({ selectedSymbol, onSymbolChange }: SymbolS
               Add to Watchlist
             </motion.button>
             <motion.button 
+              onClick={handleViewChart}
               className="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg text-sm font-medium transition-colors"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}

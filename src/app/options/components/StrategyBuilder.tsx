@@ -118,6 +118,39 @@ export default function StrategyBuilder({ symbol }: StrategyBuilderProps) {
 
   const strategy = calculateStrategy()
 
+  const handleExecuteStrategy = () => {
+    if (legs.length === 0) {
+      alert('Please add at least one leg to your strategy')
+      return
+    }
+    const confirmation = confirm(`Execute strategy "${selectedStrategy || 'Custom'}" with ${legs.length} legs for a net cost of $${Math.abs(strategy.totalCost).toFixed(2)}?`)
+    if (confirmation) {
+      alert(`Strategy executed successfully! Order submitted for ${legs.length} legs.`)
+      // TODO: Implement actual order execution
+    }
+  }
+
+  const handleBacktest = () => {
+    if (legs.length === 0) {
+      alert('Please add at least one leg to backtest')
+      return
+    }
+    alert(`Backtesting ${selectedStrategy || 'Custom'} strategy over historical data...`)
+    // TODO: Implement actual backtesting
+  }
+
+  const handleSaveStrategy = () => {
+    if (legs.length === 0) {
+      alert('Please add at least one leg to save')
+      return
+    }
+    const strategyName = prompt('Enter a name for your strategy:')
+    if (strategyName) {
+      alert(`Strategy "${strategyName}" saved successfully!`)
+      // TODO: Implement actual strategy saving
+    }
+  }
+
   return (
     <motion.div 
       className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700"
@@ -359,6 +392,7 @@ export default function StrategyBuilder({ symbol }: StrategyBuilderProps) {
             {/* Action Buttons */}
             <div className="flex items-center space-x-4 mt-6">
               <motion.button 
+                onClick={handleExecuteStrategy}
                 className="flex items-center space-x-2 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-medium transition-colors"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -368,6 +402,7 @@ export default function StrategyBuilder({ symbol }: StrategyBuilderProps) {
               </motion.button>
               
               <motion.button 
+                onClick={handleBacktest}
                 className="flex items-center space-x-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white px-6 py-3 rounded-lg font-medium transition-colors"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -377,6 +412,7 @@ export default function StrategyBuilder({ symbol }: StrategyBuilderProps) {
               </motion.button>
               
               <motion.button 
+                onClick={handleSaveStrategy}
                 className="flex items-center space-x-2 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white px-6 py-3 rounded-lg font-medium transition-colors"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}

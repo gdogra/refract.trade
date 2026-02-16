@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
-import { Calendar, TrendingUp, TrendingDown, Volume, Activity } from 'lucide-react'
+import { Calendar, TrendingUp, TrendingDown, Volume, Activity, ShoppingCart } from 'lucide-react'
 
 interface OptionContract {
   strike: number
@@ -115,6 +115,16 @@ export default function OptionsChainTable({
   const formatGreek = (value: number, decimals = 3) => value.toFixed(decimals)
   const formatPercent = (value: number) => `${(value * 100).toFixed(1)}%`
 
+  const handleBuyCall = (strike: number, price: number) => {
+    alert(`Buy Call: Strike ${strike}, Price $${formatPrice(price)}`)
+    // TODO: Implement actual order placement
+  }
+
+  const handleBuyPut = (strike: number, price: number) => {
+    alert(`Buy Put: Strike ${strike}, Price $${formatPrice(price)}`)
+    // TODO: Implement actual order placement
+  }
+
   if (isLoading) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
@@ -200,17 +210,19 @@ export default function OptionsChainTable({
               {showGreeks && (
                 <>
                   <th className="px-2 py-2 text-left">Delta</th>
-                  <th className="px-2 py-2 text-left border-r border-gray-200 dark:border-gray-600">Theta</th>
+                  <th className="px-2 py-2 text-left">Theta</th>
                 </>
               )}
+              <th className="px-2 py-2 text-center border-r border-gray-200 dark:border-gray-600">Action</th>
               
               {/* Strike */}
               <th className="px-4 py-2 text-center font-semibold">Price</th>
               
               {/* Put Headers */}
+              <th className="px-2 py-2 text-center border-l border-gray-200 dark:border-gray-600">Action</th>
               {showGreeks && (
                 <>
-                  <th className="px-2 py-2 text-left border-l border-gray-200 dark:border-gray-600">Delta</th>
+                  <th className="px-2 py-2 text-left">Delta</th>
                   <th className="px-2 py-2 text-left">Theta</th>
                 </>
               )}
@@ -259,11 +271,27 @@ export default function OptionsChainTable({
                       <td className={`px-2 py-3 text-sm text-gray-900 dark:text-white ${isITM.call ? 'bg-green-50 dark:bg-green-900/20' : ''}`}>
                         {formatGreek(option.call.delta)}
                       </td>
-                      <td className={`px-2 py-3 text-sm text-red-600 border-r border-gray-200 dark:border-gray-600 ${isITM.call ? 'bg-green-50 dark:bg-green-900/20' : ''}`}>
+                      <td className={`px-2 py-3 text-sm text-red-600 ${isITM.call ? 'bg-green-50 dark:bg-green-900/20' : ''}`}>
                         {formatGreek(option.call.theta, 1)}
                       </td>
                     </>
                   )}
+                  
+                  {/* Buy Call Button */}
+                  <td className={`px-2 py-3 text-center border-r border-gray-200 dark:border-gray-600 ${isITM.call ? 'bg-green-50 dark:bg-green-900/20' : ''}`}>
+                    <motion.button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleBuyCall(option.strike, option.call.ask)
+                      }}
+                      className="bg-green-600 hover:bg-green-700 text-white text-xs px-2 py-1 rounded flex items-center space-x-1"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <ShoppingCart className="h-3 w-3" />
+                      <span>Buy</span>
+                    </motion.button>
+                  </td>
 
                   {/* Strike Price */}
                   <td className="px-4 py-3 text-center">
@@ -275,9 +303,25 @@ export default function OptionsChainTable({
                   </td>
 
                   {/* Put Data */}
+                  {/* Buy Put Button */}
+                  <td className={`px-2 py-3 text-center border-l border-gray-200 dark:border-gray-600 ${isITM.put ? 'bg-red-50 dark:bg-red-900/20' : ''}`}>
+                    <motion.button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleBuyPut(option.strike, option.put.ask)
+                      }}
+                      className="bg-red-600 hover:bg-red-700 text-white text-xs px-2 py-1 rounded flex items-center space-x-1"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <ShoppingCart className="h-3 w-3" />
+                      <span>Buy</span>
+                    </motion.button>
+                  </td>
+                  
                   {showGreeks && (
                     <>
-                      <td className={`px-2 py-3 text-sm text-gray-900 dark:text-white border-l border-gray-200 dark:border-gray-600 ${isITM.put ? 'bg-red-50 dark:bg-red-900/20' : ''}`}>
+                      <td className={`px-2 py-3 text-sm text-gray-900 dark:text-white ${isITM.put ? 'bg-red-50 dark:bg-red-900/20' : ''}`}>
                         {formatGreek(option.put.delta)}
                       </td>
                       <td className={`px-2 py-3 text-sm text-red-600 ${isITM.put ? 'bg-red-50 dark:bg-red-900/20' : ''}`}>
