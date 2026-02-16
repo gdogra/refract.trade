@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Star, Plus, TrendingUp, TrendingDown, Volume, Activity, X, Search } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
@@ -19,6 +20,7 @@ interface WatchlistItem {
 }
 
 export default function Watchlist() {
+  const router = useRouter()
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>([
     {
       symbol: 'AAPL',
@@ -99,7 +101,7 @@ export default function Watchlist() {
   }
 
   const handleViewOptions = (symbol: string) => {
-    window.location.href = `/options?symbol=${symbol}`
+    router.push(`/options?symbol=${symbol}`)
   }
 
   return (

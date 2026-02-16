@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Home, 
@@ -17,7 +17,8 @@ import {
   Zap,
   TrendingUp,
   PieChart,
-  Bell
+  Bell,
+  Star
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import SearchModal from '@/components/SearchModal'
@@ -46,6 +47,11 @@ const navigationItems = [
     icon: PieChart
   },
   {
+    name: 'Watchlist',
+    href: '/watchlist',
+    icon: Star
+  },
+  {
     name: 'Learn',
     href: '/learn',
     icon: BookOpen
@@ -58,19 +64,86 @@ export default function Navigation() {
   const [showSearchModal, setShowSearchModal] = useState(false)
   const [showNotificationModal, setShowNotificationModal] = useState(false)
   const [unreadCount, setUnreadCount] = useState(0)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [showSearchResults, setShowSearchResults] = useState(false)
+  const [searchResults, setSearchResults] = useState<any[]>([])
+  const [selectedSearchIndex, setSelectedSearchIndex] = useState(0)
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const pathname = usePathname()
+  const router = useRouter()
+
+  // Search data for autocomplete
+  const searchData = [
+    { id: 'aapl', type: 'symbol', title: 'AAPL', subtitle: 'Apple Inc.', href: '/options?symbol=AAPL' },
+    { id: 'msft', type: 'symbol', title: 'MSFT', subtitle: 'Microsoft Corporation', href: '/options?symbol=MSFT' },
+    { id: 'nvda', type: 'symbol', title: 'NVDA', subtitle: 'NVIDIA Corporation', href: '/options?symbol=NVDA' },
+    { id: 'tsla', type: 'symbol', title: 'TSLA', subtitle: 'Tesla, Inc.', href: '/options?symbol=TSLA' },
+    { id: 'googl', type: 'symbol', title: 'GOOGL', subtitle: 'Alphabet Inc.', href: '/options?symbol=GOOGL' },
+    { id: 'amzn', type: 'symbol', title: 'AMZN', subtitle: 'Amazon.com Inc.', href: '/options?symbol=AMZN' },
+    { id: 'spy', type: 'symbol', title: 'SPY', subtitle: 'SPDR S&P 500 ETF', href: '/options?symbol=SPY' },
+    { id: 'portfolio', type: 'page', title: 'Portfolio', subtitle: 'View your positions', href: '/portfolio' },
+    { id: 'analytics', type: 'page', title: 'Analytics', subtitle: 'Advanced analysis tools', href: '/analytics' },
+    { id: 'watchlist', type: 'page', title: 'Watchlist', subtitle: 'Your saved symbols', href: '/watchlist' }
+  ]
+
+  // Search logic
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults([])
+      setShowSearchResults(false)
+      return
+    }
+
+    const upperQuery = searchQuery.toUpperCase()
+    const filteredResults = searchData.filter(item =>
+      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.subtitle?.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+
+    // Add dynamic symbol search for any ticker not in our predefined list
+    const isSymbolQuery = /^[A-Z]{1,5}$/i.test(searchQuery.trim())
+    const symbolExists = filteredResults.some(item => 
+      item.type === 'symbol' && item.title.toUpperCase() === upperQuery
+    )
+
+    if (isSymbolQuery && !symbolExists && searchQuery.trim().length >= 1) {
+      filteredResults.unshift({
+        id: `symbol-${upperQuery}`,
+        type: 'symbol',
+        title: upperQuery,
+        subtitle: `Search options for ${upperQuery}`,
+        href: `/options?symbol=${upperQuery}`
+      })
+    }
+
+    setSearchResults(filteredResults.slice(0, 6))
+    setSelectedSearchIndex(0)
+    setShowSearchResults(true)
+  }, [searchQuery])
 
   // Keyboard shortcut for search (Cmd+K or Ctrl+K)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault()
-        setShowSearchModal(true)
+        searchInputRef.current?.focus()
       }
     }
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
+  // Click outside to close search results
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchInputRef.current && !searchInputRef.current.closest('.search-container')?.contains(e.target as Node)) {
+        setShowSearchResults(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
   // Subscribe to notification updates
@@ -84,6 +157,43 @@ export default function Navigation() {
     
     return unsubscribe
   }, [])
+
+  // Search handlers
+  const handleSearchKeyDown = (e: React.KeyboardEvent) => {
+    if (!searchResults.length) return
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault()
+        setSelectedSearchIndex(prev => 
+          prev < searchResults.length - 1 ? prev + 1 : 0
+        )
+        break
+      case 'ArrowUp':
+        e.preventDefault()
+        setSelectedSearchIndex(prev => 
+          prev > 0 ? prev - 1 : searchResults.length - 1
+        )
+        break
+      case 'Enter':
+        e.preventDefault()
+        if (selectedSearchIndex < searchResults.length) {
+          handleSearchSelect(searchResults[selectedSearchIndex])
+        }
+        break
+      case 'Escape':
+        setShowSearchResults(false)
+        searchInputRef.current?.blur()
+        break
+    }
+  }
+
+  const handleSearchSelect = (result: any) => {
+    router.push(result.href)
+    setSearchQuery('')
+    setShowSearchResults(false)
+    searchInputRef.current?.blur()
+  }
 
   // Don't show navigation on auth pages
   if (pathname?.startsWith('/auth')) {
@@ -133,15 +243,66 @@ export default function Navigation() {
 
           {/* Right side - Search, Notifications, User Menu */}
           <div className="flex items-center space-x-4">
-            {/* Search Button */}
+            {/* Search Input with Autocomplete */}
+            <div className="relative hidden sm:block search-container">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  placeholder="Search symbols, pages..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={handleSearchKeyDown}
+                  onFocus={() => searchQuery && setShowSearchResults(true)}
+                  className="w-64 pl-10 pr-4 py-2 text-sm bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+              
+              {/* Autocomplete Dropdown */}
+              <AnimatePresence>
+                {showSearchResults && searchResults.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50"
+                  >
+                    {searchResults.map((result, index) => (
+                      <motion.button
+                        key={result.id}
+                        onClick={() => handleSearchSelect(result)}
+                        className={`w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-3 ${
+                          index === selectedSearchIndex ? 'bg-gray-100 dark:bg-gray-700' : ''
+                        }`}
+                        whileHover={{ scale: 1.01 }}
+                      >
+                        <div className={`w-2 h-2 rounded-full ${
+                          result.type === 'symbol' ? 'bg-green-500' : 'bg-blue-500'
+                        }`} />
+                        <div>
+                          <div className="font-medium text-gray-900 dark:text-white">
+                            {result.title}
+                          </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            {result.subtitle}
+                          </div>
+                        </div>
+                      </motion.button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Mobile Search Button */}
             <Button 
               variant="ghost" 
               size="sm" 
-              className="hidden sm:flex"
+              className="sm:hidden"
               onClick={() => setShowSearchModal(true)}
             >
               <Search className="h-4 w-4" />
-              <span className="ml-2">Search</span>
             </Button>
 
             {/* Notifications */}

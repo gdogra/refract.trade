@@ -1,15 +1,25 @@
 'use client'
 
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Settings, User, Bell, Shield, Palette, Globe, LogOut } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import SettingsConfigModal from '@/components/SettingsConfigModal'
 
 export default function SettingsPage() {
+  const [showModal, setShowModal] = useState(false)
+  const [modalConfig, setModalConfig] = useState<{sectionTitle: string, itemLabel: string} | null>(null)
+
   const handleConfigure = (sectionTitle: string, itemLabel: string) => {
-    alert(`Opening configuration for: ${sectionTitle} > ${itemLabel}
-    
-This will open a detailed configuration modal when fully implemented.`)
+    setModalConfig({ sectionTitle, itemLabel })
+    setShowModal(true)
+  }
+
+  const handleSave = (data: any) => {
+    console.log('Saving configuration:', data)
+    // Here you would typically save to a backend or localStorage
+    // For demo purposes, we'll just log it
   }
 
   const settingsSections = [
@@ -194,6 +204,18 @@ This will open a detailed configuration modal when fully implemented.`)
             </span>
           </div>
         </motion.div>
+
+        {/* Settings Configuration Modal */}
+        <SettingsConfigModal
+          isOpen={showModal}
+          config={modalConfig ? {
+            sectionTitle: modalConfig.sectionTitle,
+            itemLabel: modalConfig.itemLabel,
+            onClose: () => setShowModal(false),
+            onSave: handleSave
+          } : null}
+          onClose={() => setShowModal(false)}
+        />
       </div>
     </div>
   )

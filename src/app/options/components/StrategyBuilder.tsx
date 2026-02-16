@@ -57,10 +57,14 @@ const predefinedStrategies = [
 export default function StrategyBuilder({ symbol }: StrategyBuilderProps) {
   const [legs, setLegs] = useState<OptionLeg[]>([])
   const [selectedStrategy, setSelectedStrategy] = useState('')
+  const [legCounter, setLegCounter] = useState(0)
 
   const addLeg = () => {
+    const newId = `leg-${Date.now()}-${legCounter}`
+    setLegCounter(prev => prev + 1)
+    
     const newLeg: OptionLeg = {
-      id: Math.random().toString(),
+      id: newId,
       type: 'call',
       action: 'buy',
       strike: 190,
@@ -82,8 +86,9 @@ export default function StrategyBuilder({ symbol }: StrategyBuilderProps) {
   const loadStrategy = (strategyName: string) => {
     const strategy = predefinedStrategies.find(s => s.name === strategyName)
     if (strategy) {
+      const currentTime = Date.now()
       const newLegs: OptionLeg[] = strategy.legs.map((leg, index) => ({
-        id: Math.random().toString(),
+        id: `strategy-${currentTime}-${index}`,
         type: leg.type as 'call' | 'put',
         action: leg.action as 'buy' | 'sell',
         strike: leg.strike,
@@ -93,6 +98,7 @@ export default function StrategyBuilder({ symbol }: StrategyBuilderProps) {
       }))
       setLegs(newLegs)
       setSelectedStrategy(strategyName)
+      setLegCounter(strategy.legs.length)
     }
   }
 

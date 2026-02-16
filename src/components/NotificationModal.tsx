@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Bell, 
@@ -25,6 +26,7 @@ interface NotificationModalProps {
 export default function NotificationModal({ isOpen, onClose }: NotificationModalProps) {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [selectedTab, setSelectedTab] = useState<'all' | 'unread'>('all')
+  const router = useRouter()
 
   useEffect(() => {
     const unsubscribe = notificationService.subscribe(setNotifications)
@@ -260,7 +262,7 @@ export default function NotificationModal({ isOpen, onClose }: NotificationModal
                         {notification.data?.symbol && (
                           <button
                             onClick={() => {
-                              window.location.href = `/options?symbol=${notification.data.symbol}`
+                              router.push(`/options?symbol=${notification.data.symbol}`)
                               onClose()
                             }}
                             className="text-xs text-brand-600 hover:text-brand-700 font-medium mt-2 flex items-center"

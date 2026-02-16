@@ -1,11 +1,13 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { useRouter } from 'next/navigation'
 import { BookOpen, Play, Clock, Star, TrendingUp, Shield, Target, Lightbulb } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 
 export default function Learn() {
+  const router = useRouter()
   const handleStartCourse = (courseTitle: string) => {
     const courseMap: Record<string, string> = {
       'Options Trading Fundamentals': 'options-fundamentals',
@@ -16,7 +18,7 @@ export default function Learn() {
     
     const courseId = courseMap[courseTitle]
     if (courseId) {
-      window.location.href = `/learn/courses/${courseId}`
+      router.push(`/learn/courses/${courseId}`)
     } else {
       alert(`Course "${courseTitle}" is coming soon!`)
     }

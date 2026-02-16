@@ -26,15 +26,15 @@ import { Button } from '@/components/ui/Button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 
 export default function Profile() {
-  const { user, setUser, isLoggedIn } = useUser()
+  const { user, updateUser, isLoggedIn } = useUser()
   const [isEditing, setIsEditing] = useState(false)
   const [profileData, setProfileData] = useState({
-    firstName: user?.firstName || 'John',
-    lastName: user?.lastName || 'Doe',
-    email: user?.email || 'john.doe@example.com',
-    phone: user?.phone || '+1 (555) 123-4567',
-    location: user?.location || 'New York, NY',
-    joinDate: user?.joinDate || '2023-01-15',
+    firstName: user?.firstName || 'Alex',
+    lastName: user?.lastName || 'Chen',
+    email: user?.email || 'alex.chen@email.com',
+    phone: user?.phone || '+1 (555) 987-6543',
+    location: user?.location || 'San Francisco, CA',
+    joinDate: user?.joinDate || new Date().toISOString().split('T')[0],
     accountType: user?.accountType || 'Pro',
     tradingExperience: 'Advanced',
     bio: 'Experienced options trader with a focus on volatility strategies and risk management.'
@@ -62,20 +62,15 @@ export default function Profile() {
   const handleSave = () => {
     setProfileData(editedData)
     
-    // Update user context
-    if (user) {
-      const updatedUser = {
-        ...user,
-        firstName: editedData.firstName,
-        lastName: editedData.lastName,
-        email: editedData.email,
-        phone: editedData.phone,
-        location: editedData.location,
-        accountType: editedData.accountType as 'Basic' | 'Pro' | 'Premium'
-      }
-      setUser(updatedUser)
-      localStorage.setItem('user', JSON.stringify(updatedUser))
-    }
+    // Update user context using the new updateUser function
+    updateUser({
+      firstName: editedData.firstName,
+      lastName: editedData.lastName,
+      email: editedData.email,
+      phone: editedData.phone,
+      location: editedData.location,
+      accountType: editedData.accountType as 'Basic' | 'Pro' | 'Premium'
+    })
     
     setIsEditing(false)
   }

@@ -1,11 +1,17 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { TrendingUp, TrendingDown, DollarSign, PieChart, Activity, Target } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
+import { orderService } from '@/lib/orderService'
 
 export default function Portfolio() {
-  const positions = [
+  const [positions, setPositions] = useState<any[]>([])
+  const [orders, setOrders] = useState<any[]>([])
+
+  // Default positions for demo
+  const defaultPositions = [
     {
       symbol: 'AAPL',
       quantity: 100,
@@ -34,6 +40,46 @@ export default function Portfolio() {
       value: 85150
     }
   ]
+
+  // Load positions and orders from orderService
+  useEffect(() => {
+    const updatePortfolio = () => {
+      const optionPositions = orderService.getPositions()
+      const allOrders = orderService.getOrders()
+      
+      // Combine default stock positions with option positions
+      const combinedPositions = [
+        ...defaultPositions,
+        ...optionPositions.map(pos => ({
+          symbol: `${pos.symbol} ${pos.strike}${pos.type.charAt(0).toUpperCase()}`,
+          quantity: pos.quantity,
+          avgPrice: pos.avgPrice,
+          currentPrice: pos.avgPrice, // Mock current price
+          change: pos.pnl / (pos.quantity * 100),
+          changePercent: (pos.pnl / Math.abs(pos.totalCost)) * 100,
+          value: pos.currentValue,
+          type: 'option'
+        }))
+      ]
+      
+      setPositions(combinedPositions)
+      setOrders(allOrders)
+    }
+    
+    // Initial load
+    updatePortfolio()
+    
+    // Subscribe to order updates
+    const unsubscribe = orderService.subscribe(updatePortfolio)
+    
+    // Also refresh every 10 seconds
+    const interval = setInterval(updatePortfolio, 10000)
+    
+    return () => {
+      unsubscribe()
+      clearInterval(interval)
+    }
+  }, [])
 
   const totalValue = positions.reduce((sum, pos) => sum + pos.value, 0)
   const totalChange = positions.reduce((sum, pos) => sum + (pos.change * pos.quantity), 0)

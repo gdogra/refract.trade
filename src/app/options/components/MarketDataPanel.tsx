@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { TrendingUp, TrendingDown, Volume, Activity, Clock, DollarSign } from 'lucide-react'
 import OrderModal from '@/components/OrderModal'
@@ -32,6 +33,7 @@ interface MarketDataPanelProps {
 export default function MarketDataPanel({ symbol }: MarketDataPanelProps) {
   const [showOrderModal, setShowOrderModal] = useState(false)
   const [orderRequest, setOrderRequest] = useState<OrderRequest | null>(null)
+  const router = useRouter()
 
   const { data: marketData, isLoading } = useQuery<MarketData>({
     queryKey: ['market-data', symbol],
@@ -99,7 +101,7 @@ export default function MarketDataPanel({ symbol }: MarketDataPanelProps) {
 
   const handleQuickTrade = () => {
     // Quick trade opens the options chain for immediate trading
-    window.location.href = `/options?symbol=${symbol}`
+    router.push(`/options?symbol=${symbol}`)
   }
 
   const handleBuyCall = () => {
