@@ -1,8 +1,11 @@
 'use client'
 
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { TrendingUp, TrendingDown, Volume, Activity, Clock, DollarSign } from 'lucide-react'
+import OrderModal from '@/components/OrderModal'
+import { type OrderRequest } from '@/lib/orderService'
 
 interface MarketData {
   symbol: string
@@ -27,6 +30,9 @@ interface MarketDataPanelProps {
 }
 
 export default function MarketDataPanel({ symbol }: MarketDataPanelProps) {
+  const [showOrderModal, setShowOrderModal] = useState(false)
+  const [orderRequest, setOrderRequest] = useState<OrderRequest | null>(null)
+
   const { data: marketData, isLoading } = useQuery<MarketData>({
     queryKey: ['market-data', symbol],
     queryFn: async () => {
@@ -92,18 +98,40 @@ export default function MarketDataPanel({ symbol }: MarketDataPanelProps) {
   }
 
   const handleQuickTrade = () => {
-    alert(`Opening quick trade interface for ${symbol}...`)
-    // TODO: Implement quick trade modal
+    // Quick trade opens the options chain for immediate trading
+    window.location.href = `/options?symbol=${symbol}`
   }
 
   const handleBuyCall = () => {
-    alert(`Buy Call for ${symbol} - Opening order entry...`)
-    // TODO: Implement call order entry
+    // Create a buy call order for the current symbol
+    const orderRequest = {
+      symbol,
+      type: 'call' as const,
+      action: 'buy' as const,
+      strike: Math.round((marketData?.price || 190) * 1.05), // 5% OTM
+      expiry: '2024-01-19',
+      quantity: 1,
+      price: 2.50
+    }
+    
+    setOrderRequest(orderRequest)
+    setShowOrderModal(true)
   }
 
   const handleBuyPut = () => {
-    alert(`Buy Put for ${symbol} - Opening order entry...`)
-    // TODO: Implement put order entry
+    // Create a buy put order for the current symbol
+    const orderRequest = {
+      symbol,
+      type: 'put' as const,
+      action: 'buy' as const,
+      strike: Math.round((marketData?.price || 190) * 0.95), // 5% OTM
+      expiry: '2024-01-19',
+      quantity: 1,
+      price: 2.00
+    }
+    
+    setOrderRequest(orderRequest)
+    setShowOrderModal(true)
   }
 
   return (
@@ -296,6 +324,20 @@ export default function MarketDataPanel({ symbol }: MarketDataPanelProps) {
           Unusual volume in weekly calls
         </div>
       </motion.div>
+
+      {/* Order Modal */}
+      <OrderModal
+        isOpen={showOrderModal}
+        onClose={() => {
+          setShowOrderModal(false)
+          setOrderRequest(null)
+        }}
+        orderRequest={orderRequest}
+        onOrderSubmitted={(orderId) => {
+          console.log('Order submitted:', orderId)
+          // Could show a success toast or redirect to portfolio
+        }}
+      />
     </motion.div>
   )
 }

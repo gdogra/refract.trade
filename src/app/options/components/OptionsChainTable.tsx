@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { Calendar, TrendingUp, TrendingDown, Volume, Activity, ShoppingCart } from 'lucide-react'
+import OrderModal from '@/components/OrderModal'
+import { type OrderRequest } from '@/lib/orderService'
 
 interface OptionContract {
   strike: number
@@ -49,6 +51,8 @@ export default function OptionsChainTable({
   onStrikeSelect 
 }: OptionsChainTableProps) {
   const [showGreeks, setShowGreeks] = useState(false)
+  const [showOrderModal, setShowOrderModal] = useState(false)
+  const [orderRequest, setOrderRequest] = useState<OrderRequest | null>(null)
 
   const { data: expirations } = useQuery({
     queryKey: ['option-expirations', symbol],
@@ -116,13 +120,33 @@ export default function OptionsChainTable({
   const formatPercent = (value: number) => `${(value * 100).toFixed(1)}%`
 
   const handleBuyCall = (strike: number, price: number) => {
-    alert(`Buy Call: Strike ${strike}, Price $${formatPrice(price)}`)
-    // TODO: Implement actual order placement
+    const orderReq = {
+      symbol,
+      type: 'call' as const,
+      action: 'buy' as const,
+      strike,
+      expiry: selectedExpiry || '2024-01-19',
+      quantity: 1,
+      price
+    }
+    
+    setOrderRequest(orderReq)
+    setShowOrderModal(true)
   }
 
   const handleBuyPut = (strike: number, price: number) => {
-    alert(`Buy Put: Strike ${strike}, Price $${formatPrice(price)}`)
-    // TODO: Implement actual order placement
+    const orderReq = {
+      symbol,
+      type: 'put' as const,
+      action: 'buy' as const,
+      strike,
+      expiry: selectedExpiry || '2024-01-19',
+      quantity: 1,
+      price
+    }
+    
+    setOrderRequest(orderReq)
+    setShowOrderModal(true)
   }
 
   if (isLoading) {
@@ -368,6 +392,19 @@ export default function OptionsChainTable({
           </div>
         </div>
       </div>
+
+      {/* Order Modal */}
+      <OrderModal
+        isOpen={showOrderModal}
+        onClose={() => {
+          setShowOrderModal(false)
+          setOrderRequest(null)
+        }}
+        orderRequest={orderRequest}
+        onOrderSubmitted={(orderId) => {
+          console.log('Order submitted:', orderId)
+        }}
+      />
     </motion.div>
   )
 }

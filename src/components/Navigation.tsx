@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -20,6 +20,9 @@ import {
   Bell
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
+import SearchModal from '@/components/SearchModal'
+import NotificationModal from '@/components/NotificationModal'
+import { notificationService } from '@/lib/notificationService'
 
 const navigationItems = [
   {
@@ -52,7 +55,35 @@ const navigationItems = [
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
+  const [showSearchModal, setShowSearchModal] = useState(false)
+  const [showNotificationModal, setShowNotificationModal] = useState(false)
+  const [unreadCount, setUnreadCount] = useState(0)
   const pathname = usePathname()
+
+  // Keyboard shortcut for search (Cmd+K or Ctrl+K)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        setShowSearchModal(true)
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
+  // Subscribe to notification updates
+  useEffect(() => {
+    const unsubscribe = notificationService.subscribe(() => {
+      setUnreadCount(notificationService.getUnreadCount())
+    })
+    
+    // Set initial count
+    setUnreadCount(notificationService.getUnreadCount())
+    
+    return unsubscribe
+  }, [])
 
   // Don't show navigation on auth pages
   if (pathname?.startsWith('/auth')) {
@@ -103,15 +134,29 @@ export default function Navigation() {
           {/* Right side - Search, Notifications, User Menu */}
           <div className="flex items-center space-x-4">
             {/* Search Button */}
-            <Button variant="ghost" size="sm" className="hidden sm:flex">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="hidden sm:flex"
+              onClick={() => setShowSearchModal(true)}
+            >
               <Search className="h-4 w-4" />
               <span className="ml-2">Search</span>
             </Button>
 
             {/* Notifications */}
-            <Button variant="ghost" size="sm" className="relative">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="relative"
+              onClick={() => setShowNotificationModal(true)}
+            >
               <Bell className="h-4 w-4" />
-              <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full"></span>
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
             </Button>
 
             {/* User Menu */}
@@ -206,6 +251,26 @@ export default function Navigation() {
           )}
         </AnimatePresence>
       </div>
+
+      {/* Search Modal */}
+      <AnimatePresence>
+        {showSearchModal && (
+          <SearchModal
+            isOpen={showSearchModal}
+            onClose={() => setShowSearchModal(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Notification Modal */}
+      <AnimatePresence>
+        {showNotificationModal && (
+          <NotificationModal
+            isOpen={showNotificationModal}
+            onClose={() => setShowNotificationModal(false)}
+          />
+        )}
+      </AnimatePresence>
     </nav>
   )
 }

@@ -7,8 +7,19 @@ import { Button } from '@/components/ui/Button'
 
 export default function Learn() {
   const handleStartCourse = (courseTitle: string) => {
-    alert(`Starting course: "${courseTitle}"\n\nThis will redirect to the course content when implemented.`)
-    // TODO: Implement actual course navigation
+    const courseMap: Record<string, string> = {
+      'Options Trading Fundamentals': 'options-fundamentals',
+      'Advanced Strategies': 'advanced-strategies',
+      'Risk Management': 'risk-management',
+      'Technical Analysis': 'technical-analysis'
+    }
+    
+    const courseId = courseMap[courseTitle]
+    if (courseId) {
+      window.location.href = `/learn/courses/${courseId}`
+    } else {
+      alert(`Course "${courseTitle}" is coming soon!`)
+    }
   }
 
   const courses = [
