@@ -19,42 +19,6 @@ interface WatchlistItem {
   added: Date
 }
 
-// Default watchlist items
-const defaultWatchlistItems: WatchlistItem[] = [
-  {
-    symbol: 'AAPL',
-    name: 'Apple Inc.',
-    price: 189.95,
-    change: 2.45,
-    changePercent: 1.31,
-    volume: 45234567,
-    marketCap: 2950000000000,
-    pe: 28.5,
-    added: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
-  },
-  {
-    symbol: 'NVDA',
-    name: 'NVIDIA Corporation',
-    price: 489.33,
-    change: 12.45,
-    changePercent: 2.61,
-    volume: 56789012,
-    marketCap: 1200000000000,
-    pe: 65.2,
-    added: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
-  },
-  {
-    symbol: 'TSLA',
-    name: 'Tesla, Inc.',
-    price: 248.42,
-    change: -5.67,
-    changePercent: -2.23,
-    volume: 67890123,
-    marketCap: 790000000000,
-    pe: 45.8,
-    added: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-  }
-]
 
 export default function Watchlist() {
   const router = useRouter()
@@ -65,10 +29,6 @@ export default function Watchlist() {
     const savedWatchlist = localStorage.getItem('userWatchlist')
     if (savedWatchlist) {
       setWatchlist(JSON.parse(savedWatchlist))
-    } else {
-      // Initialize with default items
-      setWatchlist(defaultWatchlistItems)
-      localStorage.setItem('userWatchlist', JSON.stringify(defaultWatchlistItems))
     }
   }, [])
 
@@ -96,24 +56,13 @@ export default function Watchlist() {
     return num.toLocaleString()
   }
 
-  const handleAddSymbol = () => {
+  const handleAddSymbol = async () => {
     if (!newSymbol.trim() || watchlist.some(item => item.symbol === newSymbol.toUpperCase())) {
       return
     }
 
-    const mockItem: WatchlistItem = {
-      symbol: newSymbol.toUpperCase(),
-      name: `${newSymbol.toUpperCase()} Corporation`,
-      price: Math.random() * 500 + 50,
-      change: (Math.random() - 0.5) * 20,
-      changePercent: (Math.random() - 0.5) * 5,
-      volume: Math.floor(Math.random() * 100000000) + 1000000,
-      marketCap: Math.floor(Math.random() * 1000000000000) + 10000000000,
-      pe: Math.random() * 100 + 10,
-      added: new Date()
-    }
-
-    setWatchlist([mockItem, ...watchlist])
+    // TODO: Replace with real API call to fetch symbol data
+    alert(`Symbol ${newSymbol.toUpperCase()} will be added when API integration is complete`)
     setNewSymbol('')
     setIsAddingSymbol(false)
   }

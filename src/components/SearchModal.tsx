@@ -29,98 +29,32 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
 
-  // Mock search data with current prices (as of market close)
+  // Static navigation data - TODO: Add dynamic symbol search API
   const searchData: SearchResult[] = [
-    // Popular Symbols
+    // Pages
     {
-      id: 'aapl',
-      type: 'symbol',
-      title: 'AAPL',
-      subtitle: 'Apple Inc.',
-      price: 196.89,
-      change: 1.84,
-      changePercent: 0.94,
-      href: '/options?symbol=AAPL'
+      id: 'portfolio',
+      type: 'page',
+      title: 'Portfolio',
+      subtitle: 'View your positions and performance',
+      href: '/portfolio',
+      icon: BarChart3
     },
     {
-      id: 'msft',
-      type: 'symbol',
-      title: 'MSFT',
-      subtitle: 'Microsoft Corporation',
-      price: 421.32,
-      change: 3.47,
-      changePercent: 0.83,
-      href: '/options?symbol=MSFT'
+      id: 'analytics',
+      type: 'page',
+      title: 'Analytics',
+      subtitle: 'Market analysis and insights',
+      href: '/analytics',
+      icon: TrendingUp
     },
     {
-      id: 'nvda',
-      type: 'symbol',
-      title: 'NVDA',
-      subtitle: 'NVIDIA Corporation',
-      price: 875.28,
-      change: 28.91,
-      changePercent: 3.42,
-      href: '/options?symbol=NVDA'
-    },
-    {
-      id: 'tsla',
-      type: 'symbol',
-      title: 'TSLA',
-      subtitle: 'Tesla, Inc.',
-      price: 251.75,
-      change: 7.34,
-      changePercent: 3.00,
-      href: '/options?symbol=TSLA'
-    },
-    {
-      id: 'googl',
-      type: 'symbol',
-      title: 'GOOGL',
-      subtitle: 'Alphabet Inc.',
-      price: 156.78,
-      change: 0.89,
-      changePercent: 0.57,
-      href: '/options?symbol=GOOGL'
-    },
-    {
-      id: 'amzn',
-      type: 'symbol',
-      title: 'AMZN',
-      subtitle: 'Amazon.com Inc.',
-      price: 178.25,
-      change: 1.75,
-      changePercent: 0.99,
-      href: '/options?symbol=AMZN'
-    },
-    {
-      id: 'spy',
-      type: 'symbol',
-      title: 'SPY',
-      subtitle: 'SPDR S&P 500 ETF',
-      price: 478.95,
-      change: 2.33,
-      changePercent: 0.49,
-      href: '/options?symbol=SPY'
-    },
-    {
-      id: 'qqq',
-      type: 'symbol',
-      title: 'QQQ',
-      subtitle: 'Invesco QQQ Trust',
-      price: 412.45,
-      change: -0.67,
-      changePercent: -0.16,
-      href: '/options?symbol=QQQ'
-    },
-    {
-      id: 'meta',
-      type: 'symbol',
-      title: 'META',
-      subtitle: 'Meta Platforms Inc.',
-      price: 352.89,
-      change: 4.21,
-      changePercent: 1.21,
-      href: '/options?symbol=META'
+      id: 'watchlist',
+      type: 'page',
+      title: 'Watchlist',
+      subtitle: 'Track your favorite symbols',
+      href: '/watchlist',
+      icon: Star
     },
     // Courses
     {
@@ -154,31 +88,6 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
       subtitle: 'Use charts and indicators effectively',
       href: '/learn/courses/technical-analysis',
       icon: BookOpen
-    },
-    // Pages
-    {
-      id: 'portfolio',
-      type: 'page',
-      title: 'Portfolio',
-      subtitle: 'View your positions and performance',
-      href: '/portfolio',
-      icon: BarChart3
-    },
-    {
-      id: 'analytics',
-      type: 'page',
-      title: 'Analytics',
-      subtitle: 'Market analysis and insights',
-      href: '/analytics',
-      icon: TrendingUp
-    },
-    {
-      id: 'watchlist',
-      type: 'page',
-      title: 'Watchlist',
-      subtitle: 'Track your favorite symbols',
-      href: '/watchlist',
-      icon: Star
     }
   ]
 

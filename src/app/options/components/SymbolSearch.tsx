@@ -28,36 +28,14 @@ export default function SymbolSearch({ selectedSymbol, onSymbolChange }: SymbolS
   const { data: searchResults } = useQuery<SearchResult[]>({
     queryKey: ['symbol-search', query],
     queryFn: async () => {
-      if (query.length < 1) return []
-      
-      // Mock search results - will connect to real API later
-      const mockResults = [
-        { symbol: 'AAPL', name: 'Apple Inc.', price: 189.95, change: 2.45, changePercent: 1.31, volume: 45234567, isWatchlisted: true },
-        { symbol: 'MSFT', name: 'Microsoft Corporation', price: 415.67, change: -1.23, changePercent: -0.29, volume: 23456789 },
-        { symbol: 'GOOGL', name: 'Alphabet Inc.', price: 156.78, change: 0.89, changePercent: 0.57, volume: 18765432 },
-        { symbol: 'TSLA', name: 'Tesla, Inc.', price: 248.42, change: -5.67, changePercent: -2.23, volume: 67890123 },
-        { symbol: 'AMZN', name: 'Amazon.com, Inc.', price: 178.25, change: 1.75, changePercent: 0.99, volume: 34567890 },
-        { symbol: 'NVDA', name: 'NVIDIA Corporation', price: 489.33, change: 12.45, changePercent: 2.61, volume: 56789012, isWatchlisted: true },
-        { symbol: 'SPY', name: 'SPDR S&P 500 ETF', price: 478.95, change: 2.33, changePercent: 0.49, volume: 78901234 },
-        { symbol: 'QQQ', name: 'Invesco QQQ Trust', price: 412.45, change: -0.67, changePercent: -0.16, volume: 45678901 }
-      ]
-      
-      return mockResults.filter(result => 
-        result.symbol.toLowerCase().includes(query.toLowerCase()) ||
-        result.name.toLowerCase().includes(query.toLowerCase())
-      ).slice(0, 8)
+      // TODO: Replace with real API call
+      throw new Error('Symbol search API not connected')
     },
-    enabled: query.length > 0
+    enabled: false
   })
 
-  const popularSymbols = [
-    { symbol: 'SPY', name: 'S&P 500 ETF' },
-    { symbol: 'QQQ', name: 'Nasdaq 100 ETF' },
-    { symbol: 'AAPL', name: 'Apple' },
-    { symbol: 'TSLA', name: 'Tesla' },
-    { symbol: 'NVDA', name: 'NVIDIA' },
-    { symbol: 'MSFT', name: 'Microsoft' }
-  ]
+  // TODO: Replace with dynamic popular symbols from API
+  const popularSymbols: { symbol: string; name: string }[] = []
 
   const handleSymbolSelect = useCallback((symbol: string) => {
     onSymbolChange(symbol)

@@ -80,10 +80,8 @@ class OrderService {
       this.saveToLocalStorage()
       this.notifyListeners()
 
-      // Simulate processing delay
-      setTimeout(() => {
-        this.processOrder(order.id)
-      }, 2000)
+      // TODO: Replace with real order processing API
+      // For now, orders remain in pending status
 
       return { success: true, orderId: order.id }
     } catch (error) {
@@ -91,41 +89,10 @@ class OrderService {
     }
   }
 
+  // TODO: Remove this method when real order processing is implemented
   private processOrder(orderId: string) {
-    const order = this.orders.find(o => o.id === orderId)
-    if (!order) return
-
-    // Simulate order processing (90% fill rate)
-    const willFill = Math.random() > 0.1
-    
-    order.status = willFill ? 'filled' : 'rejected'
-    
-    // Add some price slippage for realism
-    if (willFill && order.action === 'buy') {
-      const slippage = (Math.random() - 0.5) * 0.05 // ±2.5 cents
-      order.price = Math.max(0.01, order.price + slippage)
-      order.totalCost = order.price * order.quantity * 100
-    }
-
-    // Create notification based on order status
-    if (willFill) {
-      notificationService.addNotification({
-        type: 'order',
-        title: 'Order Filled',
-        message: `Your ${order.symbol} ${order.strike} ${order.type.toUpperCase()} order has been filled at $${order.price.toFixed(2)}`,
-        data: { symbol: order.symbol, orderId: order.id }
-      })
-    } else {
-      notificationService.addNotification({
-        type: 'order',
-        title: 'Order Rejected',
-        message: `Your ${order.symbol} ${order.strike} ${order.type.toUpperCase()} order was rejected`,
-        data: { symbol: order.symbol, orderId: order.id }
-      })
-    }
-
-    this.saveToLocalStorage()
-    this.notifyListeners()
+    // Real order processing will be handled by broker API
+    // This method is no longer used
   }
 
   getOrders(): Order[] {
@@ -211,8 +178,8 @@ class OrderService {
   }
 
   private getCurrentPrice(symbol: string, type: 'call' | 'put', strike: number): number {
-    // Mock current prices - in real app would fetch from API
-    return Math.random() * 5 + 1
+    // TODO: Replace with real market data API
+    return 0 // Returns 0 until API integration
   }
 }
 

@@ -10,36 +10,6 @@ export default function Portfolio() {
   const [positions, setPositions] = useState<any[]>([])
   const [orders, setOrders] = useState<any[]>([])
 
-  // Default positions for demo
-  const defaultPositions = [
-    {
-      symbol: 'AAPL',
-      quantity: 100,
-      avgPrice: 150.25,
-      currentPrice: 155.80,
-      change: 5.55,
-      changePercent: 3.7,
-      value: 15580
-    },
-    {
-      symbol: 'TSLA',
-      quantity: 50,
-      avgPrice: 220.50,
-      currentPrice: 215.30,
-      change: -5.20,
-      changePercent: -2.4,
-      value: 10765
-    },
-    {
-      symbol: 'SPY',
-      quantity: 200,
-      avgPrice: 420.00,
-      currentPrice: 425.75,
-      change: 5.75,
-      changePercent: 1.4,
-      value: 85150
-    }
-  ]
 
   // Load positions and orders from orderService
   useEffect(() => {
@@ -47,20 +17,17 @@ export default function Portfolio() {
       const optionPositions = orderService.getPositions()
       const allOrders = orderService.getOrders()
       
-      // Combine default stock positions with option positions
-      const combinedPositions = [
-        ...defaultPositions,
-        ...optionPositions.map(pos => ({
-          symbol: `${pos.symbol} ${pos.strike}${pos.type.charAt(0).toUpperCase()}`,
-          quantity: pos.quantity,
-          avgPrice: pos.avgPrice,
-          currentPrice: pos.avgPrice, // Mock current price
-          change: pos.pnl / (pos.quantity * 100),
-          changePercent: (pos.pnl / Math.abs(pos.totalCost)) * 100,
-          value: pos.currentValue,
-          type: 'option'
-        }))
-      ]
+      // Use only option positions from orderService
+      const combinedPositions = optionPositions.map(pos => ({
+        symbol: `${pos.symbol} ${pos.strike}${pos.type.charAt(0).toUpperCase()}`,
+        quantity: pos.quantity,
+        avgPrice: pos.avgPrice,
+        currentPrice: pos.avgPrice,
+        change: pos.pnl / (pos.quantity * 100),
+        changePercent: (pos.pnl / Math.abs(pos.totalCost)) * 100,
+        value: pos.currentValue,
+        type: 'option'
+      }))
       
       setPositions(combinedPositions)
       setOrders(allOrders)

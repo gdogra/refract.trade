@@ -57,63 +57,25 @@ export default function OptionsChainTable({
   const { data: expirations } = useQuery({
     queryKey: ['option-expirations', symbol],
     queryFn: async () => {
-      // Mock data - will connect to real API later
-      const dates = []
-      const today = new Date()
-      for (let i = 0; i < 8; i++) {
-        const date = new Date(today)
-        date.setDate(date.getDate() + (i * 7) + 7) // Weekly expirations
-        dates.push(date.toISOString().split('T')[0])
-      }
-      return dates
-    }
+      // TODO: Replace with real API call
+      throw new Error('Options API not connected')
+    },
+    enabled: false
   })
 
   const { data: optionsChain, isLoading } = useQuery<OptionContract[]>({
     queryKey: ['options-chain', symbol, selectedExpiry],
     queryFn: async () => {
-      // Mock options chain data
-      const strikes = []
-      const baseStrike = 180 // Mock current price around $180
-      
-      for (let i = -10; i <= 10; i++) {
-        const strike = baseStrike + (i * 5)
-        strikes.push({
-          strike,
-          call: {
-            bid: Math.max(0, (baseStrike - strike) + Math.random() * 2),
-            ask: Math.max(0.05, (baseStrike - strike) + Math.random() * 2 + 0.05),
-            last: Math.max(0, (baseStrike - strike) + Math.random() * 2 + 0.02),
-            volume: Math.floor(Math.random() * 1000),
-            openInterest: Math.floor(Math.random() * 5000),
-            delta: strike < baseStrike ? 0.3 + Math.random() * 0.4 : Math.random() * 0.3,
-            gamma: Math.random() * 0.05,
-            theta: -(Math.random() * 30),
-            vega: Math.random() * 100,
-            iv: 0.2 + Math.random() * 0.3
-          },
-          put: {
-            bid: Math.max(0, (strike - baseStrike) + Math.random() * 2),
-            ask: Math.max(0.05, (strike - baseStrike) + Math.random() * 2 + 0.05),
-            last: Math.max(0, (strike - baseStrike) + Math.random() * 2 + 0.02),
-            volume: Math.floor(Math.random() * 1000),
-            openInterest: Math.floor(Math.random() * 5000),
-            delta: strike > baseStrike ? -(0.3 + Math.random() * 0.4) : -(Math.random() * 0.3),
-            gamma: Math.random() * 0.05,
-            theta: -(Math.random() * 30),
-            vega: Math.random() * 100,
-            iv: 0.2 + Math.random() * 0.3
-          }
-        })
-      }
-      
-      return strikes
-    }
+      // TODO: Replace with real API call
+      throw new Error('Options API not connected')
+    },
+    enabled: false
   })
 
-  if (!selectedExpiry && expirations && expirations.length > 0) {
-    onExpiryChange(expirations[0])
-  }
+  // TODO: Handle expiry selection when API is connected
+  // if (!selectedExpiry && expirations && expirations.length > 0) {
+  //   onExpiryChange(expirations[0])
+  // }
 
   const formatPrice = (price: number) => price.toFixed(2)
   const formatGreek = (value: number, decimals = 3) => value.toFixed(decimals)
@@ -149,16 +111,18 @@ export default function OptionsChainTable({
     setShowOrderModal(true)
   }
 
-  if (isLoading) {
+  // Show API integration required message when no data available
+  if (!optionsChain) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
-        <div className="animate-pulse">
-          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-6"></div>
-          <div className="space-y-4">
-            {[...Array(10)].map((_, i) => (
-              <div key={i} className="h-12 bg-gray-200 dark:bg-gray-700 rounded"></div>
-            ))}
-          </div>
+        <div className="text-center py-12">
+          <Activity className="h-16 w-16 mx-auto mb-4 text-gray-400 opacity-50" />
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            Options Chain Not Available
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400">
+            Options data requires API integration to display live market data
+          </p>
         </div>
       </div>
     )
@@ -182,15 +146,11 @@ export default function OptionsChainTable({
             <div className="flex items-center space-x-2">
               <Calendar className="h-4 w-4 text-gray-500" />
               <select
-                value={selectedExpiry}
-                onChange={(e) => onExpiryChange(e.target.value)}
-                className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+                value=""
+                disabled
+                className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-gray-100 dark:bg-gray-600 text-gray-500 dark:text-gray-400 text-sm cursor-not-allowed"
               >
-                {expirations?.map((expiry) => (
-                  <option key={expiry} value={expiry}>
-                    {new Date(expiry).toLocaleDateString()}
-                  </option>
-                ))}
+                <option>No expiry dates available</option>
               </select>
             </div>
             
@@ -256,11 +216,23 @@ export default function OptionsChainTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-            {optionsChain?.map((option, index) => {
+            {!optionsChain || optionsChain.length === 0 ? (
+              <tr>
+                <td colSpan={showGreeks ? 11 : 7} className="px-6 py-12 text-center">
+                  <div className="text-gray-500 dark:text-gray-400">
+                    <Activity className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p className="text-lg font-medium mb-2">Options data not available</p>
+                    <p className="text-sm">API integration required to display options chain</p>
+                  </div>
+                </td>
+              </tr>
+            ) : (
+              optionsChain?.map((option, index) => {
               const isSelected = selectedStrike === option.strike
+              // TODO: Calculate ITM based on real current price
               const isITM = {
-                call: option.strike < 180, // Mock current price
-                put: option.strike > 180
+                call: false,
+                put: false
               }
               
               return (
@@ -369,7 +341,8 @@ export default function OptionsChainTable({
                   </td>
                 </motion.tr>
               )
-            })}
+              })
+            )}
           </tbody>
         </table>
       </div>

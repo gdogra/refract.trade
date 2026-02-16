@@ -72,15 +72,20 @@ export default function StrategyBuilder({ symbol }: StrategyBuilderProps) {
       quantity: 1,
       price: 2.50
     }
-    setLegs([...legs, newLeg])
+    setLegs(prevLegs => [...prevLegs, newLeg])
   }
 
   const removeLeg = (id: string) => {
-    setLegs(legs.filter(leg => leg.id !== id))
+    setLegs(prevLegs => prevLegs.filter(leg => leg.id !== id))
+  }
+
+  const clearAllLegs = () => {
+    setLegs([])
+    setSelectedStrategy('')
   }
 
   const updateLeg = (id: string, updates: Partial<OptionLeg>) => {
-    setLegs(legs.map(leg => leg.id === id ? { ...leg, ...updates } : leg))
+    setLegs(prevLegs => prevLegs.map(leg => leg.id === id ? { ...leg, ...updates } : leg))
   }
 
   const loadStrategy = (strategyName: string) => {
@@ -94,7 +99,7 @@ export default function StrategyBuilder({ symbol }: StrategyBuilderProps) {
         strike: leg.strike,
         expiry: '2024-01-19',
         quantity: leg.quantity,
-        price: Math.random() * 3 + 1 // Mock price
+        price: 0 // TODO: Fetch real option prices
       }))
       setLegs(newLegs)
       setSelectedStrategy(strategyName)
@@ -103,22 +108,18 @@ export default function StrategyBuilder({ symbol }: StrategyBuilderProps) {
   }
 
   const calculateStrategy = () => {
-    // Mock calculation - in real app would use Black-Scholes or similar
+    // TODO: Replace with real Black-Scholes calculation
     const totalCost = legs.reduce((sum, leg) => {
       const cost = leg.price * leg.quantity * 100 // Options are per 100 shares
       return leg.action === 'buy' ? sum + cost : sum - cost
     }, 0)
 
-    const maxProfit = Math.random() * 1000 + 200
-    const maxLoss = Math.abs(totalCost)
-    const breakevens = legs.length > 0 ? [legs[0].strike + totalCost/100] : []
-
     return {
       totalCost,
-      maxProfit,
-      maxLoss,
-      breakevens,
-      probabilityOfProfit: 0.65
+      maxProfit: 0, // TODO: Calculate with real pricing models
+      maxLoss: Math.abs(totalCost),
+      breakevens: [] as number[], // TODO: Calculate real breakevens
+      probabilityOfProfit: 0 // TODO: Calculate with real models
     }
   }
 
@@ -168,15 +169,28 @@ export default function StrategyBuilder({ symbol }: StrategyBuilderProps) {
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
             Strategy Builder - {symbol}
           </h2>
-          <motion.button
-            onClick={addLeg}
-            className="flex items-center space-x-2 bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <Plus className="h-4 w-4" />
-            <span>Add Leg</span>
-          </motion.button>
+          <div className="flex items-center space-x-2">
+            {legs.length > 0 && (
+              <motion.button
+                onClick={clearAllLegs}
+                className="flex items-center space-x-2 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <X className="h-4 w-4" />
+                <span>Clear All</span>
+              </motion.button>
+            )}
+            <motion.button
+              onClick={addLeg}
+              className="flex items-center space-x-2 bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Plus className="h-4 w-4" />
+              <span>Add Leg</span>
+            </motion.button>
+          </div>
         </div>
 
         {/* Predefined Strategies */}
@@ -385,12 +399,42 @@ export default function StrategyBuilder({ symbol }: StrategyBuilderProps) {
                 </div>
               </div>
 
-              {/* Risk/Reward Chart Placeholder */}
-              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 flex items-center justify-center">
-                <div className="text-center text-gray-500 dark:text-gray-400">
-                  <TrendingUp className="h-8 w-8 mx-auto mb-2" />
-                  <div className="text-sm">P&L Chart</div>
-                  <div className="text-xs">Coming Soon</div>
+              {/* Risk/Reward Chart */}
+              <div className="bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-700 dark:to-blue-900/20 rounded-lg p-4">
+                <div className="text-center text-gray-900 dark:text-white mb-4">
+                  <TrendingUp className="h-8 w-8 mx-auto mb-2 text-blue-500" />
+                  <div className="text-sm font-medium">P&L Chart</div>
+                </div>
+                
+                {/* Mock P&L Chart */}
+                <div className="h-32 relative bg-white dark:bg-gray-800 rounded border">
+                  <svg className="absolute inset-0 w-full h-full">
+                    {/* Grid lines */}
+                    <defs>
+                      <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                        <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e5e7eb" strokeWidth="0.5"/>
+                      </pattern>
+                    </defs>
+                    <rect width="100%" height="100%" fill="url(#grid)" />
+                    
+                    {/* P&L Line */}
+                    <polyline
+                      points="10,100 50,80 100,60 150,70 200,50 250,45 290,40"
+                      fill="none"
+                      stroke="#22c55e"
+                      strokeWidth="2"
+                    />
+                    
+                    {/* Breakeven line */}
+                    <line x1="0" y1="80" x2="300" y2="80" stroke="#ef4444" strokeWidth="1" strokeDasharray="5,5" />
+                  </svg>
+                  
+                  <div className="absolute bottom-1 left-2 text-xs text-gray-500">
+                    Strike Price Range
+                  </div>
+                  <div className="absolute top-1 right-2 text-xs text-gray-500">
+                    P&L
+                  </div>
                 </div>
               </div>
             </div>
