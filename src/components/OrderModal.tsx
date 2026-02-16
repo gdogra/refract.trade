@@ -226,14 +226,14 @@ export default function OrderModal({ isOpen, onClose, orderRequest, onOrderSubmi
                   <Button
                     onClick={handleClose}
                     variant="ghost"
-                    className="flex-1"
+                    className="flex-1 border border-gray-300 dark:border-gray-600"
                     disabled={isSubmitting}
                   >
                     Cancel
                   </Button>
                   <Button
                     onClick={handleSubmitOrder}
-                    className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                    className="flex-1 bg-green-600 hover:bg-green-700 focus:ring-2 focus:ring-green-500 text-white font-semibold py-3 px-4"
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? 'Processing...' : `${orderRequest.action === 'buy' ? 'Buy' : 'Sell'} ${orderRequest.type.toUpperCase()}`}

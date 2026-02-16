@@ -267,19 +267,57 @@ export default function Portfolio() {
               <div className="h-80 flex items-center justify-center bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-800 dark:to-blue-900/20 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600">
                 <div className="text-center">
                   <div className="flex items-center justify-center space-x-3 mb-4">
-                    <Activity className="h-16 w-16 text-blue-500" />
-                    <TrendingUp className="h-12 w-12 text-green-500" />
+                    <Activity className="h-8 w-8 text-blue-500" />
+                    <span className="text-lg font-semibold text-gray-900 dark:text-white">Portfolio Performance</span>
                   </div>
-                  <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                    Performance Chart Coming Soon
-                  </h4>
-                  <p className="text-gray-600 dark:text-gray-400 mb-4 max-w-md">
-                    Interactive charts showing your portfolio performance over time, with customizable timeframes and detailed analytics.
-                  </p>
-                  <div className="flex justify-center space-x-4 text-sm text-gray-500">
-                    <span>• Historical Performance</span>
-                    <span>• Risk Metrics</span>
-                    <span>• Benchmark Comparison</span>
+                  
+                  {/* Mock Performance Chart */}
+                  <div className="w-full h-48 bg-gradient-to-r from-green-400 to-blue-500 rounded-lg relative overflow-hidden mb-4">
+                    {/* Chart Grid Lines */}
+                    <div className="absolute inset-0 opacity-20">
+                      {[...Array(5)].map((_, i) => (
+                        <div key={i} className="absolute left-0 right-0 border-t border-white" style={{ top: `${i * 25}%` }} />
+                      ))}
+                    </div>
+                    
+                    {/* Performance Line */}
+                    <svg className="absolute inset-0 w-full h-full">
+                      <polyline
+                        points="0,120 40,110 80,95 120,100 160,85 200,75 240,70 280,65 320,60"
+                        fill="none"
+                        stroke="white"
+                        strokeWidth="3"
+                        className="drop-shadow-sm"
+                      />
+                      {/* Data Points */}
+                      <circle cx="320" cy="60" r="4" fill="white" className="drop-shadow-sm" />
+                    </svg>
+                    
+                    {/* Performance Stats */}
+                    <div className="absolute bottom-4 left-4 text-white">
+                      <div className="text-sm opacity-90">30-Day Return</div>
+                      <div className="text-xl font-bold">+12.4%</div>
+                    </div>
+                    
+                    <div className="absolute bottom-4 right-4 text-white text-right">
+                      <div className="text-sm opacity-90">vs S&P 500</div>
+                      <div className="text-xl font-bold">+3.2%</div>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-3 gap-4 text-center text-sm">
+                    <div>
+                      <div className="text-gray-500 dark:text-gray-400">Sharpe Ratio</div>
+                      <div className="font-semibold text-gray-900 dark:text-white">1.85</div>
+                    </div>
+                    <div>
+                      <div className="text-gray-500 dark:text-gray-400">Max Drawdown</div>
+                      <div className="font-semibold text-red-600">-4.2%</div>
+                    </div>
+                    <div>
+                      <div className="text-gray-500 dark:text-gray-400">Win Rate</div>
+                      <div className="font-semibold text-green-600">68%</div>
+                    </div>
                   </div>
                 </div>
               </div>

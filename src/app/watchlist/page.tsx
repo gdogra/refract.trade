@@ -21,7 +21,10 @@ interface WatchlistItem {
 
 export default function Watchlist() {
   const router = useRouter()
-  const [watchlist, setWatchlist] = useState<WatchlistItem[]>([
+  const [watchlist, setWatchlist] = useState<WatchlistItem[]>([])
+
+  // Initialize with default items if empty
+  const defaultWatchlistItems = [
     {
       symbol: 'AAPL',
       name: 'Apple Inc.',
@@ -56,6 +59,25 @@ export default function Watchlist() {
       added: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
     }
   ])
+
+  // Load watchlist from localStorage
+  useEffect(() => {
+    const savedWatchlist = localStorage.getItem('userWatchlist')
+    if (savedWatchlist) {
+      setWatchlist(JSON.parse(savedWatchlist))
+    } else {
+      // Initialize with default items
+      setWatchlist(defaultWatchlistItems)
+      localStorage.setItem('userWatchlist', JSON.stringify(defaultWatchlistItems))
+    }
+  }, [])
+
+  // Save watchlist to localStorage whenever it changes
+  useEffect(() => {
+    if (watchlist.length > 0) {
+      localStorage.setItem('userWatchlist', JSON.stringify(watchlist))
+    }
+  }, [watchlist])
 
   const [newSymbol, setNewSymbol] = useState('')
   const [isAddingSymbol, setIsAddingSymbol] = useState(false)

@@ -29,6 +29,25 @@ class OrderService {
   private orders: Order[] = []
   private listeners: ((orders: Order[]) => void)[] = []
 
+  constructor() {
+    // Load orders from localStorage on initialization
+    if (typeof window !== 'undefined') {
+      const savedOrders = localStorage.getItem('userOrders')
+      if (savedOrders) {
+        this.orders = JSON.parse(savedOrders).map((order: any) => ({
+          ...order,
+          timestamp: new Date(order.timestamp)
+        }))
+      }
+    }
+  }
+
+  private saveToLocalStorage() {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('userOrders', JSON.stringify(this.orders))
+    }
+  }
+
   generateOrderId(): string {
     return `ORD_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
   }
@@ -58,6 +77,7 @@ class OrderService {
 
       // Add to orders
       this.orders.push(order)
+      this.saveToLocalStorage()
       this.notifyListeners()
 
       // Simulate processing delay
@@ -104,6 +124,7 @@ class OrderService {
       })
     }
 
+    this.saveToLocalStorage()
     this.notifyListeners()
   }
 
@@ -119,6 +140,7 @@ class OrderService {
     const order = this.orders.find(o => o.id === orderId)
     if (order && order.status === 'pending') {
       order.status = 'cancelled'
+      this.saveToLocalStorage()
       this.notifyListeners()
       return true
     }
