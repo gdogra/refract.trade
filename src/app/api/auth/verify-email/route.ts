@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createSupabaseAdmin } from '@/lib/supabase'
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,28 +13,21 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Direct fetch to Supabase REST API
-    const supabaseUrl = 'https://pfeikjkqqotksxwijcwh.supabase.co'
-    const serviceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmZWlramtxcW90a3N4d2lqY3doIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDY2Njk4OSwiZXhwIjoyMDg2MjQyOTg5fQ.n4cv1s6tqumaLEOOJ2tg7eyowzkjx9TfoNpSrSlAW3s'
+    const supabase = createSupabaseAdmin()
     
     // Find user with this token
-    const response = await fetch(`${supabaseUrl}/rest/v1/users?verification_token=eq.${token}&select=id,email,email_verified,verification_expires`, {
-      headers: {
-        'apikey': serviceKey,
-        'Authorization': `Bearer ${serviceKey}`
-      }
-    })
-
-    const users = await response.json()
+    const { data: user, error: fetchError } = await supabase
+      .from('users')
+      .select('id, email, email_verified, verification_expires')
+      .eq('verification_token', token)
+      .single()
     
-    if (!users || users.length === 0) {
+    if (fetchError || !user) {
       return NextResponse.json(
         { error: 'Invalid verification token' },
         { status: 400 }
       )
     }
-
-    const user = users[0]
 
     // Check if token is expired
     if (new Date() > new Date(user.verification_expires)) {
@@ -52,21 +46,17 @@ export async function GET(request: NextRequest) {
     }
 
     // Update user as verified
-    const updateResponse = await fetch(`${supabaseUrl}/rest/v1/users?id=eq.${user.id}`, {
-      method: 'PATCH',
-      headers: {
-        'apikey': serviceKey,
-        'Authorization': `Bearer ${serviceKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
+    const { error: updateError } = await supabase
+      .from('users')
+      .update({
         email_verified: true,
         verification_token: null,
         verification_expires: null
       })
-    })
+      .eq('id', user.id)
 
-    if (!updateResponse.ok) {
+    if (updateError) {
+      console.error('Update error:', updateError)
       throw new Error('Failed to update user verification status')
     }
 
@@ -78,8 +68,9 @@ export async function GET(request: NextRequest) {
       { status: 200 }
     )
   } catch (error: any) {
+    console.error('Verification error:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: error.message },
       { status: 500 }
     )
   }

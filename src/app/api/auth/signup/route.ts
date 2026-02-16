@@ -82,7 +82,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Send verification email (log for now, replace with real email service in production)
-    const verificationUrl = `https://refracttrade.netlify.app/auth/verify-email?token=${verificationToken}`
+    const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+    const verificationUrl = `${baseUrl}/auth/verify-email?token=${verificationToken}`
     
     // Log verification URL for testing (replace with actual email sending)
     console.log(`\n=== EMAIL VERIFICATION ===`)
