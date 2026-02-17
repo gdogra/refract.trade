@@ -288,7 +288,7 @@ export function useMarketStatus() {
 
 // Hook for portfolio market values
 export function usePortfolioMarketData(positions: Array<{ symbol: string; quantity: number }>) {
-  const symbols = [...new Set(positions.map(p => p.symbol))] // Remove duplicates
+  const symbols = Array.from(new Set(positions.map(p => p.symbol))) // Remove duplicates
   const { data: marketData, loading, error } = useBatchMarketData(symbols)
 
   const portfolioValue = Object.entries(marketData).reduce((total, [symbol, data]) => {
