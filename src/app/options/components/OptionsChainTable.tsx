@@ -190,6 +190,16 @@ export default function OptionsChainTable({
         </div>
       </div>
 
+      {/* API Integration Notice */}
+      <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+        <div className="flex items-center space-x-2">
+          <Activity className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+          <span className="text-sm text-yellow-800 dark:text-yellow-200">
+            <strong>API Integration Required:</strong> Live options data (prices, volume, IV) requires market data API connection. Current values are placeholders for development.
+          </span>
+        </div>
+      </div>
+
       {/* Options Chain Table */}
       <div className="overflow-x-auto">
         <table className="w-full">

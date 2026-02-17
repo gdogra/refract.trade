@@ -38,26 +38,28 @@ export default function MarketDataPanel({ symbol }: MarketDataPanelProps) {
   const { data: marketData, isLoading } = useQuery<MarketData>({
     queryKey: ['market-data', symbol],
     queryFn: async () => {
-      // Mock market data - will connect to real API later
-      return {
-        symbol,
-        price: 196.89,
-        change: 1.84,
-        changePercent: 0.94,
-        dayRange: { low: 186.50, high: 191.20 },
-        volume: 45234567,
-        avgVolume: 52000000,
-        marketCap: 2950000000000,
-        pe: 28.5,
-        beta: 1.23,
-        iv30: 0.285,
-        ivRank: 65,
-        earnings: '2024-02-01',
-        dividend: 0.96,
-        divYield: 0.51
-      }
-    }
+      // TODO: Connect to real market data API
+      throw new Error('Market data API not connected')
+    },
+    enabled: false // Disable query until API is connected
   })
+
+  // Show API integration message when no data
+  if (!marketData) {
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 sticky top-6">
+        <div className="text-center py-8">
+          <DollarSign className="h-12 w-12 mx-auto mb-4 text-gray-400 opacity-50" />
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            Market Data Not Available
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400 text-sm">
+            Real-time market data requires API integration
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   if (isLoading) {
     return (
@@ -106,12 +108,16 @@ export default function MarketDataPanel({ symbol }: MarketDataPanelProps) {
 
   const handleBuyCall = () => {
     // Create a buy call order for the current symbol
+    // Use next Friday as expiry date
+    const nextFriday = new Date()
+    nextFriday.setDate(nextFriday.getDate() + ((5 - nextFriday.getDay() + 7) % 7 || 7))
+    
     const orderRequest = {
       symbol,
       type: 'call' as const,
       action: 'buy' as const,
       strike: Math.round((marketData?.price || 190) * 1.05), // 5% OTM
-      expiry: '2024-01-19',
+      expiry: nextFriday.toISOString().split('T')[0],
       quantity: 1,
       price: 2.50
     }
@@ -122,12 +128,16 @@ export default function MarketDataPanel({ symbol }: MarketDataPanelProps) {
 
   const handleBuyPut = () => {
     // Create a buy put order for the current symbol
+    // Use next Friday as expiry date
+    const nextFriday = new Date()
+    nextFriday.setDate(nextFriday.getDate() + ((5 - nextFriday.getDay() + 7) % 7 || 7))
+    
     const orderRequest = {
       symbol,
       type: 'put' as const,
       action: 'buy' as const,
       strike: Math.round((marketData?.price || 190) * 0.95), // 5% OTM
-      expiry: '2024-01-19',
+      expiry: nextFriday.toISOString().split('T')[0],
       quantity: 1,
       price: 2.00
     }

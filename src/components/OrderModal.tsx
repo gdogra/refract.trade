@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, AlertTriangle, CheckCircle, TrendingUp, TrendingDown } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
@@ -16,6 +16,16 @@ interface OrderModalProps {
 export default function OrderModal({ isOpen, onClose, orderRequest, onOrderSubmitted }: OrderModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [orderResult, setOrderResult] = useState<{ success: boolean; orderId?: string; error?: string } | null>(null)
+  const [editableQuantity, setEditableQuantity] = useState(1)
+  const [editablePrice, setEditablePrice] = useState(0)
+
+  // Update editable values when orderRequest changes
+  useEffect(() => {
+    if (orderRequest) {
+      setEditableQuantity(orderRequest.quantity)
+      setEditablePrice(orderRequest.price)
+    }
+  }, [orderRequest])
 
   const handleSubmitOrder = async () => {
     if (!orderRequest) return
@@ -23,7 +33,14 @@ export default function OrderModal({ isOpen, onClose, orderRequest, onOrderSubmi
     setIsSubmitting(true)
     
     try {
-      const result = await orderService.submitOrder(orderRequest)
+      // Create updated order request with editable values
+      const updatedOrderRequest = {
+        ...orderRequest,
+        quantity: editableQuantity,
+        price: editablePrice
+      }
+      
+      const result = await orderService.submitOrder(updatedOrderRequest)
       setOrderResult(result)
       
       if (result.success && result.orderId) {
@@ -49,7 +66,7 @@ export default function OrderModal({ isOpen, onClose, orderRequest, onOrderSubmi
 
   if (!orderRequest) return null
 
-  const totalCost = orderRequest.price * orderRequest.quantity * 100
+  const totalCost = editablePrice * editableQuantity * 100
   const isCall = orderRequest.type === 'call'
   const isBuy = orderRequest.action === 'buy'
 
@@ -182,18 +199,51 @@ export default function OrderModal({ isOpen, onClose, orderRequest, onOrderSubmi
                       </span>
                     </div>
                     
-                    <div className="flex justify-between">
+                    <div className="flex justify-between items-center">
                       <span className="text-gray-600 dark:text-gray-400">Quantity</span>
-                      <span className="font-semibold text-gray-900 dark:text-white">
-                        {orderRequest.quantity} contract{orderRequest.quantity !== 1 ? 's' : ''}
-                      </span>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => setEditableQuantity(Math.max(1, editableQuantity - 1))}
+                          className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500"
+                          disabled={isSubmitting}
+                        >
+                          -
+                        </button>
+                        <input
+                          type="number"
+                          value={editableQuantity}
+                          onChange={(e) => setEditableQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                          className="w-16 text-center border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                          min="1"
+                          disabled={isSubmitting}
+                        />
+                        <button
+                          onClick={() => setEditableQuantity(editableQuantity + 1)}
+                          className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500"
+                          disabled={isSubmitting}
+                        >
+                          +
+                        </button>
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                          contract{editableQuantity !== 1 ? 's' : ''}
+                        </span>
+                      </div>
                     </div>
                     
-                    <div className="flex justify-between">
+                    <div className="flex justify-between items-center">
                       <span className="text-gray-600 dark:text-gray-400">Price per share</span>
-                      <span className="font-semibold text-gray-900 dark:text-white">
-                        ${orderRequest.price.toFixed(2)}
-                      </span>
+                      <div className="flex items-center space-x-1">
+                        <span className="text-gray-600 dark:text-gray-400">$</span>
+                        <input
+                          type="number"
+                          value={editablePrice.toFixed(2)}
+                          onChange={(e) => setEditablePrice(Math.max(0.01, parseFloat(e.target.value) || 0.01))}
+                          className="w-20 text-right border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                          min="0.01"
+                          step="0.01"
+                          disabled={isSubmitting}
+                        />
+                      </div>
                     </div>
                     
                     <hr className="border-gray-300 dark:border-gray-600" />
