@@ -29,66 +29,27 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
 
-  // Static navigation data - TODO: Add dynamic symbol search API
+  // Search data with basic symbol support
   const searchData: SearchResult[] = [
+    // Common symbols
+    { id: 'aapl', type: 'symbol', title: 'AAPL', subtitle: 'Apple Inc.', href: '/options?symbol=AAPL' },
+    { id: 'msft', type: 'symbol', title: 'MSFT', subtitle: 'Microsoft Corporation', href: '/options?symbol=MSFT' },
+    { id: 'nvda', type: 'symbol', title: 'NVDA', subtitle: 'NVIDIA Corporation', href: '/options?symbol=NVDA' },
+    { id: 'tsla', type: 'symbol', title: 'TSLA', subtitle: 'Tesla, Inc.', href: '/options?symbol=TSLA' },
+    { id: 'googl', type: 'symbol', title: 'GOOGL', subtitle: 'Alphabet Inc.', href: '/options?symbol=GOOGL' },
+    { id: 'amzn', type: 'symbol', title: 'AMZN', subtitle: 'Amazon.com Inc.', href: '/options?symbol=AMZN' },
+    { id: 'spy', type: 'symbol', title: 'SPY', subtitle: 'SPDR S&P 500 ETF', href: '/options?symbol=SPY' },
+    { id: 'qqq', type: 'symbol', title: 'QQQ', subtitle: 'Invesco QQQ Trust', href: '/options?symbol=QQQ' },
+    { id: 'meta', type: 'symbol', title: 'META', subtitle: 'Meta Platforms Inc.', href: '/options?symbol=META' },
     // Pages
-    {
-      id: 'portfolio',
-      type: 'page',
-      title: 'Portfolio',
-      subtitle: 'View your positions and performance',
-      href: '/portfolio',
-      icon: BarChart3
-    },
-    {
-      id: 'analytics',
-      type: 'page',
-      title: 'Analytics',
-      subtitle: 'Market analysis and insights',
-      href: '/analytics',
-      icon: TrendingUp
-    },
-    {
-      id: 'watchlist',
-      type: 'page',
-      title: 'Watchlist',
-      subtitle: 'Track your favorite symbols',
-      href: '/watchlist',
-      icon: Star
-    },
+    { id: 'portfolio', type: 'page', title: 'Portfolio', subtitle: 'View your positions and performance', href: '/portfolio', icon: BarChart3 },
+    { id: 'analytics', type: 'page', title: 'Analytics', subtitle: 'Market analysis and insights', href: '/analytics', icon: TrendingUp },
+    { id: 'watchlist', type: 'page', title: 'Watchlist', subtitle: 'Track your favorite symbols', href: '/watchlist', icon: Star },
     // Courses
-    {
-      id: 'options-fundamentals',
-      type: 'course',
-      title: 'Options Trading Fundamentals',
-      subtitle: 'Learn the basics of options trading',
-      href: '/learn/courses/options-fundamentals',
-      icon: BookOpen
-    },
-    {
-      id: 'advanced-strategies',
-      type: 'course',
-      title: 'Advanced Options Strategies',
-      subtitle: 'Master complex trading strategies',
-      href: '/learn/courses/advanced-strategies',
-      icon: BookOpen
-    },
-    {
-      id: 'risk-management',
-      type: 'course',
-      title: 'Risk Management',
-      subtitle: 'Essential risk management techniques',
-      href: '/learn/courses/risk-management',
-      icon: BookOpen
-    },
-    {
-      id: 'technical-analysis',
-      type: 'course',
-      title: 'Technical Analysis',
-      subtitle: 'Use charts and indicators effectively',
-      href: '/learn/courses/technical-analysis',
-      icon: BookOpen
-    }
+    { id: 'options-fundamentals', type: 'course', title: 'Options Trading Fundamentals', subtitle: 'Learn the basics of options trading', href: '/learn/courses/options-fundamentals', icon: BookOpen },
+    { id: 'advanced-strategies', type: 'course', title: 'Advanced Options Strategies', subtitle: 'Master complex trading strategies', href: '/learn/courses/advanced-strategies', icon: BookOpen },
+    { id: 'risk-management', type: 'course', title: 'Risk Management', subtitle: 'Essential risk management techniques', href: '/learn/courses/risk-management', icon: BookOpen },
+    { id: 'technical-analysis', type: 'course', title: 'Technical Analysis', subtitle: 'Use charts and indicators effectively', href: '/learn/courses/technical-analysis', icon: BookOpen }
   ]
 
   useEffect(() => {

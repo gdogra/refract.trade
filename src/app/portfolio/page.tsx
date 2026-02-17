@@ -2,14 +2,16 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { TrendingUp, TrendingDown, DollarSign, PieChart, Activity, Target } from 'lucide-react'
+import { TrendingUp, TrendingDown, DollarSign, PieChart, Activity, Target, ShoppingCart, TrendingDown as SellIcon } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
-import { orderService } from '@/lib/orderService'
+import { orderService, type OrderRequest } from '@/lib/orderService'
+import OrderModal from '@/components/OrderModal'
 
 export default function Portfolio() {
   const [positions, setPositions] = useState<any[]>([])
   const [orders, setOrders] = useState<any[]>([])
-
+  const [showOrderModal, setShowOrderModal] = useState(false)
+  const [orderRequest, setOrderRequest] = useState<OrderRequest | null>(null)
 
   // Load positions and orders from orderService
   useEffect(() => {
@@ -51,6 +53,47 @@ export default function Portfolio() {
   const totalValue = positions.reduce((sum, pos) => sum + pos.value, 0)
   const totalChange = positions.reduce((sum, pos) => sum + (pos.change * pos.quantity), 0)
   const totalChangePercent = (totalChange / (totalValue - totalChange)) * 100
+
+  // Trading handlers
+  const handleBuyPosition = (position: any) => {
+    // Extract symbol and option details from position
+    const symbolMatch = position.symbol.match(/^([A-Z]+)\s+(\d+)([CP])$/)
+    if (!symbolMatch) return
+    
+    const [, symbol, strike, type] = symbolMatch
+    const orderReq: OrderRequest = {
+      symbol,
+      type: type === 'C' ? 'call' : 'put',
+      action: 'buy',
+      strike: parseInt(strike),
+      expiry: '2024-12-20', // Default expiry - will be updated in modal
+      quantity: 1,
+      price: position.currentPrice
+    }
+    
+    setOrderRequest(orderReq)
+    setShowOrderModal(true)
+  }
+
+  const handleSellPosition = (position: any) => {
+    // Extract symbol and option details from position
+    const symbolMatch = position.symbol.match(/^([A-Z]+)\s+(\d+)([CP])$/)
+    if (!symbolMatch) return
+    
+    const [, symbol, strike, type] = symbolMatch
+    const orderReq: OrderRequest = {
+      symbol,
+      type: type === 'C' ? 'call' : 'put',
+      action: 'sell',
+      strike: parseInt(strike),
+      expiry: '2024-12-20', // Default expiry - will be updated in modal
+      quantity: Math.min(position.quantity, 1), // Sell up to current quantity
+      price: position.currentPrice
+    }
+    
+    setOrderRequest(orderReq)
+    setShowOrderModal(true)
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
@@ -178,6 +221,7 @@ export default function Portfolio() {
                       <th className="text-right py-3 px-4 font-medium text-gray-900 dark:text-white">Current Price</th>
                       <th className="text-right py-3 px-4 font-medium text-gray-900 dark:text-white">Change</th>
                       <th className="text-right py-3 px-4 font-medium text-gray-900 dark:text-white">Value</th>
+                      <th className="text-center py-3 px-4 font-medium text-gray-900 dark:text-white">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -209,6 +253,34 @@ export default function Portfolio() {
                         </td>
                         <td className="py-4 px-4 text-right font-medium text-gray-900 dark:text-white">
                           ${position.value.toLocaleString()}
+                        </td>
+                        <td className="py-4 px-4 text-center">
+                          <div className="flex items-center justify-center space-x-2">
+                            <motion.button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleBuyPosition(position)
+                              }}
+                              className="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-2 rounded-lg flex items-center space-x-1 transition-colors"
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                            >
+                              <ShoppingCart className="h-3 w-3" />
+                              <span>Buy</span>
+                            </motion.button>
+                            <motion.button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleSellPosition(position)
+                              }}
+                              className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-2 rounded-lg flex items-center space-x-1 transition-colors"
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                            >
+                              <SellIcon className="h-3 w-3" />
+                              <span>Sell</span>
+                            </motion.button>
+                          </div>
                         </td>
                       </motion.tr>
                     ))}
@@ -291,6 +363,19 @@ export default function Portfolio() {
             </CardContent>
           </Card>
         </motion.div>
+
+        {/* Order Modal */}
+        <OrderModal
+          isOpen={showOrderModal}
+          onClose={() => {
+            setShowOrderModal(false)
+            setOrderRequest(null)
+          }}
+          orderRequest={orderRequest}
+          onOrderSubmitted={(orderId) => {
+            console.log('Order submitted:', orderId)
+          }}
+        />
       </div>
     </div>
   )

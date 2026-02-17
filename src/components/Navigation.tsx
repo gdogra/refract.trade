@@ -72,13 +72,16 @@ export default function Navigation() {
   const pathname = usePathname()
   const router = useRouter()
 
-  // Static navigation data - TODO: Add dynamic symbol search API
+  // Navigation and symbol search data
   const searchData = [
+    { id: 'aapl', type: 'symbol', title: 'AAPL', subtitle: 'Apple Inc.', href: '/options?symbol=AAPL' },
+    { id: 'msft', type: 'symbol', title: 'MSFT', subtitle: 'Microsoft Corporation', href: '/options?symbol=MSFT' },
+    { id: 'nvda', type: 'symbol', title: 'NVDA', subtitle: 'NVIDIA Corporation', href: '/options?symbol=NVDA' },
+    { id: 'tsla', type: 'symbol', title: 'TSLA', subtitle: 'Tesla, Inc.', href: '/options?symbol=TSLA' },
+    { id: 'googl', type: 'symbol', title: 'GOOGL', subtitle: 'Alphabet Inc.', href: '/options?symbol=GOOGL' },
     { id: 'portfolio', type: 'page', title: 'Portfolio', subtitle: 'View your positions', href: '/portfolio' },
     { id: 'analytics', type: 'page', title: 'Analytics', subtitle: 'Advanced analysis tools', href: '/analytics' },
-    { id: 'watchlist', type: 'page', title: 'Watchlist', subtitle: 'Your saved symbols', href: '/watchlist' },
-    { id: 'learn', type: 'page', title: 'Learn', subtitle: 'Trading education', href: '/learn' },
-    { id: 'settings', type: 'page', title: 'Settings', subtitle: 'Account settings', href: '/settings' }
+    { id: 'watchlist', type: 'page', title: 'Watchlist', subtitle: 'Your saved symbols', href: '/watchlist' }
   ]
 
   // Search logic
