@@ -2,7 +2,7 @@
  * Symbol Search using Yahoo Finance
  */
 
-interface SymbolSearchResult {
+export interface SymbolSearchResult {
   symbol: string
   name: string
   exchange: string
@@ -67,15 +67,15 @@ export async function searchSymbols(query: string): Promise<SymbolSearchResult[]
 }
 
 // Popular symbols for quick access
-export const POPULAR_SYMBOLS = [
-  { symbol: 'AAPL', name: 'Apple Inc.' },
-  { symbol: 'TSLA', name: 'Tesla Inc.' },
-  { symbol: 'MSFT', name: 'Microsoft Corp.' },
-  { symbol: 'GOOGL', name: 'Alphabet Inc.' },
-  { symbol: 'AMZN', name: 'Amazon.com Inc.' },
-  { symbol: 'NVDA', name: 'NVIDIA Corp.' },
-  { symbol: 'SPY', name: 'SPDR S&P 500 ETF' },
-  { symbol: 'QQQ', name: 'Invesco QQQ Trust ETF' },
-  { symbol: 'IWM', name: 'iShares Russell 2000 ETF' },
-  { symbol: 'META', name: 'Meta Platforms Inc.' }
+export const POPULAR_SYMBOLS: SymbolSearchResult[] = [
+  { symbol: 'AAPL', name: 'Apple Inc.', exchange: 'NASDAQ', type: 'EQUITY' },
+  { symbol: 'TSLA', name: 'Tesla Inc.', exchange: 'NASDAQ', type: 'EQUITY' },
+  { symbol: 'MSFT', name: 'Microsoft Corp.', exchange: 'NASDAQ', type: 'EQUITY' },
+  { symbol: 'GOOGL', name: 'Alphabet Inc.', exchange: 'NASDAQ', type: 'EQUITY' },
+  { symbol: 'AMZN', name: 'Amazon.com Inc.', exchange: 'NASDAQ', type: 'EQUITY' },
+  { symbol: 'NVDA', name: 'NVIDIA Corp.', exchange: 'NASDAQ', type: 'EQUITY' },
+  { symbol: 'SPY', name: 'SPDR S&P 500 ETF', exchange: 'NYSE', type: 'ETF' },
+  { symbol: 'QQQ', name: 'Invesco QQQ Trust ETF', exchange: 'NASDAQ', type: 'ETF' },
+  { symbol: 'IWM', name: 'iShares Russell 2000 ETF', exchange: 'NYSE', type: 'ETF' },
+  { symbol: 'META', name: 'Meta Platforms Inc.', exchange: 'NASDAQ', type: 'EQUITY' }
 ]
