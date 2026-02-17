@@ -11,6 +11,7 @@ interface UseOptionsChainState {
 
 interface UseOptionsChainReturn extends UseOptionsChainState {
   refresh: () => Promise<void>
+  refetch: () => Promise<void>
   calls: OptionContract[]
   puts: OptionContract[]
   expirations: string[]
@@ -164,6 +165,7 @@ export function useOptionsChain(symbol?: string, expiration?: string): UseOption
   return {
     ...state,
     refresh,
+    refetch: refresh,
     calls: state.data?.calls ?? [],
     puts: state.data?.puts ?? [],
     expirations: state.data?.expirationDates ?? [],

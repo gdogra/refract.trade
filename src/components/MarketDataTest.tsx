@@ -39,12 +39,26 @@ export default function MarketDataTest() {
 
   const loadServiceStatus = async () => {
     try {
-      const response = await fetch('/api/market-data?type=status')
+      const response = await fetch('/api/options/quote?symbol=AAPL')
       const data = await response.json()
       
       if (data.success) {
-        setServiceInfo(data.data.service)
-        setProviders(data.data.providers)
+        setServiceInfo({
+          enableRealData: true,
+          provider: 'Yahoo Finance',
+          hasRealDataService: true,
+          providerCount: 1,
+          cacheSize: 0,
+          subscriberCount: 0
+        })
+        setProviders([{
+          name: 'Yahoo Finance',
+          connected: true,
+          rateLimit: {
+            remaining: 100,
+            resetTime: new Date()
+          }
+        }])
       }
     } catch (err) {
       console.error('Failed to load service status:', err)
@@ -58,8 +72,14 @@ export default function MarketDataTest() {
     setError(null)
     
     try {
-      const marketData = await marketDataService.getMarketData(symbol.toUpperCase())
-      setQuote(marketData)
+      const response = await fetch(`/api/options/quote?symbol=${symbol.toUpperCase()}`)
+      const result = await response.json()
+      
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Failed to fetch quote')
+      }
+      
+      setQuote(result.data)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch quote')
     } finally {
@@ -73,7 +93,13 @@ export default function MarketDataTest() {
     setError(null)
     
     try {
-      const batchData = await marketDataService.getBatchMarketData(symbols)
+      const promises = symbols.map(async (sym) => {
+        const response = await fetch(`/api/options/quote?symbol=${sym}`)
+        const result = await response.json()
+        return { symbol: sym, ...result }
+      })
+      
+      const batchData = await Promise.all(promises)
       setQuote(batchData)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch batch quotes')

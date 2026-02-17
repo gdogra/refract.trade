@@ -12,12 +12,21 @@ export interface OptionsChain {
   symbol: string
   underlyingPrice: number
   expirationDates: string[]
+  expirations: string[]
   selectedExpiration: string
   calls: OptionContract[]
   puts: OptionContract[]
   dataSource: 'yahoo_finance'
   delayMinutes: 15
   lastUpdated: string
+}
+
+export interface OptionGreeks {
+  delta: number
+  gamma: number
+  theta: number
+  vega: number
+  rho: number
 }
 
 export interface OptionContract {
@@ -42,6 +51,7 @@ export interface OptionContract {
   rho: number
   daysToExpiry: number
   probabilityOfProfit: number
+  greeks?: OptionGreeks
 }
 
 interface YahooOptionResponse {
@@ -272,6 +282,7 @@ function parseYahooResponse(result: any, selectedExpiration?: string): OptionsCh
     symbol,
     underlyingPrice,
     expirationDates,
+    expirations: expirationDates,
     selectedExpiration: expiry,
     calls,
     puts,

@@ -40,7 +40,7 @@ export default function MarketDataPanel({ symbol }: MarketDataPanelProps) {
     queryFn: async () => {
       if (!symbol) throw new Error('No symbol provided')
       
-      const response = await fetch(`/api/market-data?symbol=${symbol}`, {
+      const response = await fetch(`/api/options/quote?symbol=${symbol}`, {
         credentials: 'include'
       })
       
@@ -57,20 +57,20 @@ export default function MarketDataPanel({ symbol }: MarketDataPanelProps) {
       const apiData = result.data
       return {
         symbol: apiData.symbol,
-        price: apiData.price,
-        change: apiData.change,
-        changePercent: apiData.changePercent,
-        dayRange: { low: apiData.low || apiData.price * 0.95, high: apiData.high || apiData.price * 1.05 },
-        volume: apiData.volume || 0,
-        avgVolume: apiData.volume || 0, // Use same volume as average for now
-        marketCap: 0, // Not available in our API
-        pe: 0, // Not available in our API
-        beta: 0, // Not available in our API
-        iv30: 25, // Default IV
+        price: apiData.regularMarketPrice,
+        change: apiData.regularMarketChange,
+        changePercent: apiData.regularMarketChangePercent,
+        dayRange: { low: apiData.regularMarketDayLow, high: apiData.regularMarketDayHigh },
+        volume: apiData.regularMarketVolume || 0,
+        avgVolume: apiData.averageDailyVolume10Day || 0,
+        marketCap: apiData.marketCap || 0,
+        pe: apiData.trailingPE || 0,
+        beta: apiData.beta || 0,
+        iv30: apiData.impliedVolatility || 25,
         ivRank: 50, // Default IV rank
-        earnings: 'N/A',
-        dividend: 0,
-        divYield: 0
+        earnings: apiData.earningsTimestamp ? new Date(apiData.earningsTimestamp * 1000).toISOString() : 'N/A',
+        dividend: apiData.dividendRate || 0,
+        divYield: apiData.dividendYield || 0
       }
     },
     enabled: !!symbol, // Enable query when symbol is provided
