@@ -202,6 +202,13 @@ class MarketDataService {
    * Initialize real market data providers
    */
   private async initializeRealDataProviders(): Promise<void> {
+    console.log('🔍 Initializing real data providers...')
+    console.log('Environment variables check:')
+    console.log('- NEXT_PUBLIC_ENABLE_REAL_DATA:', process.env.NEXT_PUBLIC_ENABLE_REAL_DATA)
+    console.log('- NEXT_PUBLIC_MARKET_DATA_PROVIDER:', process.env.NEXT_PUBLIC_MARKET_DATA_PROVIDER)
+    console.log('- ALPHA_VANTAGE_API_KEY present:', !!process.env.ALPHA_VANTAGE_API_KEY)
+    console.log('- NODE_ENV:', process.env.NODE_ENV)
+
     try {
       const providers = []
 
@@ -212,9 +219,9 @@ class MarketDataService {
           providers.push(MarketDataProviderFactory.createProvider('alpha_vantage', {
             apiKey: alphaVantageKey
           }))
-          console.log('Added Alpha Vantage provider')
+          console.log('✅ Added Alpha Vantage provider with key:', alphaVantageKey === 'demo' ? 'demo' : 'custom')
         } catch (error) {
-          console.warn('Failed to add Alpha Vantage provider:', error)
+          console.warn('❌ Failed to add Alpha Vantage provider:', error)
         }
       }
 
@@ -533,14 +540,26 @@ class MarketDataService {
    * Get service configuration info
    */
   getServiceInfo() {
-    return {
+    const serviceInfo = {
       enableRealData: this.config.enableRealData,
       provider: this.config.provider,
       hasRealDataService: !!this.realDataService,
       providerCount: this.realDataService ? this.realDataService.getProviderStatus().length : 0,
       cacheSize: this.cache.size,
-      subscriberCount: this.subscribers.size
+      subscriberCount: this.subscribers.size,
+      // Enhanced debugging information
+      debug: {
+        configEnableRealData: this.config.enableRealData,
+        envEnableRealData: process.env.NEXT_PUBLIC_ENABLE_REAL_DATA,
+        envProvider: process.env.NEXT_PUBLIC_MARKET_DATA_PROVIDER,
+        hasAlphaVantageKey: !!process.env.ALPHA_VANTAGE_API_KEY,
+        nodeEnv: process.env.NODE_ENV,
+        realDataServiceType: this.realDataService ? 'MultiProviderMarketDataService' : 'none'
+      }
     }
+    
+    console.log('📊 Service info requested:', serviceInfo)
+    return serviceInfo
   }
 
   /**

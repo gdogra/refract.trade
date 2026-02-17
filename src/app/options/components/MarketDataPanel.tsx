@@ -35,13 +35,47 @@ export default function MarketDataPanel({ symbol }: MarketDataPanelProps) {
   const [orderRequest, setOrderRequest] = useState<OrderRequest | null>(null)
   const router = useRouter()
 
-  const { data: marketData, isLoading } = useQuery<MarketData>({
+  const { data: marketData, isLoading, error } = useQuery<MarketData>({
     queryKey: ['market-data', symbol],
     queryFn: async () => {
-      // TODO: Connect to real market data API
-      throw new Error('Market data API not connected')
+      if (!symbol) throw new Error('No symbol provided')
+      
+      const response = await fetch(`/api/market-data?symbol=${symbol}`, {
+        credentials: 'include'
+      })
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch market data')
+      }
+      
+      const result = await response.json()
+      if (!result.success) {
+        throw new Error(result.error || 'Market data request failed')
+      }
+      
+      // Transform API response to match expected interface
+      const apiData = result.data
+      return {
+        symbol: apiData.symbol,
+        price: apiData.price,
+        change: apiData.change,
+        changePercent: apiData.changePercent,
+        dayRange: { low: apiData.low || apiData.price * 0.95, high: apiData.high || apiData.price * 1.05 },
+        volume: apiData.volume || 0,
+        avgVolume: apiData.volume || 0, // Use same volume as average for now
+        marketCap: 0, // Not available in our API
+        pe: 0, // Not available in our API
+        beta: 0, // Not available in our API
+        iv30: 25, // Default IV
+        ivRank: 50, // Default IV rank
+        earnings: 'N/A',
+        dividend: 0,
+        divYield: 0
+      }
     },
-    enabled: false // Disable query until API is connected
+    enabled: !!symbol, // Enable query when symbol is provided
+    refetchInterval: 30000, // Refetch every 30 seconds
+    staleTime: 15000 // Consider data stale after 15 seconds
   })
 
   // Show API integration message when no data
