@@ -29,30 +29,38 @@ export default function Profile() {
   const { user, updateUser, isLoggedIn } = useUser()
   const [isEditing, setIsEditing] = useState(false)
   const [profileData, setProfileData] = useState({
-    firstName: user?.firstName || 'Alex',
-    lastName: user?.lastName || 'Chen',
-    email: user?.email || 'alex.chen@email.com',
-    phone: user?.phone || '+1 (555) 987-6543',
-    location: user?.location || 'San Francisco, CA',
+    firstName: user?.firstName || '',
+    lastName: user?.lastName || '',
+    email: user?.email || '',
+    phone: user?.phone || '',
+    location: user?.location || '',
     joinDate: user?.joinDate || new Date().toISOString().split('T')[0],
-    accountType: user?.accountType || 'Pro',
-    tradingExperience: 'Advanced',
-    bio: 'Experienced options trader with a focus on volatility strategies and risk management.'
+    accountType: user?.accountType || 'Basic',
+    tradingExperience: '',
+    bio: ''
   })
 
   useEffect(() => {
-    if (user) {
-      setProfileData({
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        phone: user.phone,
-        location: user.location,
-        joinDate: user.joinDate,
-        accountType: user.accountType,
-        tradingExperience: 'Advanced',
-        bio: 'Experienced options trader with a focus on volatility strategies and risk management.'
-      })
+    // Load profile data from localStorage or user context
+    const savedProfile = localStorage.getItem('userProfile')
+    if (savedProfile) {
+      const parsed = JSON.parse(savedProfile)
+      setProfileData(parsed)
+      setEditedData(parsed)
+    } else if (user) {
+      const defaultProfile = {
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        location: user.location || '',
+        joinDate: user.joinDate || new Date().toISOString().split('T')[0],
+        accountType: user.accountType || 'Basic',
+        tradingExperience: '',
+        bio: ''
+      }
+      setProfileData(defaultProfile)
+      setEditedData(defaultProfile)
     }
   }, [user])
 
@@ -61,6 +69,9 @@ export default function Profile() {
 
   const handleSave = () => {
     setProfileData(editedData)
+    
+    // Save to localStorage
+    localStorage.setItem('userProfile', JSON.stringify(editedData))
     
     // Update user context using the new updateUser function
     updateUser({
@@ -73,6 +84,7 @@ export default function Profile() {
     })
     
     setIsEditing(false)
+    alert('Profile updated successfully!')
   }
 
   const handleCancel = () => {
@@ -80,13 +92,14 @@ export default function Profile() {
     setIsEditing(false)
   }
 
+  // Trading stats would come from order service when API is connected
   const tradingStats = {
-    totalTrades: 142,
-    winRate: 68.5,
-    totalReturn: 23.7,
-    avgHoldTime: '3.2 days',
-    favoriteStrategy: 'Iron Condor',
-    riskScore: 7.2
+    totalTrades: 0,
+    winRate: 0,
+    totalReturn: 0,
+    avgHoldTime: 'N/A',
+    favoriteStrategy: 'N/A',
+    riskScore: 0
   }
 
   const accountSettings = {
@@ -127,7 +140,7 @@ export default function Profile() {
                 <div className="text-center">
                   <div className="relative inline-block">
                     <div className="w-24 h-24 bg-gradient-to-r from-brand-500 to-brand-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
-                      {profileData.firstName[0]}{profileData.lastName[0]}
+                      {(profileData.firstName[0] || 'U')}{(profileData.lastName[0] || 'U')}
                     </div>
                     <button className="absolute bottom-0 right-0 w-8 h-8 bg-white dark:bg-gray-800 rounded-full border-2 border-gray-200 dark:border-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-brand-600">
                       <Camera className="h-4 w-4" />
@@ -135,7 +148,7 @@ export default function Profile() {
                   </div>
                   
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                    {profileData.firstName} {profileData.lastName}
+                    {profileData.firstName || profileData.lastName ? `${profileData.firstName} ${profileData.lastName}` : 'User Profile'}
                   </h2>
                   <p className="text-gray-600 dark:text-gray-400 mb-2">
                     {profileData.accountType} Account

@@ -6,38 +6,23 @@ import { motion } from 'framer-motion'
 import { Star, Plus, TrendingUp, TrendingDown, Volume, Activity, X, Search } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
-
-interface WatchlistItem {
-  symbol: string
-  name: string
-  price: number
-  change: number
-  changePercent: number
-  volume: number
-  marketCap: number
-  pe: number
-  added: Date
-}
+import { watchlistService, type WatchlistItem } from '@/lib/watchlistService'
 
 
 export default function Watchlist() {
   const router = useRouter()
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>([])
 
-  // Load watchlist from localStorage
+  // Load watchlist and subscribe to changes
   useEffect(() => {
-    const savedWatchlist = localStorage.getItem('userWatchlist')
-    if (savedWatchlist) {
-      setWatchlist(JSON.parse(savedWatchlist))
-    }
+    setWatchlist(watchlistService.getWatchlist())
+    
+    const unsubscribe = watchlistService.subscribe((updatedWatchlist) => {
+      setWatchlist(updatedWatchlist)
+    })
+    
+    return unsubscribe
   }, [])
-
-  // Save watchlist to localStorage whenever it changes
-  useEffect(() => {
-    if (watchlist.length > 0) {
-      localStorage.setItem('userWatchlist', JSON.stringify(watchlist))
-    }
-  }, [watchlist])
 
   const [newSymbol, setNewSymbol] = useState('')
   const [isAddingSymbol, setIsAddingSymbol] = useState(false)
@@ -57,18 +42,24 @@ export default function Watchlist() {
   }
 
   const handleAddSymbol = async () => {
-    if (!newSymbol.trim() || watchlist.some(item => item.symbol === newSymbol.toUpperCase())) {
+    if (!newSymbol.trim()) {
       return
     }
 
-    // TODO: Replace with real API call to fetch symbol data
-    alert(`Symbol ${newSymbol.toUpperCase()} will be added when API integration is complete`)
+    const symbolInfo = watchlistService.getSymbolInfo(newSymbol)
+    if (symbolInfo) {
+      const success = watchlistService.addToWatchlist(symbolInfo.symbol, symbolInfo.name)
+      if (!success) {
+        alert(`${newSymbol.toUpperCase()} is already in your watchlist`)
+      }
+    }
+    
     setNewSymbol('')
     setIsAddingSymbol(false)
   }
 
   const handleRemoveSymbol = (symbol: string) => {
-    setWatchlist(watchlist.filter(item => item.symbol !== symbol))
+    watchlistService.removeFromWatchlist(symbol)
   }
 
   const handleViewOptions = (symbol: string) => {

@@ -4,6 +4,7 @@ import { useState, useCallback, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, TrendingUp, TrendingDown, Star } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
+import { watchlistService } from '@/lib/watchlistService'
 
 interface SearchResult {
   symbol: string
@@ -98,13 +99,20 @@ export default function SymbolSearch({ selectedSymbol, onSymbolChange }: SymbolS
   }
 
   const handleAddToWatchlist = () => {
-    alert(`${selectedSymbol} added to your watchlist!`)
-    // TODO: Implement actual watchlist functionality
+    const symbolInfo = watchlistService.getSymbolInfo(selectedSymbol)
+    if (symbolInfo) {
+      const success = watchlistService.addToWatchlist(symbolInfo.symbol, symbolInfo.name)
+      if (success) {
+        alert(`${selectedSymbol} added to your watchlist!`)
+      } else {
+        alert(`${selectedSymbol} is already in your watchlist`)
+      }
+    }
   }
 
   const handleViewChart = () => {
-    alert(`Opening chart for ${selectedSymbol}...`)
-    // TODO: Implement chart view functionality
+    // Redirect to a chart service or show chart modal
+    window.open(`https://finance.yahoo.com/chart/${selectedSymbol}`, '_blank')
   }
 
   useEffect(() => {
