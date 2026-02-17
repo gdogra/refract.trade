@@ -3,6 +3,13 @@
  * Handles real-time market data, options chains, and historical data
  */
 
+import { 
+  MarketDataProviderFactory, 
+  MultiProviderMarketDataService,
+  type RealTimeQuote,
+  type HistoricalData as ProviderHistoricalData 
+} from './providers/marketDataProviders'
+
 export interface MarketDataPoint {
   symbol: string
   price: number
@@ -155,6 +162,7 @@ class MarketDataService {
   private websocket: WebSocket | null = null
   private reconnectAttempts = 0
   private maxReconnectAttempts = 5
+  private realDataService: MultiProviderMarketDataService | null = null
 
   // Configuration
   private config = {
@@ -163,6 +171,8 @@ class MarketDataService {
     wsUrl: process.env.NEXT_PUBLIC_MARKET_DATA_WS || 'wss://socket.polygon.io',
     cacheTTL: 30 * 1000, // 30 seconds default cache
     requestTimeout: 10 * 1000, // 10 seconds timeout
+    enableRealData: process.env.NEXT_PUBLIC_ENABLE_REAL_DATA === 'true',
+    provider: process.env.NEXT_PUBLIC_MARKET_DATA_PROVIDER || 'alpha_vantage'
   }
 
   /**
@@ -172,6 +182,12 @@ class MarketDataService {
     if (typeof window === 'undefined') return // Skip SSR
     
     try {
+      // Initialize real data providers if enabled
+      if (this.config.enableRealData) {
+        await this.initializeRealDataProviders()
+        console.log('Real market data providers initialized')
+      }
+
       // Connect to WebSocket for real-time data
       await this.connectWebSocket()
       console.log('Market data service initialized')
@@ -179,6 +195,39 @@ class MarketDataService {
       console.error('Failed to initialize market data service:', error)
       // Fallback to polling mode
       this.startPollingMode()
+    }
+  }
+
+  /**
+   * Initialize real market data providers
+   */
+  private async initializeRealDataProviders(): Promise<void> {
+    try {
+      const providers = []
+
+      // Primary provider (Alpha Vantage)
+      if (process.env.ALPHA_VANTAGE_API_KEY) {
+        providers.push(MarketDataProviderFactory.createProvider('alpha_vantage', {
+          apiKey: process.env.ALPHA_VANTAGE_API_KEY
+        }))
+      }
+
+      // Fallback providers
+      if (process.env.FINNHUB_API_KEY) {
+        providers.push(MarketDataProviderFactory.createProvider('finnhub', {
+          apiKey: process.env.FINNHUB_API_KEY
+        }))
+      }
+
+      // Yahoo Finance (no API key needed)
+      providers.push(MarketDataProviderFactory.createProvider('yahoo_finance', {}))
+
+      if (providers.length > 0) {
+        this.realDataService = new MultiProviderMarketDataService(providers)
+        console.log(`Initialized ${providers.length} market data providers`)
+      }
+    } catch (error) {
+      console.error('Failed to initialize real data providers:', error)
     }
   }
 
@@ -194,16 +243,42 @@ class MarketDataService {
     }
 
     try {
-      // In development, return mock data
-      if (process.env.NODE_ENV === 'development') {
-        const mockData = MOCK_MARKET_DATA[symbol.toUpperCase()]
-        if (mockData) {
-          this.setCache(cacheKey, mockData, this.config.cacheTTL)
-          return mockData
+      // Try real data providers first if enabled
+      if (this.config.enableRealData && this.realDataService) {
+        try {
+          const realQuote = await this.realDataService.getQuote(symbol)
+          const marketData: MarketDataPoint = {
+            symbol: realQuote.symbol,
+            price: realQuote.price,
+            change: realQuote.change,
+            changePercent: realQuote.changePercent,
+            volume: realQuote.volume,
+            timestamp: realQuote.timestamp,
+            bid: realQuote.bid,
+            ask: realQuote.ask,
+            high: realQuote.high,
+            low: realQuote.low,
+            open: realQuote.open
+          }
+
+          this.setCache(cacheKey, marketData, this.config.cacheTTL)
+          this.notifySubscribers(`market_${symbol}`, marketData)
+          return marketData
+        } catch (realDataError) {
+          console.warn(`Real data providers failed for ${symbol}:`, realDataError)
+          // Fall through to mock data or legacy API
         }
       }
 
-      // Real API call (example with Polygon.io)
+      // Fallback to mock data in development or when real data fails
+      const mockData = MOCK_MARKET_DATA[symbol.toUpperCase()]
+      if (mockData) {
+        this.setCache(cacheKey, mockData, this.config.cacheTTL)
+        this.notifySubscribers(`market_${symbol}`, mockData)
+        return mockData
+      }
+
+      // Legacy API call (Polygon.io) as final fallback
       const response = await this.makeAPICall(`/v2/aggs/ticker/${symbol}/prev`, {
         apikey: this.config.apiKey
       })
@@ -229,7 +304,7 @@ class MarketDataService {
     } catch (error) {
       console.error(`Failed to fetch market data for ${symbol}:`, error)
       
-      // Return mock data as fallback
+      // Final fallback to mock data
       const mockData = MOCK_MARKET_DATA[symbol.toUpperCase()]
       if (mockData) {
         return mockData
@@ -369,6 +444,44 @@ class MarketDataService {
    * Get multiple symbols' data in batch
    */
   async getBatchMarketData(symbols: string[]): Promise<Record<string, MarketDataPoint>> {
+    try {
+      // Try real data providers first if enabled
+      if (this.config.enableRealData && this.realDataService) {
+        try {
+          const realQuotes = await this.realDataService.getBatchQuotes(symbols)
+          const batchData: Record<string, MarketDataPoint> = {}
+          
+          for (const [symbol, quote] of Object.entries(realQuotes)) {
+            batchData[symbol] = {
+              symbol: quote.symbol,
+              price: quote.price,
+              change: quote.change,
+              changePercent: quote.changePercent,
+              volume: quote.volume,
+              timestamp: quote.timestamp,
+              bid: quote.bid,
+              ask: quote.ask,
+              high: quote.high,
+              low: quote.low,
+              open: quote.open
+            }
+            
+            // Cache individual results
+            this.setCache(`market_${symbol}`, batchData[symbol], this.config.cacheTTL)
+            this.notifySubscribers(`market_${symbol}`, batchData[symbol])
+          }
+          
+          return batchData
+        } catch (realDataError) {
+          console.warn('Real data batch request failed:', realDataError)
+          // Fall through to individual requests
+        }
+      }
+    } catch (error) {
+      console.warn('Batch request setup failed:', error)
+    }
+
+    // Fallback to individual requests
     const promises = symbols.map(symbol => 
       this.getMarketData(symbol).catch(error => {
         console.error(`Failed to fetch data for ${symbol}:`, error)
@@ -386,6 +499,30 @@ class MarketDataService {
     })
     
     return batchData
+  }
+
+  /**
+   * Get market data provider status
+   */
+  getProviderStatus(): Array<{ name: string; connected: boolean; rateLimit: any }> {
+    if (this.realDataService) {
+      return this.realDataService.getProviderStatus()
+    }
+    return []
+  }
+
+  /**
+   * Get service configuration info
+   */
+  getServiceInfo() {
+    return {
+      enableRealData: this.config.enableRealData,
+      provider: this.config.provider,
+      hasRealDataService: !!this.realDataService,
+      providerCount: this.realDataService ? this.realDataService.getProviderStatus().length : 0,
+      cacheSize: this.cache.size,
+      subscriberCount: this.subscribers.size
+    }
   }
 
   /**

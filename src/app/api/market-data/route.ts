@@ -8,8 +8,8 @@ export async function GET(request: NextRequest) {
     const symbols = searchParams.get('symbols')
     const type = searchParams.get('type') || 'quote'
 
-    // Input validation
-    if (!symbol && !symbols) {
+    // Input validation - only require symbol/symbols for non-status requests
+    if (type !== 'status' && !symbol && !symbols) {
       return NextResponse.json(
         { error: 'Symbol or symbols parameter is required' },
         { status: 400 }
@@ -36,11 +36,9 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    // Handle single symbol request
-    const symbolUpper = symbol!.toUpperCase()
-
     switch (type) {
       case 'quote':
+        const symbolUpper = symbol!.toUpperCase()
         const marketData = await marketDataService.getMarketData(symbolUpper)
         return NextResponse.json({
           success: true,
@@ -49,8 +47,9 @@ export async function GET(request: NextRequest) {
         })
 
       case 'options':
+        const symbolUpper2 = symbol!.toUpperCase()
         const expiry = searchParams.get('expiry')
-        const optionChain = await marketDataService.getOptionChain(symbolUpper, expiry || undefined)
+        const optionChain = await marketDataService.getOptionChain(symbolUpper2, expiry || undefined)
         return NextResponse.json({
           success: true,
           data: optionChain,
@@ -58,13 +57,14 @@ export async function GET(request: NextRequest) {
         })
 
       case 'history':
+        const symbolUpper3 = symbol!.toUpperCase()
         const timespan = searchParams.get('timespan') as 'minute' | 'hour' | 'day' | 'week' | 'month' || 'day'
         const from = searchParams.get('from') || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
         const to = searchParams.get('to') || new Date().toISOString().split('T')[0]
         const limit = parseInt(searchParams.get('limit') || '120')
 
         const historicalData = await marketDataService.getHistoricalData(
-          symbolUpper,
+          symbolUpper3,
           timespan,
           from,
           to,
@@ -77,9 +77,22 @@ export async function GET(request: NextRequest) {
           timestamp: new Date().toISOString()
         })
 
+      case 'status':
+        const serviceInfo = marketDataService.getServiceInfo()
+        const providerStatus = marketDataService.getProviderStatus()
+        
+        return NextResponse.json({
+          success: true,
+          data: {
+            service: serviceInfo,
+            providers: providerStatus,
+            timestamp: new Date().toISOString()
+          }
+        })
+
       default:
         return NextResponse.json(
-          { error: 'Invalid type parameter. Use: quote, options, or history' },
+          { error: 'Invalid type parameter. Use: quote, options, history, or status' },
           { status: 400 }
         )
     }
