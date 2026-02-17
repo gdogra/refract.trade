@@ -272,11 +272,11 @@ export default function OptionsChainTable({
       )}
       
       {!isLoading && optionsChain && optionsChain.length > 0 && optionsChain[0]?.call?.bid === 0 && (
-        <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+        <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
           <div className="flex items-center space-x-2">
-            <Activity className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-            <span className="text-sm text-amber-800 dark:text-amber-200">
-              <strong>Using Mock Data:</strong> Live options data unavailable. Displaying sample data for interface testing.
+            <Activity className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <span className="text-sm text-blue-800 dark:text-blue-200">
+              <strong>Enhanced Demo Data:</strong> Using real underlying stock prices with simulated options pricing for demonstration.
             </span>
           </div>
         </div>
