@@ -2,9 +2,13 @@
 
 This document lists all environment variables that need to be configured in your Netlify dashboard for the Refract.trade application to work properly in production.
 
+## ⚠️ IMPORTANT: Database Variables Must Be Set First!
+
+**The build will FAIL if DATABASE_URL is not configured before deployment.** Prisma needs this to generate the client during the build process.
+
 ## Required Environment Variables
 
-### Database & Authentication
+### Database & Authentication (CRITICAL - These must be set first!)
 ```
 DATABASE_URL=postgresql://postgres.pfeikjkqqotksxwijcwh:FUsFtNdYPK8n5LA4@aws-0-us-east-1.pooler.supabase.com:5432/postgres
 DIRECT_URL=postgresql://postgres.pfeikjkqqotksxwijcwh:FUsFtNdYPK8n5LA4@aws-0-us-east-1.pooler.supabase.com:5432/postgres
@@ -47,6 +51,24 @@ IEX_API_KEY=your_iex_api_key_here
 POLYGON_API_KEY=your_polygon_api_key_here
 INTRINIO_API_KEY=your_intrinio_api_key_here
 ```
+
+## 🚀 Deployment Checklist
+
+**Before triggering a Netlify build, ensure you have:**
+
+1. ✅ Set `DATABASE_URL` and `DIRECT_URL` in Netlify environment variables
+2. ✅ Set all Supabase environment variables (`NEXT_PUBLIC_SUPABASE_URL`, etc.)
+3. ✅ Set NextAuth variables (`NEXTAUTH_SECRET`, `NEXTAUTH_URL`)
+4. ✅ Set market data variables (`NEXT_PUBLIC_MARKET_DATA_PROVIDER`, etc.)
+5. ✅ **Trigger a manual deploy** after setting environment variables
+
+## Troubleshooting Build Issues
+
+If you see "PrismaClientInitializationError" during build:
+
+1. **Check DATABASE_URL**: Ensure it's set correctly in Netlify environment variables
+2. **Clear Build Cache**: In Netlify dashboard, go to Site settings → Build & deploy → Build settings → Clear cache and retry
+3. **Redeploy**: Trigger a fresh deployment after clearing cache
 
 ## Notes
 

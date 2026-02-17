@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { prisma, safeExecutePrisma } from '@/lib/prisma'
 import { calculateGreeks, getTimeToExpiry, type GreeksInput } from '@/lib/greeks'
 import { marketDataService } from '@/lib/marketData'
 
@@ -17,25 +17,28 @@ export async function GET(request: NextRequest) {
     const includeGreeks = searchParams.get('includeGreeks') === 'true'
     const includeAnalytics = searchParams.get('includeAnalytics') === 'true'
 
-    // Get user's positions from database
-    const positions = await prisma.position.findMany({
-      where: {
-        userId: session.user.id,
-        isActive: true
-      },
-      include: {
-        legs: true,
-        transactions: {
-          orderBy: {
-            timestamp: 'desc'
-          },
-          take: 1
+    // Get user's positions from database with safe execution
+    const positions = await safeExecutePrisma(
+      async (client) => await client.position.findMany({
+        where: {
+          userId: session.user.id,
+          isActive: true
+        },
+        include: {
+          legs: true,
+          transactions: {
+            orderBy: {
+              timestamp: 'desc'
+            },
+            take: 1
+          }
+        },
+        orderBy: {
+          entryDate: 'desc'
         }
-      },
-      orderBy: {
-        entryDate: 'desc'
-      }
-    })
+      }),
+      [] // Fallback to empty array if Prisma fails
+    )
 
     // Get current market data for all unique symbols
     const symbolSet = new Set(positions.map(p => p.symbol))
@@ -253,33 +256,40 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create position in database
-    const position = await prisma.position.create({
-      data: {
-        userId: session.user.id,
-        accountId: accountId || 'default', // You might want to create a default account
-        symbol,
-        strategyType,
-        quantity,
-        entryPrice,
-        entryDate: new Date(),
-        legs: {
-          create: legs.map((leg: any) => ({
-            symbol: leg.symbol,
-            optionType: leg.optionType,
-            strike: leg.strike,
-            expiry: new Date(leg.expiry),
-            quantity: leg.quantity,
-            side: leg.side,
-            entryPrice: leg.entryPrice,
-            iv: leg.iv || null
-          }))
+    // Create position in database with safe execution
+    const position = await safeExecutePrisma(
+      async (client) => await client.position.create({
+        data: {
+          userId: session.user.id,
+          accountId: accountId || 'default', // You might want to create a default account
+          symbol,
+          strategyType,
+          quantity,
+          entryPrice,
+          entryDate: new Date(),
+          legs: {
+            create: legs.map((leg: any) => ({
+              symbol: leg.symbol,
+              optionType: leg.optionType,
+              strike: leg.strike,
+              expiry: new Date(leg.expiry),
+              quantity: leg.quantity,
+              side: leg.side,
+              entryPrice: leg.entryPrice,
+              iv: leg.iv || null
+            }))
+          }
+        },
+        include: {
+          legs: true
         }
-      },
-      include: {
-        legs: true
-      }
-    })
+      }),
+      null // Fallback to null if creation fails
+    )
+
+    if (!position) {
+      throw new Error('Failed to create position in database')
+    }
 
     return NextResponse.json({
       success: true,

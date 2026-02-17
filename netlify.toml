@@ -1,11 +1,15 @@
 [build]
-  command = "npm run build"
+  command = "./scripts/build.sh"
   publish = ".next"
 
 [build.environment]
   NODE_VERSION = "18"
   NEXT_TELEMETRY_DISABLED = "1"
   SECRETS_SCAN_ENABLED = "false"
+  # Force Prisma to generate client during build
+  PRISMA_GENERATE_SKIP_AUTOINSTALL = "true"
+  # Disable Prisma telemetry
+  CHECKPOINT_DISABLE = "1"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
