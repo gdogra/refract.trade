@@ -72,7 +72,26 @@ export default function OptionsChainTable({
   const { data: optionsChain, isLoading } = useQuery<OptionContract[]>({
     queryKey: ['options-chain', symbol, selectedExpiry],
     queryFn: async () => {
-      // Basic options chain for trading (prices set to 0 until API connected)
+      if (!symbol || !selectedExpiry) return []
+      
+      try {
+        const response = await fetch(`/api/market-data?symbol=${symbol}&type=options&expiry=${selectedExpiry}`, {
+          credentials: 'include'
+        })
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch options data')
+        }
+        
+        const result = await response.json()
+        if (result.success && result.data) {
+          return result.data // Use real options data from API
+        }
+      } catch (error) {
+        console.warn('Options API failed, using mock data:', error)
+      }
+      
+      // Fallback to mock data if API fails
       const strikes = []
       const baseStrike = 200
       
@@ -190,15 +209,28 @@ export default function OptionsChainTable({
         </div>
       </div>
 
-      {/* API Integration Notice */}
-      <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-        <div className="flex items-center space-x-2">
-          <Activity className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
-          <span className="text-sm text-yellow-800 dark:text-yellow-200">
-            <strong>API Integration Required:</strong> Live options data (prices, volume, IV) requires market data API connection. Current values are placeholders for development.
-          </span>
+      {/* Market Data Status */}
+      {isLoading && (
+        <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+          <div className="flex items-center space-x-2">
+            <Activity className="h-4 w-4 text-blue-600 dark:text-blue-400 animate-spin" />
+            <span className="text-sm text-blue-800 dark:text-blue-200">
+              Loading live options data for {symbol}...
+            </span>
+          </div>
         </div>
-      </div>
+      )}
+      
+      {!isLoading && optionsChain && optionsChain.length > 0 && optionsChain[0]?.call?.bid === 0 && (
+        <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+          <div className="flex items-center space-x-2">
+            <Activity className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+            <span className="text-sm text-amber-800 dark:text-amber-200">
+              <strong>Using Mock Data:</strong> Live options data unavailable. Displaying sample data for interface testing.
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Options Chain Table */}
       <div className="overflow-x-auto">

@@ -18,8 +18,9 @@ export default function Analytics() {
     // TODO: Replace with real AI API call
     await new Promise(resolve => setTimeout(resolve, 1000))
     setAiStrategyResult({
-      error: 'AI service not connected',
-      message: 'Strategy generation requires AI API integration'
+      comingSoon: true,
+      title: 'AI Strategy Generation',
+      message: 'Advanced ML-powered strategy recommendations coming soon'
     })
     setIsAnalyzing(false)
   }
@@ -29,8 +30,9 @@ export default function Analytics() {
     // TODO: Replace with real AI API call
     await new Promise(resolve => setTimeout(resolve, 1000))
     setPredictiveAnalysis({
-      error: 'Predictive AI not connected',
-      message: 'Market prediction requires AI API integration'
+      comingSoon: true,
+      title: 'Predictive Market Analysis',
+      message: 'AI-powered market prediction models coming soon'
     })
     setIsAnalyzing(false)
   }
@@ -41,8 +43,9 @@ export default function Analytics() {
     await new Promise(resolve => setTimeout(resolve, 1000))
     setSmartAlerts([{
       id: 1,
-      error: true,
-      message: 'Smart alerts require AI API integration'
+      comingSoon: true,
+      title: 'Smart AI Alerts',
+      message: 'Intelligent trading alerts powered by AI coming soon'
     }])
     setIsAnalyzing(false)
   }
@@ -148,10 +151,10 @@ export default function Analytics() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-center text-gray-500 dark:text-gray-400 py-8">
-                  <Zap className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p className="font-medium mb-2">AI insights not available</p>
-                  <p className="text-sm">Requires AI service integration</p>
+                <div className="text-center text-blue-600 dark:text-blue-400 py-8">
+                  <Zap className="h-12 w-12 mx-auto mb-4 opacity-70" />
+                  <p className="font-medium mb-2">AI Trading Insights</p>
+                  <p className="text-sm">Advanced ML-powered trading intelligence coming soon</p>
                 </div>
               </CardContent>
             </Card>
@@ -219,10 +222,10 @@ export default function Analytics() {
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800"
+                      className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800"
                     >
-                      <div className="text-center text-red-600 dark:text-red-400">
-                        <p className="font-medium">{aiStrategyResult.error}</p>
+                      <div className="text-center text-blue-600 dark:text-blue-400">
+                        <p className="font-medium">{aiStrategyResult.title}</p>
                         <p className="text-sm mt-1">{aiStrategyResult.message}</p>
                       </div>
                     </motion.div>
@@ -272,10 +275,10 @@ export default function Analytics() {
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800"
+                      className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800"
                     >
-                      <div className="text-center text-red-600 dark:text-red-400">
-                        <p className="font-medium">{predictiveAnalysis.error}</p>
+                      <div className="text-center text-blue-600 dark:text-blue-400">
+                        <p className="font-medium">{predictiveAnalysis.title}</p>
                         <p className="text-sm mt-1">{predictiveAnalysis.message}</p>
                       </div>
                     </motion.div>
@@ -325,10 +328,10 @@ export default function Analytics() {
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800"
+                      className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800"
                     >
-                      <div className="text-center text-red-600 dark:text-red-400">
-                        <p className="font-medium">Smart Alerts Not Available</p>
+                      <div className="text-center text-blue-600 dark:text-blue-400">
+                        <p className="font-medium">{smartAlerts[0]?.title}</p>
                         <p className="text-sm mt-1">{smartAlerts[0]?.message}</p>
                       </div>
                     </motion.div>

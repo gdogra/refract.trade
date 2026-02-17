@@ -78,17 +78,49 @@ export default function MarketDataPanel({ symbol }: MarketDataPanelProps) {
     staleTime: 15000 // Consider data stale after 15 seconds
   })
 
-  // Show API integration message when no data
+  // Show loading or error states
+  if (isLoading) {
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 sticky top-6">
+        <div className="text-center py-8">
+          <Activity className="h-8 w-8 mx-auto mb-4 text-blue-500 animate-spin" />
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            Loading Market Data
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400 text-sm">
+            Fetching real-time data for {symbol}...
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 sticky top-6">
+        <div className="text-center py-8">
+          <DollarSign className="h-12 w-12 mx-auto mb-4 text-red-400 opacity-50" />
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            Market Data Unavailable
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400 text-sm">
+            Unable to load market data for {symbol}. Check your connection.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   if (!marketData) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 sticky top-6">
         <div className="text-center py-8">
           <DollarSign className="h-12 w-12 mx-auto mb-4 text-gray-400 opacity-50" />
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-            Market Data Not Available
+            No Data Available
           </h3>
           <p className="text-gray-600 dark:text-gray-400 text-sm">
-            Real-time market data requires API integration
+            Please select a symbol to view market data
           </p>
         </div>
       </div>

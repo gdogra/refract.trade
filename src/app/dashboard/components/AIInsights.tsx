@@ -18,46 +18,10 @@ export default function AIInsights() {
   const { data: insights, isLoading } = useQuery<AIInsight[]>({
     queryKey: ['ai-insights'],
     queryFn: async () => {
-      // Mock data for now - will connect to AI service later
-      return [
-        {
-          id: '1',
-          type: 'opportunity',
-          title: 'High Probability Trade',
-          description: 'NVDA bull call spread shows 78% win rate based on current market conditions',
-          confidence: 78,
-          action: 'View Strategy',
-          impact: 'high'
-        },
-        {
-          id: '2',
-          type: 'warning',
-          title: 'Position Risk Alert',
-          description: 'Your TSLA position may face increased volatility due to upcoming earnings',
-          confidence: 85,
-          action: 'Adjust Position',
-          impact: 'medium'
-        },
-        {
-          id: '3',
-          type: 'optimization',
-          title: 'Portfolio Rebalancing',
-          description: 'Consider reducing tech exposure and increasing defensive positions',
-          confidence: 72,
-          action: 'View Suggestions',
-          impact: 'medium'
-        },
-        {
-          id: '4',
-          type: 'education',
-          title: 'Learning Opportunity',
-          description: 'Current market regime favors iron condors - learn this strategy',
-          confidence: 90,
-          action: 'Start Learning',
-          impact: 'low'
-        }
-      ]
-    }
+      // TODO: Connect to real AI service - for now return empty array
+      return []
+    },
+    enabled: false // Disable query until AI service is implemented
   })
 
   if (isLoading) {
@@ -135,7 +99,14 @@ export default function AIInsights() {
       </div>
 
       <div className="space-y-4">
-        {insights?.slice(0, 3).map((insight, index) => {
+        {(!insights || insights.length === 0) ? (
+          <div className="text-center text-blue-600 dark:text-blue-400 py-8">
+            <Brain className="h-12 w-12 mx-auto mb-4 opacity-70" />
+            <p className="font-medium mb-2">AI Insights Coming Soon</p>
+            <p className="text-sm">Advanced ML-powered trading intelligence in development</p>
+          </div>
+        ) : (
+          insights?.slice(0, 3).map((insight, index) => {
           const IconComponent = getInsightIcon(insight.type)
           
           return (
@@ -200,25 +171,26 @@ export default function AIInsights() {
               </div>
             </motion.div>
           )
-        })}
+        })
+        )}
       </div>
 
       {/* AI Status */}
       <motion.div 
-        className="mt-6 p-3 bg-gradient-to-r from-brand-50 to-purple-50 dark:from-brand-900/10 dark:to-purple-900/10 rounded-lg"
+        className="mt-6 p-3 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/10 dark:to-purple-900/10 rounded-lg"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5, delay: 0.6 }}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-sm text-gray-700 dark:text-gray-300">
-              AI Analysis Active
+            <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
+            <span className="text-sm text-blue-700 dark:text-blue-300">
+              AI Features In Development
             </span>
           </div>
-          <span className="text-xs text-gray-600 dark:text-gray-400">
-            Next update in 5m
+          <span className="text-xs text-blue-600 dark:text-blue-400">
+            Coming Soon
           </span>
         </div>
       </motion.div>
