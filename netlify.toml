@@ -15,6 +15,32 @@
   package = "@netlify/plugin-nextjs"
 
 # Headers for security and performance
+[[redirects]]
+  from = "/api/options/quote"
+  to = "/api/options/quote/"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/options/chain"
+  to = "/api/options/chain/"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/options/expirations"
+  to = "/api/options/expirations/"
+  status = 200
+  force = true
+
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Cache-Control = "public, max-age=60"
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
+
 [[headers]]
   for = "/*"
   [headers.values]
