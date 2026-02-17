@@ -81,7 +81,10 @@ class OrderService {
       this.notifyListeners()
 
       // TODO: Replace with real order processing API
-      // For now, orders remain in pending status
+      // For demo purposes, auto-fill orders after a short delay
+      setTimeout(() => {
+        this.fillOrder(order.id)
+      }, 1000 + Math.random() * 2000) // Fill after 1-3 seconds
 
       return { success: true, orderId: order.id }
     } catch (error) {
@@ -89,10 +92,25 @@ class OrderService {
     }
   }
 
-  // TODO: Remove this method when real order processing is implemented
-  private processOrder(orderId: string) {
-    // Real order processing will be handled by broker API
-    // This method is no longer used
+  // Fill order for demo purposes
+  private fillOrder(orderId: string): boolean {
+    const order = this.orders.find(o => o.id === orderId)
+    if (order && order.status === 'pending') {
+      order.status = 'filled'
+      this.saveToLocalStorage()
+      this.notifyListeners()
+
+      // Send notification for filled order
+      notificationService.addNotification({
+        type: 'order',
+        title: 'Order Filled',
+        message: `${order.action.toUpperCase()} ${order.quantity} ${order.symbol} ${order.strike}${order.type.charAt(0).toUpperCase()} @ $${order.price}`,
+        data: { orderId: order.id, action: 'filled' }
+      })
+      
+      return true
+    }
+    return false
   }
 
   getOrders(): Order[] {
@@ -179,7 +197,21 @@ class OrderService {
 
   private getCurrentPrice(symbol: string, type: 'call' | 'put', strike: number): number {
     // TODO: Replace with real market data API
-    return 0 // Returns 0 until API integration
+    // For demo purposes, generate realistic mock prices based on order history
+    const key = `${symbol}_${type}_${strike}`
+    const relatedOrders = this.orders.filter(o => 
+      o.symbol === symbol && o.type === type && o.strike === strike && o.status === 'filled'
+    )
+    
+    if (relatedOrders.length > 0) {
+      // Use last filled price with some random variation (+/- 10%)
+      const lastPrice = relatedOrders[relatedOrders.length - 1].price
+      const variation = (Math.random() - 0.5) * 0.2 // +/- 10%
+      return Math.max(0.01, lastPrice * (1 + variation))
+    }
+    
+    // Default mock price if no order history
+    return Math.max(0.01, Math.random() * 5 + 0.5) // Between $0.50 and $5.50
   }
 }
 
