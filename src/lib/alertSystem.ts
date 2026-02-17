@@ -496,11 +496,16 @@ class AlertSystem {
       details.thresholdValue = Array.isArray(condition.value) ? condition.value[0] : condition.value
       
       switch (condition.operator) {
-        case 'gt': return fieldValue > condition.value
-        case 'gte': return fieldValue >= condition.value
-        case 'lt': return fieldValue < condition.value
-        case 'lte': return fieldValue <= condition.value
-        case 'eq': return fieldValue === condition.value
+        case 'gt': 
+          return Array.isArray(condition.value) ? false : fieldValue > condition.value
+        case 'gte': 
+          return Array.isArray(condition.value) ? false : fieldValue >= condition.value
+        case 'lt': 
+          return Array.isArray(condition.value) ? false : fieldValue < condition.value
+        case 'lte': 
+          return Array.isArray(condition.value) ? false : fieldValue <= condition.value
+        case 'eq': 
+          return Array.isArray(condition.value) ? false : fieldValue === condition.value
         case 'between':
           if (Array.isArray(condition.value)) {
             return fieldValue >= condition.value[0] && fieldValue <= condition.value[1]
@@ -648,7 +653,7 @@ class AlertSystem {
       isRead: false,
       isResolved: false,
       userId,
-      actionRequired: severity === AlertSeverity.HIGH || severity === AlertSeverity.CRITICAL
+      actionRequired: [AlertSeverity.HIGH, AlertSeverity.CRITICAL].includes(severity)
     }
   }
 
