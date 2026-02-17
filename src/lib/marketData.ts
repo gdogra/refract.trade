@@ -354,8 +354,8 @@ class MarketDataService {
       // Get underlying price
       const underlyingData = await this.getMarketData(symbol)
       
-      // In development, return mock option chain
-      if (process.env.NODE_ENV === 'development') {
+      // Return mock option chain if real data is disabled
+      if (!this.config.enableRealData || !this.realDataService) {
         const mockChain = this.generateMockOptionChain(symbol, underlyingData.price, expiry)
         this.setCache(cacheKey, mockChain, this.config.cacheTTL * 2) // Cache longer for options
         return mockChain
