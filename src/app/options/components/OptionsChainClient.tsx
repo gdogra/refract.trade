@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { useSearchParams } from 'next/navigation'
 import SymbolSearch from './SymbolSearch'
 import OptionsChainTable from './OptionsChainTable'
 import StrategyBuilder from './StrategyBuilder'
@@ -10,10 +11,19 @@ import ImpliedVolatilityChart from './ImpliedVolatilityChart'
 import MarketDataPanel from './MarketDataPanel'
 
 export default function OptionsChainClient() {
-  const [selectedSymbol, setSelectedSymbol] = useState('AAPL')
+  const searchParams = useSearchParams()
+  const [selectedSymbol, setSelectedSymbol] = useState('')
   const [selectedExpiry, setSelectedExpiry] = useState('')
   const [selectedStrike, setSelectedStrike] = useState<number | null>(null)
   const [viewMode, setViewMode] = useState<'chain' | 'strategy' | 'analysis'>('chain')
+
+  // Set symbol from URL parameter
+  useEffect(() => {
+    const urlSymbol = searchParams.get('symbol')
+    if (urlSymbol) {
+      setSelectedSymbol(urlSymbol.toUpperCase())
+    }
+  }, [searchParams])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4 lg:p-8">

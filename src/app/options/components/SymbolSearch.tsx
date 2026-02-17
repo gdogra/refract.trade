@@ -39,13 +39,39 @@ export default function SymbolSearch({ selectedSymbol, onSymbolChange }: SymbolS
         { symbol: 'AMZN', name: 'Amazon.com, Inc.', price: 0, change: 0, changePercent: 0, volume: 0 },
         { symbol: 'NVDA', name: 'NVIDIA Corporation', price: 0, change: 0, changePercent: 0, volume: 0 },
         { symbol: 'SPY', name: 'SPDR S&P 500 ETF', price: 0, change: 0, changePercent: 0, volume: 0 },
-        { symbol: 'QQQ', name: 'Invesco QQQ Trust', price: 0, change: 0, changePercent: 0, volume: 0 }
+        { symbol: 'QQQ', name: 'Invesco QQQ Trust', price: 0, change: 0, changePercent: 0, volume: 0 },
+        { symbol: 'PLTR', name: 'Palantir Technologies Inc.', price: 0, change: 0, changePercent: 0, volume: 0 },
+        { symbol: 'ORCL', name: 'Oracle Corporation', price: 0, change: 0, changePercent: 0, volume: 0 },
+        { symbol: 'META', name: 'Meta Platforms Inc.', price: 0, change: 0, changePercent: 0, volume: 0 },
+        { symbol: 'NFLX', name: 'Netflix Inc.', price: 0, change: 0, changePercent: 0, volume: 0 },
+        { symbol: 'AMD', name: 'Advanced Micro Devices Inc.', price: 0, change: 0, changePercent: 0, volume: 0 },
+        { symbol: 'INTC', name: 'Intel Corporation', price: 0, change: 0, changePercent: 0, volume: 0 }
       ]
       
-      return commonSymbols.filter(result => 
+      const filteredSymbols = commonSymbols.filter(result => 
         result.symbol.toLowerCase().includes(query.toLowerCase()) ||
         result.name.toLowerCase().includes(query.toLowerCase())
-      ).slice(0, 8)
+      )
+      
+      // Add dynamic symbol search for any ticker not in our predefined list
+      const upperQuery = query.toUpperCase()
+      const isSymbolQuery = /^[A-Z]{1,5}$/i.test(query.trim())
+      const symbolExists = filteredSymbols.some(result => 
+        result.symbol.toUpperCase() === upperQuery
+      )
+      
+      if (isSymbolQuery && !symbolExists && query.trim().length >= 1) {
+        filteredSymbols.unshift({
+          symbol: upperQuery,
+          name: `${upperQuery} (Search for options)`,
+          price: 0,
+          change: 0,
+          changePercent: 0,
+          volume: 0
+        })
+      }
+      
+      return filteredSymbols.slice(0, 8)
     },
     enabled: query.length > 0
   })

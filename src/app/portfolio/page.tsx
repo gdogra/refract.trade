@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { TrendingUp, TrendingDown, DollarSign, PieChart, Activity, Target, ShoppingCart, TrendingDown as SellIcon } from 'lucide-react'
+import { TrendingUp, TrendingDown, DollarSign, PieChart, Activity, Target, TrendingDown as SellIcon } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { orderService, type OrderRequest } from '@/lib/orderService'
 import OrderModal from '@/components/OrderModal'
@@ -54,27 +54,7 @@ export default function Portfolio() {
   const totalChange = positions.reduce((sum, pos) => sum + (pos.change * pos.quantity), 0)
   const totalChangePercent = (totalChange / (totalValue - totalChange)) * 100
 
-  // Trading handlers
-  const handleBuyPosition = (position: any) => {
-    // Extract symbol and option details from position
-    const symbolMatch = position.symbol.match(/^([A-Z]+)\s+(\d+)([CP])$/)
-    if (!symbolMatch) return
-    
-    const [, symbol, strike, type] = symbolMatch
-    const orderReq: OrderRequest = {
-      symbol,
-      type: type === 'C' ? 'call' : 'put',
-      action: 'buy',
-      strike: parseInt(strike),
-      expiry: '2024-12-20', // Default expiry - will be updated in modal
-      quantity: 1,
-      price: position.currentPrice
-    }
-    
-    setOrderRequest(orderReq)
-    setShowOrderModal(true)
-  }
-
+  // Trading handler - only sell since these are owned positions
   const handleSellPosition = (position: any) => {
     // Extract symbol and option details from position
     const symbolMatch = position.symbol.match(/^([A-Z]+)\s+(\d+)([CP])$/)
@@ -255,32 +235,18 @@ export default function Portfolio() {
                           ${position.value.toLocaleString()}
                         </td>
                         <td className="py-4 px-4 text-center">
-                          <div className="flex items-center justify-center space-x-2">
-                            <motion.button
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                handleBuyPosition(position)
-                              }}
-                              className="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-2 rounded-lg flex items-center space-x-1 transition-colors"
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
-                            >
-                              <ShoppingCart className="h-3 w-3" />
-                              <span>Buy</span>
-                            </motion.button>
-                            <motion.button
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                handleSellPosition(position)
-                              }}
-                              className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-2 rounded-lg flex items-center space-x-1 transition-colors"
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
-                            >
-                              <SellIcon className="h-3 w-3" />
-                              <span>Sell</span>
-                            </motion.button>
-                          </div>
+                          <motion.button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleSellPosition(position)
+                            }}
+                            className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-2 rounded-lg flex items-center space-x-1 transition-colors"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            <SellIcon className="h-3 w-3" />
+                            <span>Sell</span>
+                          </motion.button>
                         </td>
                       </motion.tr>
                     ))}
@@ -310,53 +276,12 @@ export default function Portfolio() {
                     <span className="text-lg font-semibold text-gray-900 dark:text-white">Portfolio Performance</span>
                   </div>
                   
-                  {/* Mock Performance Chart */}
-                  <div className="w-full h-48 bg-gradient-to-r from-green-400 to-blue-500 rounded-lg relative overflow-hidden mb-4">
-                    {/* Chart Grid Lines */}
-                    <div className="absolute inset-0 opacity-20">
-                      {[...Array(5)].map((_, i) => (
-                        <div key={i} className="absolute left-0 right-0 border-t border-white" style={{ top: `${i * 25}%` }} />
-                      ))}
-                    </div>
-                    
-                    {/* Performance Line */}
-                    <svg className="absolute inset-0 w-full h-full">
-                      <polyline
-                        points="0,120 40,110 80,95 120,100 160,85 200,75 240,70 280,65 320,60"
-                        fill="none"
-                        stroke="white"
-                        strokeWidth="3"
-                        className="drop-shadow-sm"
-                      />
-                      {/* Data Points */}
-                      <circle cx="320" cy="60" r="4" fill="white" className="drop-shadow-sm" />
-                    </svg>
-                    
-                    {/* Performance Stats */}
-                    <div className="absolute bottom-4 left-4 text-white">
-                      <div className="text-sm opacity-90">30-Day Return</div>
-                      <div className="text-xl font-bold">+12.4%</div>
-                    </div>
-                    
-                    <div className="absolute bottom-4 right-4 text-white text-right">
-                      <div className="text-sm opacity-90">vs S&P 500</div>
-                      <div className="text-xl font-bold">+3.2%</div>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-3 gap-4 text-center text-sm">
-                    <div>
-                      <div className="text-gray-500 dark:text-gray-400">Sharpe Ratio</div>
-                      <div className="font-semibold text-gray-900 dark:text-white">1.85</div>
-                    </div>
-                    <div>
-                      <div className="text-gray-500 dark:text-gray-400">Max Drawdown</div>
-                      <div className="font-semibold text-red-600">-4.2%</div>
-                    </div>
-                    <div>
-                      <div className="text-gray-500 dark:text-gray-400">Win Rate</div>
-                      <div className="font-semibold text-green-600">68%</div>
-                    </div>
+                  <div className="text-center text-gray-500 dark:text-gray-400">
+                    <Activity className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                      Performance Chart Not Available
+                    </h3>
+                    <p>Performance tracking requires API integration to display real portfolio data</p>
                   </div>
                 </div>
               </div>
