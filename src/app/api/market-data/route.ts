@@ -38,7 +38,13 @@ export async function GET(request: NextRequest) {
 
     switch (type) {
       case 'quote':
-        const symbolUpper = symbol!.toUpperCase()
+        if (!symbol) {
+          return NextResponse.json(
+            { error: 'Symbol parameter is required for quote requests' },
+            { status: 400 }
+          )
+        }
+        const symbolUpper = symbol.toUpperCase()
         const marketData = await marketDataService.getMarketData(symbolUpper)
         return NextResponse.json({
           success: true,
@@ -47,7 +53,13 @@ export async function GET(request: NextRequest) {
         })
 
       case 'options':
-        const symbolUpper2 = symbol!.toUpperCase()
+        if (!symbol) {
+          return NextResponse.json(
+            { error: 'Symbol parameter is required for options requests' },
+            { status: 400 }
+          )
+        }
+        const symbolUpper2 = symbol.toUpperCase()
         const expiry = searchParams.get('expiry')
         const optionChain = await marketDataService.getOptionChain(symbolUpper2, expiry || undefined)
         return NextResponse.json({
@@ -57,7 +69,13 @@ export async function GET(request: NextRequest) {
         })
 
       case 'history':
-        const symbolUpper3 = symbol!.toUpperCase()
+        if (!symbol) {
+          return NextResponse.json(
+            { error: 'Symbol parameter is required for history requests' },
+            { status: 400 }
+          )
+        }
+        const symbolUpper3 = symbol.toUpperCase()
         const timespan = searchParams.get('timespan') as 'minute' | 'hour' | 'day' | 'week' | 'month' || 'day'
         const from = searchParams.get('from') || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
         const to = searchParams.get('to') || new Date().toISOString().split('T')[0]

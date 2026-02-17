@@ -184,7 +184,7 @@ export default function OptionsChainTable({
                 onChange={(e) => onExpiryChange(e.target.value)}
                 className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent"
               >
-                {expirations?.map((expiry) => (
+                {(expirations || []).map((expiry) => (
                   <option key={expiry} value={expiry}>
                     {new Date(expiry).toLocaleDateString()}
                   </option>
@@ -277,7 +277,7 @@ export default function OptionsChainTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-            {optionsChain?.map((option, index) => {
+            {(optionsChain || []).map((option, index) => {
               const isSelected = selectedStrike === option.strike
               // TODO: Calculate ITM based on real current price
               const isITM = {
