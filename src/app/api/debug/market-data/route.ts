@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
     // This endpoint helps debug market data service in production
     console.log('🔧 Debug endpoint called')
     
-    const debugInfo = {
+    const debugInfo: any = {
       timestamp: new Date().toISOString(),
       environment: {
         NODE_ENV: process.env.NODE_ENV,
