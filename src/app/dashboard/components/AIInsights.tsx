@@ -106,7 +106,7 @@ export default function AIInsights() {
             <p className="text-sm">Advanced ML-powered trading intelligence in development</p>
           </div>
         ) : (
-          insights?.slice(0, 3).map((insight, index) => {
+          (insights || []).slice(0, 3).map((insight, index) => {
           const IconComponent = getInsightIcon(insight.type)
           
           return (
