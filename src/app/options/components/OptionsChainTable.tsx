@@ -85,7 +85,57 @@ export default function OptionsChainTable({
         
         const result = await response.json()
         if (result.success && result.data) {
-          return result.data // Use real options data from API
+          const optionChain = result.data
+          
+          // Transform OptionChain {calls: [...], puts: [...]} to expected format
+          if (optionChain.calls && optionChain.puts) {
+            const strikeMap = new Map()
+            
+            // Add calls
+            optionChain.calls.forEach((call: any) => {
+              if (!strikeMap.has(call.strike)) {
+                strikeMap.set(call.strike, { strike: call.strike })
+              }
+              strikeMap.get(call.strike).call = {
+                bid: call.bid,
+                ask: call.ask,
+                last: call.lastPrice,
+                volume: call.volume,
+                openInterest: call.openInterest,
+                delta: call.delta,
+                gamma: call.gamma,
+                theta: call.theta,
+                vega: call.vega,
+                iv: call.impliedVolatility
+              }
+            })
+            
+            // Add puts
+            optionChain.puts.forEach((put: any) => {
+              if (!strikeMap.has(put.strike)) {
+                strikeMap.set(put.strike, { strike: put.strike })
+              }
+              strikeMap.get(put.strike).put = {
+                bid: put.bid,
+                ask: put.ask,
+                last: put.lastPrice,
+                volume: put.volume,
+                openInterest: put.openInterest,
+                delta: put.delta,
+                gamma: put.gamma,
+                theta: put.theta,
+                vega: put.vega,
+                iv: put.impliedVolatility
+              }
+            })
+            
+            return Array.from(strikeMap.values()).sort((a, b) => a.strike - b.strike)
+          }
+          
+          // If data is already in the expected format (array), use it directly
+          if (Array.isArray(result.data)) {
+            return result.data
+          }
         }
       } catch (error) {
         console.warn('Options API failed, using mock data:', error)
