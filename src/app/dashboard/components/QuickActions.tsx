@@ -1,8 +1,10 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, Search, BarChart3, BookOpen, Settings, Zap, TrendingUp } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import AddPositionForm from '@/components/forms/AddPositionForm'
 
 const actions = [
   {
@@ -11,7 +13,7 @@ const actions = [
     description: 'Open a new position',
     icon: Plus,
     color: 'bg-brand-500 hover:bg-brand-600',
-    href: '/options'
+    action: 'add-position'
   },
   {
     id: 'analyze',
@@ -57,18 +59,24 @@ const actions = [
 
 export default function QuickActions() {
   const router = useRouter()
+  const [showAddPosition, setShowAddPosition] = useState(false)
 
-  const handleActionClick = (href: string) => {
-    router.push(href)
+  const handleActionClick = (action: any) => {
+    if (action.action === 'add-position') {
+      setShowAddPosition(true)
+    } else if (action.href) {
+      router.push(action.href)
+    }
   }
 
   return (
-    <motion.div 
-      className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700"
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.5 }}
-    >
+    <>
+      <motion.div 
+        className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700"
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5 }}
+      >
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
         Quick Actions
       </h3>
@@ -80,7 +88,7 @@ export default function QuickActions() {
           return (
             <motion.button
               key={action.id}
-              onClick={() => handleActionClick(action.href)}
+              onClick={() => handleActionClick(action)}
               className="group relative overflow-hidden rounded-lg p-4 text-left transition-all hover:shadow-lg"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -141,5 +149,19 @@ export default function QuickActions() {
         </motion.button>
       </motion.div>
     </motion.div>
+
+      {/* Add Position Modal */}
+      <AnimatePresence>
+        {showAddPosition && (
+          <AddPositionForm
+            onClose={() => setShowAddPosition(false)}
+            onSuccess={() => {
+              setShowAddPosition(false)
+              // The form will invalidate the positions query automatically
+            }}
+          />
+        )}
+      </AnimatePresence>
+    </>
   )
 }

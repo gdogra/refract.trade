@@ -11,65 +11,58 @@ interface Position {
   quantity: number
   entryPrice: number
   currentPrice: number
-  pnl: number
+  unrealizedPnl: number
+  realizedPnl: number
   pnlPercent: number
-  expiry: string
   daysToExpiry: number
-  delta: number
-  theta: number
+  entryDate: string
+  greeks?: {
+    delta: number
+    gamma: number
+    theta: number
+    vega: number
+    rho: number
+    theoreticalValue: number
+  } | null
+  legs: Array<{
+    id: string
+    symbol: string
+    optionType: 'call' | 'put'
+    strike: number
+    expiry: string
+    quantity: number
+    side: 'buy' | 'sell'
+    entryPrice: number
+    exitPrice?: number | null
+    iv?: number | null
+  }>
+  marketData?: {
+    currentPrice: number
+    change: number
+    changePercent: number
+    volume: number
+    timestamp: string
+  } | null
 }
 
 export default function PositionsList() {
-  const { data: positions, isLoading } = useQuery<Position[]>({
+  const { data: positionsData, isLoading } = useQuery({
     queryKey: ['positions'],
     queryFn: async () => {
-      // Mock data for now - will connect to API later
-      return [
-        {
-          id: '1',
-          symbol: 'AAPL',
-          strategy: 'Iron Condor',
-          quantity: 5,
-          entryPrice: 2.45,
-          currentPrice: 3.20,
-          pnl: 375.00,
-          pnlPercent: 30.61,
-          expiry: '2024-01-19',
-          daysToExpiry: 14,
-          delta: 0.23,
-          theta: -12.50
-        },
-        {
-          id: '2',
-          symbol: 'TSLA',
-          strategy: 'Bull Call Spread',
-          quantity: 10,
-          entryPrice: 4.80,
-          currentPrice: 3.90,
-          pnl: -900.00,
-          pnlPercent: -18.75,
-          expiry: '2024-02-16',
-          daysToExpiry: 42,
-          delta: 0.67,
-          theta: -8.75
-        },
-        {
-          id: '3',
-          symbol: 'SPY',
-          strategy: 'Short Straddle',
-          quantity: 2,
-          entryPrice: 8.25,
-          currentPrice: 6.80,
-          pnl: 290.00,
-          pnlPercent: 17.58,
-          expiry: '2024-01-12',
-          daysToExpiry: 7,
-          delta: -0.12,
-          theta: 45.30
-        }
-      ]
+      const response = await fetch('/api/positions?includeGreeks=true', {
+        credentials: 'include'
+      })
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch positions')
+      }
+      
+      return response.json()
     }
   })
+
+  const positions = positionsData?.data?.positions || []
+  const summary = positionsData?.data?.summary
 
   if (isLoading) {
     return (
@@ -111,7 +104,7 @@ export default function PositionsList() {
       </div>
 
       <div className="space-y-4">
-        {positions?.map((position, index) => (
+        {positions?.map((position: Position, index: number) => (
           <motion.div
             key={position.id}
             className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
@@ -145,21 +138,23 @@ export default function PositionsList() {
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-4 text-xs">
-                  <span className="text-gray-600 dark:text-gray-400">
-                    Δ: {position.delta >= 0 ? '+' : ''}{position.delta.toFixed(2)}
-                  </span>
-                  <span className="text-gray-600 dark:text-gray-400">
-                    Θ: {position.theta >= 0 ? '+' : ''}{position.theta.toFixed(2)}
-                  </span>
-                </div>
+                {position.greeks && (
+                  <div className="flex items-center space-x-4 text-xs">
+                    <span className="text-gray-600 dark:text-gray-400">
+                      Δ: {position.greeks.delta >= 0 ? '+' : ''}{position.greeks.delta.toFixed(2)}
+                    </span>
+                    <span className="text-gray-600 dark:text-gray-400">
+                      Θ: {position.greeks.theta >= 0 ? '+' : ''}{position.greeks.theta.toFixed(2)}
+                    </span>
+                  </div>
+                )}
               </div>
 
               <div className="text-right space-y-1">
                 <div className={`font-semibold ${
-                  position.pnl >= 0 ? 'text-green-600' : 'text-red-600'
+                  position.unrealizedPnl >= 0 ? 'text-green-600' : 'text-red-600'
                 }`}>
-                  {formatCurrency(position.pnl)}
+                  {formatCurrency(position.unrealizedPnl)}
                 </div>
                 <div className={`text-sm flex items-center ${
                   position.pnlPercent >= 0 ? 'text-green-600' : 'text-red-600'
@@ -187,21 +182,53 @@ export default function PositionsList() {
         ))}
       </div>
 
-      <motion.div 
-        className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.5 }}
-      >
-        <div className="flex justify-between text-sm">
-          <span className="text-gray-600 dark:text-gray-400">
-            Total P&L Today
-          </span>
-          <span className="font-semibold text-green-600">
-            +$1,234.56 (+2.34%)
-          </span>
-        </div>
-      </motion.div>
+      {summary && (
+        <motion.div 
+          className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+        >
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-gray-600 dark:text-gray-400">
+                Total Positions
+              </span>
+              <span className="font-medium">
+                {summary.totalPositions}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600 dark:text-gray-400">
+                Portfolio Value
+              </span>
+              <span className="font-medium">
+                {formatCurrency(summary.totalValue)}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600 dark:text-gray-400">
+                Total P&L
+              </span>
+              <span className={`font-semibold ${
+                summary.totalPnl >= 0 ? 'text-green-600' : 'text-red-600'
+              }`}>
+                {formatCurrency(summary.totalPnl)} ({formatPercentage(summary.totalPnlPercent)})
+              </span>
+            </div>
+            {summary.expiringThisWeek > 0 && (
+              <div className="flex justify-between">
+                <span className="text-gray-600 dark:text-gray-400">
+                  Expiring This Week
+                </span>
+                <span className="font-medium text-amber-600">
+                  {summary.expiringThisWeek}
+                </span>
+              </div>
+            )}
+          </div>
+        </motion.div>
+      )}
     </motion.div>
   )
 }
