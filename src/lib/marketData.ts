@@ -205,26 +205,44 @@ class MarketDataService {
     try {
       const providers = []
 
-      // Primary provider (Alpha Vantage)
-      if (process.env.ALPHA_VANTAGE_API_KEY) {
-        providers.push(MarketDataProviderFactory.createProvider('alpha_vantage', {
-          apiKey: process.env.ALPHA_VANTAGE_API_KEY
-        }))
+      // Primary provider (Alpha Vantage) - use demo key if no key provided
+      const alphaVantageKey = process.env.ALPHA_VANTAGE_API_KEY || 'demo'
+      if (alphaVantageKey) {
+        try {
+          providers.push(MarketDataProviderFactory.createProvider('alpha_vantage', {
+            apiKey: alphaVantageKey
+          }))
+          console.log('Added Alpha Vantage provider')
+        } catch (error) {
+          console.warn('Failed to add Alpha Vantage provider:', error)
+        }
       }
 
       // Fallback providers
       if (process.env.FINNHUB_API_KEY) {
-        providers.push(MarketDataProviderFactory.createProvider('finnhub', {
-          apiKey: process.env.FINNHUB_API_KEY
-        }))
+        try {
+          providers.push(MarketDataProviderFactory.createProvider('finnhub', {
+            apiKey: process.env.FINNHUB_API_KEY
+          }))
+          console.log('Added Finnhub provider')
+        } catch (error) {
+          console.warn('Failed to add Finnhub provider:', error)
+        }
       }
 
-      // Yahoo Finance (no API key needed)
-      providers.push(MarketDataProviderFactory.createProvider('yahoo_finance', {}))
+      // Yahoo Finance (no API key needed) - always try to add as ultimate fallback
+      try {
+        providers.push(MarketDataProviderFactory.createProvider('yahoo_finance', {}))
+        console.log('Added Yahoo Finance provider')
+      } catch (error) {
+        console.warn('Failed to add Yahoo Finance provider:', error)
+      }
 
       if (providers.length > 0) {
         this.realDataService = new MultiProviderMarketDataService(providers)
         console.log(`Initialized ${providers.length} market data providers`)
+      } else {
+        console.warn('No market data providers could be initialized')
       }
     } catch (error) {
       console.error('Failed to initialize real data providers:', error)
