@@ -50,10 +50,10 @@ export async function searchSymbols(query: string): Promise<SymbolSearchResult[]
     
     // Filter to equities and ETFs only
     const results = data.quotes
-      .filter(quote => 
+      .filter((quote: any) => 
         quote.quoteType === 'EQUITY' || quote.quoteType === 'ETF'
       )
-      .map(quote => ({
+      .map((quote: any) => ({
         symbol: quote.symbol,
         name: quote.shortname || quote.longname || quote.symbol,
         exchange: quote.exchange || 'Unknown',
