@@ -125,10 +125,12 @@ export default function LandingPage() {
 
   const handleSignup = () => {
     // Track conversion
-    window.gtag?.('event', 'signup_attempt', {
-      event_category: 'engagement',
-      event_label: 'hero_cta'
-    })
+    if (typeof window !== 'undefined' && 'gtag' in window) {
+      (window as any).gtag('event', 'signup_attempt', {
+        event_category: 'engagement',
+        event_label: 'hero_cta'
+      })
+    }
     
     // Redirect to signup
     window.location.href = '/auth/signup'
