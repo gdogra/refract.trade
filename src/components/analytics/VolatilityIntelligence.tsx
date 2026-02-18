@@ -12,7 +12,8 @@ import {
   Clock,
   Target,
   Eye,
-  Settings
+  Settings,
+  Calendar
 } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'

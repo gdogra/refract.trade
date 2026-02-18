@@ -334,7 +334,7 @@ export class AITradePilotEngine {
     if (!safetyCheck.safe) {
       return {
         success: false,
-        message: safetyCheck.reason,
+        message: safetyCheck.reason || 'Safety check failed',
         requiresUserAction: true
       }
     }
