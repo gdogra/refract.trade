@@ -413,7 +413,7 @@ export class OptionsRecommendationEngine {
       const strike = Math.round((basePrice * (1.02 + Math.random() * 0.08)) / 5) * 5
       const daysToExpiry = 14 + Math.floor(Math.random() * 35)
       
-      const recommendation: OptionRecommendation = {
+      const baseRecommendation = {
         id: `${symbol}-call-${strike}-${daysToExpiry}`,
         symbol,
         companyName: this.getCompanyName(symbol),
@@ -484,6 +484,24 @@ export class OptionsRecommendationEngine {
         reasoning: `Strong bullish setup for ${symbol} based on technical breakout above resistance, positive earnings momentum, and favorable sector rotation. Current implied volatility suggests the option is fairly priced with good risk/reward ratio.`
       }
 
+      const recommendation: OptionRecommendation = {
+        ...baseRecommendation,
+        portfolioImpact: {
+          riskContribution: 0.02,
+          correlationRisk: 0.1,
+          diversificationBenefit: 0.15,
+          optimalPositionSize: 1,
+          riskBudgetUtilization: 0.05
+        },
+        qualityScore: {
+          overall: 75,
+          liquidity: 80,
+          timing: 70,
+          risk: 75,
+          conviction: 80
+        }
+      }
+
       recommendations.push(recommendation)
     }
 
@@ -505,7 +523,7 @@ export class OptionsRecommendationEngine {
       const strike = Math.round((basePrice * (0.92 + Math.random() * 0.08)) / 5) * 5
       const daysToExpiry = 14 + Math.floor(Math.random() * 35)
       
-      const recommendation: OptionRecommendation = {
+      const basePutRecommendation = {
         id: `${symbol}-put-${strike}-${daysToExpiry}`,
         symbol,
         companyName: this.getCompanyName(symbol),
@@ -598,6 +616,24 @@ export class OptionsRecommendationEngine {
         ],
         
         reasoning: `Bearish setup for ${symbol} based on technical breakdown below moving averages, fundamental concerns about growth trajectory, and negative sentiment shift. High implied volatility provides attractive premium for put buyers.`
+      }
+
+      const recommendation: OptionRecommendation = {
+        ...basePutRecommendation,
+        portfolioImpact: {
+          riskContribution: 0.03,
+          correlationRisk: 0.15,
+          diversificationBenefit: 0.2,
+          optimalPositionSize: 1,
+          riskBudgetUtilization: 0.06
+        },
+        qualityScore: {
+          overall: 70,
+          liquidity: 75,
+          timing: 65,
+          risk: 70,
+          conviction: 75
+        }
       }
 
       recommendations.push(recommendation)
