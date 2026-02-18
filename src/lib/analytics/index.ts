@@ -2,6 +2,7 @@
  * Analytics Module Index
  * 
  * Exports all hedge-fund-grade analytics components for institutional options trading
+ * Plus AI Portfolio Pilot system for autonomous risk-managed trading
  */
 
 // Core Analytics Engines
@@ -14,6 +15,13 @@ export * from './riskAdjustedRanking'
 export * from './opportunitiesScanner'
 export * from './continuousMonitoring'
 
+// AI Portfolio Pilot System
+export * from './portfolioAwareRecommendations'
+export * from './aiTradePilotModes'
+export * from './whatCouldHurtYou'
+export * from './tradeLifecycleManagement'
+export * from './autonomousRiskManagement'
+
 // Re-export key types for convenience
 export type {
   // Volatility Intelligence
@@ -21,63 +29,7 @@ export type {
   IVRankPercentile,
   RealizedVsImplied,
   EventVolatility,
-  VolatilitySkew,
-  
-  // Advanced Risk Metrics
-  AdvancedRiskMetrics,
-  CVaRResult,
-  VaRResult,
-  DistributionAnalysis,
-  StressTestResults,
-  TailExposureAnalysis,
-  KellyFractionResult,
-  
-  // Greeks Aggregation
-  PortfolioGreeks,
-  GammaProfile,
-  ThetaDecayPoint,
-  VegaSensitivityPoint,
-  GreeksRiskLimits,
-  HedgingRecommendation,
-  AdvancedGreeks,
-  
-  // Liquidity Modeling
-  LiquidityProfile,
-  OpenInterestAnalysis,
-  VolumeProfileAnalysis,
-  BidAskAnalysis,
-  SlippageEstimates,
-  ScalingLimits,
-  ExecutionRiskAssessment,
-  
-  // Strategy Optimization
-  StrategyOptimization,
-  OptimizedStrategy,
-  StrategyType,
-  TradeQualityScore,
-  ExecutionGuidance,
-  MarketConditionAssessment,
-  
-  // Risk-Adjusted Ranking
-  RiskAdjustedOpportunityScore,
-  RAOSComponents,
-  OpportunityRanking,
-  ActionableInsight,
-  InstitutionalGrade,
-  
-  // Opportunities Scanner
-  OpportunitiesScanner,
-  RankedOpportunity,
-  MonitoringEngine,
-  PortfolioHealthDashboard,
-  RiskExposureMap,
-  OpportunityAlert,
-  
-  // Continuous Monitoring
-  ContinuousMonitoringEngine,
-  MonitoringAlert,
-  ActionableGuidance,
-  WorstCaseScenario
+  VolatilitySkew
 } from './volatilityIntelligence'
 
 /**
