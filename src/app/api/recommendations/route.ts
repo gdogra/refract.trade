@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '../auth/[...nextauth]/route'
+import { authOptions } from '@/lib/auth'
 import { OptionsRecommendationEngine, RecommendationFilters } from '@/lib/optionsRecommendations'
 import { RiskBudgetManager } from '@/lib/riskBudgeting'
 import { SubscriptionManager, UsageTracker } from '@/lib/subscription'
