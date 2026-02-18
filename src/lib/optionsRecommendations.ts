@@ -312,8 +312,8 @@ export class OptionsRecommendationEngine {
     
     return {
       riskReduction: [], // TODO: Implement diversification strategies
-      hedging: hedging.filter(Boolean),
-      incomeGeneration: incomeGeneration.filter(Boolean)
+      hedging: hedging.filter((item): item is OptionRecommendation => item !== null),
+      incomeGeneration: incomeGeneration.filter((item): item is OptionRecommendation => item !== null)
     }
   }
   
