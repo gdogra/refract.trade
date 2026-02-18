@@ -441,7 +441,7 @@ export class OptionsRecommendationEngine {
         probabilityOfProfit: 45 + Math.random() * 25,
         
         technicalAnalysis: {
-          trend: 'bullish',
+          trend: 'bullish' as const,
           support: basePrice * 0.95,
           resistance: basePrice * 1.08,
           rsi: 40 + Math.random() * 30,
@@ -551,7 +551,7 @@ export class OptionsRecommendationEngine {
         probabilityOfProfit: 40 + Math.random() * 30,
         
         technicalAnalysis: {
-          trend: 'bearish',
+          trend: 'bearish' as const,
           support: basePrice * 0.88,
           resistance: basePrice * 1.05,
           rsi: 60 + Math.random() * 25,
