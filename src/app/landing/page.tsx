@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowRight, TrendingUp, Shield, Brain, Target, Users, BarChart3, CheckCircle, Star, Award, Zap } from 'lucide-react'
+import { ArrowRight, TrendingUp, TrendingDown, Shield, Brain, Target, Users, BarChart3, CheckCircle, Star, Award, Zap } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/badge'
