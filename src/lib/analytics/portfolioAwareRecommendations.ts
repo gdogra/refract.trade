@@ -551,7 +551,7 @@ export class PositionLifecycleManager {
     })
   }
 
-  private static analyzePosition(position: PortfolioPosition, marketConditions: any) {
+  private static analyzePosition(position: PortfolioPosition, marketConditions: any): Omit<PositionManagementSignal, 'positionId'> {
     // Profit taking logic
     const profitPercent = position.unrealizedPnL / Math.abs(position.risk)
     if (profitPercent > 0.5) {

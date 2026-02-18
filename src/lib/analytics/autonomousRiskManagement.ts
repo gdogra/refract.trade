@@ -129,7 +129,8 @@ export class AutonomousRiskProtectionEngine {
     }
 
     // Sector concentration breach
-    const maxSectorExposure = Math.max(...Object.values(portfolioContext.sectorExposures || {}))
+    const sectorValues = Object.values(portfolioContext.sectorExposures || {}) as number[]
+    const maxSectorExposure = sectorValues.length > 0 ? Math.max(...sectorValues) : 0
     if (maxSectorExposure > this.settings.maxSectorConcentration) {
       breaches.push({
         type: 'sector_concentration',
@@ -713,7 +714,8 @@ export class SmartRiskLimitEngine {
 
   private static assessConcentrationRisk(portfolioContext: any): number {
     const sectorExposures = portfolioContext.sectorExposures || {}
-    return Math.max(...Object.values(sectorExposures))
+    const sectorValues = Object.values(sectorExposures) as number[]
+    return sectorValues.length > 0 ? Math.max(...sectorValues) : 0
   }
 
   private static assessCorrelationRisk(portfolioContext: any): number {

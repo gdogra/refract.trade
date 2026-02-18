@@ -511,6 +511,29 @@ export class WorstCaseAnalysisEngine {
     })
   }
 
+  private simulateRateImpact(positions: any[], rateChange: number): AffectedPosition[] {
+    return positions.map(position => {
+      // Interest rate changes primarily affect options with high rho
+      let lossMultiplier = Math.abs(position.rho || 0.01) * 0.1
+      
+      // Longer-dated options more sensitive
+      if (position.daysToExpiry > 60) lossMultiplier *= 1.5
+      if (position.daysToExpiry > 180) lossMultiplier *= 2.0
+      
+      const projectedLoss = Math.abs(position.risk * rateChange * lossMultiplier)
+      
+      return {
+        symbol: position.symbol,
+        strategy: position.strategy,
+        currentValue: position.marketValue,
+        projectedLoss,
+        lossPercent: (projectedLoss / Math.abs(position.risk)),
+        contributionToTotalLoss: projectedLoss,
+        reason: `${(rateChange * 10000).toFixed(0)} bps rate shock affects option pricing`
+      }
+    })
+  }
+
   /**
    * Simulate correlation breakdown
    */

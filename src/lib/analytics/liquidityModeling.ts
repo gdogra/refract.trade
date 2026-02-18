@@ -608,7 +608,7 @@ function assessExecutionRisk(
   else riskLevel = 'low'
   
   const mitigationStrategies = [
-    ...new Set(risks.map(r => r.mitigation))
+    ...Array.from(new Set(risks.map(r => r.mitigation)))
   ]
   
   return {

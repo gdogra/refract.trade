@@ -13,7 +13,7 @@
  */
 
 import { Position } from '@/types'
-import { RankedOpportunity, OpportunityAlert } from './opportunitiesScanner'
+import { ScannedOpportunity, OpportunityAlert } from './opportunitiesScanner'
 import { PortfolioGreeks } from './greeksAggregation'
 import { LiquidityProfile } from './liquidityModeling'
 
@@ -33,7 +33,7 @@ export interface WatchedSymbol {
   symbol: string
   currentPrice: number
   priceHistory: PricePoint[]
-  volatilityHistory: VolatilityPoint[]
+  volatilityHistory: MonitoringVolatilityPoint[]
   liquidityMetrics: LiquidityMetrics
   eventCalendar: UpcomingEvent[]
   triggers: SymbolTrigger[]
@@ -49,7 +49,7 @@ export interface PricePoint {
   changePercent: number
 }
 
-export interface VolatilityPoint {
+export interface MonitoringVolatilityPoint {
   timestamp: Date
   impliedVol: number
   realizedVol: number
@@ -484,7 +484,7 @@ async function monitorPortfolio(
   }
   
   const totalExposure = Array.from(symbolExposure.values()).reduce((sum, exp) => sum + exp, 0)
-  for (const [symbol, exposure] of symbolExposure) {
+  for (const [symbol, exposure] of Array.from(symbolExposure.entries())) {
     const concentrationPercent = exposure / totalExposure
     if (concentrationPercent > 0.4) { // 40% concentration threshold
       alerts.push({

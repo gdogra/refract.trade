@@ -28,14 +28,14 @@ import { Position } from '@/types'
 export interface OpportunitiesScanner {
   scanUniverse: string[]
   lastScanTime: Date
-  opportunities: RankedOpportunity[]
+  opportunities: ScannedOpportunity[]
   monitoringEngine: MonitoringEngine
   portfolioHealth: PortfolioHealthDashboard
   riskExposureMap: RiskExposureMap
   alerts: OpportunityAlert[]
 }
 
-export interface RankedOpportunity extends RiskAdjustedOpportunityScore {
+export interface ScannedOpportunity extends RiskAdjustedOpportunityScore {
   rank: number
   tier: 'S' | 'A' | 'B' | 'C' | 'D'
   lastUpdated: Date
@@ -49,14 +49,14 @@ export interface RankedOpportunity extends RiskAdjustedOpportunityScore {
 }
 
 export interface MonitoringEngine {
-  activeAlerts: MonitoringAlert[]
+  activeAlerts: ScannerMonitoringAlert[]
   watchlist: WatchlistItem[]
   triggerRules: TriggerRule[]
   lastMonitorTime: Date
   monitoringFrequency: number // Minutes
 }
 
-export interface MonitoringAlert {
+export interface ScannerMonitoringAlert {
   id: string
   type: 'volatility_spike' | 'trend_shift' | 'liquidity_deterioration' | 'profit_target' | 'stop_loss' | 'correlation_spike'
   severity: 'info' | 'warning' | 'critical'
@@ -218,7 +218,7 @@ export async function scanForOpportunities(
   filters: OpportunityFilters
 ): Promise<OpportunitiesScanner> {
   const scanStartTime = new Date()
-  const opportunities: RankedOpportunity[] = []
+  const opportunities: ScannedOpportunity[] = []
   
   // Scan each symbol in universe
   for (const symbol of universe) {
@@ -276,7 +276,7 @@ export interface OpportunityFilters {
 async function analyzeSymbolOpportunity(
   symbol: string,
   filters: OpportunityFilters
-): Promise<RankedOpportunity | null> {
+): Promise<ScannedOpportunity | null> {
   try {
     // Get options chain
     const optionsChain = await getOptionsChain(symbol)
@@ -446,7 +446,7 @@ async function calculateAdvancedRiskMetricsForStrategy(strategy: OptimizedStrate
 /**
  * Rank opportunities by RAOS
  */
-function rankOpportunitiesByRAOS(opportunities: RankedOpportunity[]): RankedOpportunity[] {
+function rankOpportunitiesByRAOS(opportunities: ScannedOpportunity[]): ScannedOpportunity[] {
   return opportunities
     .sort((a, b) => b.raos - a.raos)
     .map((opportunity, index) => ({
@@ -459,9 +459,9 @@ function rankOpportunitiesByRAOS(opportunities: RankedOpportunity[]): RankedOppo
  * Apply quality filters to opportunities
  */
 function applyQualityFilters(
-  opportunities: RankedOpportunity[],
+  opportunities: ScannedOpportunity[],
   filters: OpportunityFilters
-): RankedOpportunity[] {
+): ScannedOpportunity[] {
   return opportunities.filter(opportunity => {
     // Basic RAOS filter
     if (opportunity.raos < filters.minRAOS) return false
@@ -493,7 +493,7 @@ function applyQualityFilters(
  * Generate continuous monitoring engine
  */
 async function generateMonitoringEngine(
-  opportunities: RankedOpportunity[],
+  opportunities: ScannedOpportunity[],
   positions: Position[]
 ): Promise<MonitoringEngine> {
   const watchlist: WatchlistItem[] = opportunities.slice(0, 20).map(opp => ({
@@ -563,7 +563,7 @@ async function generateMonitoringEngine(
  */
 function calculatePortfolioHealth(
   positions: Position[],
-  opportunities: RankedOpportunity[]
+  opportunities: ScannedOpportunity[]
 ): PortfolioHealthDashboard {
   // Calculate portfolio metrics
   const totalValue = positions.reduce((sum, pos) => 
@@ -733,7 +733,7 @@ function generateRiskExposureMap(positions: Position[]): RiskExposureMap {
  * Generate opportunity alerts
  */
 function generateOpportunityAlerts(
-  opportunities: RankedOpportunity[],
+  opportunities: ScannedOpportunity[],
   portfolioHealth: PortfolioHealthDashboard
 ): OpportunityAlert[] {
   const alerts: OpportunityAlert[] = []
@@ -798,7 +798,7 @@ export interface OpportunityAlert {
   title: string
   message: string
   actionRequired: string
-  opportunities: RankedOpportunity[]
+  opportunities: ScannedOpportunity[]
   timeGenerated: Date
   isRead: boolean
   priority: 'critical' | 'high' | 'medium' | 'low'

@@ -562,7 +562,7 @@ export function generateOpportunitySummary(
     topOpportunities: topOpportunities.length,
     averageRAOS: avgRAOS,
     totalExpectedValue,
-    averageProbabilityOfProfit,
+    averageProbabilityOfProfit: avgProbabilityOfProfit,
     strategyTypeDistribution,
     institutionalEligibleCount: institutionalEligible,
     marketConditionsSummary: 'Current market conditions analyzed for optimal strategy selection',

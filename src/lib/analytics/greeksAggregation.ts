@@ -618,7 +618,7 @@ export function calculateAdvancedGreeks(
   // Charm (dDelta/dTime)
   const charm = optionContract.type === 'call'
     ? -phi(d1) * (2 * riskFreeRate * T - d2 * vol * Math.sqrt(T)) / (2 * T * vol * Math.sqrt(T))
-    : charm - riskFreeRate * Math.exp(-riskFreeRate * T) * Phi(-d2)
+    : -phi(d1) * (2 * riskFreeRate * T - d2 * vol * Math.sqrt(T)) / (2 * T * vol * Math.sqrt(T)) - riskFreeRate * Math.exp(-riskFreeRate * T) * Phi(-d2)
   
   // Vanna (dDelta/dVol = dVega/dPrice)
   const vanna = -phi(d1) * d2 / vol

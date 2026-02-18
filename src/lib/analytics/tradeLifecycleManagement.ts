@@ -647,7 +647,7 @@ export class TradeQualityEngine {
     trade: TradeContext,
     marketConditions: any,
     portfolioContext: any
-  ): TradeQualityScore {
+  ): LifecycleTradeQualityScore {
     
     const qualityFactors = {
       liquidityScore: this.assessLiquidity(trade),
@@ -787,7 +787,7 @@ export class TradeQualityEngine {
   }
 }
 
-export interface TradeQualityScore {
+export interface LifecycleTradeQualityScore {
   overallScore: number
   letterGrade: 'AAA' | 'AA' | 'A' | 'BBB' | 'BB' | 'B' | 'C'
   factors: Record<string, number>

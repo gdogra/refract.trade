@@ -383,7 +383,7 @@ function buildTermStructure(surface: VolatilityPoint[]): TermStructurePoint[] {
   // Calculate ATM vol for each expiration
   const termStructure: TermStructurePoint[] = []
   
-  for (const [expiration, points] of expirationMap) {
+  for (const [expiration, points] of Array.from(expirationMap.entries())) {
     const atmVol = points.reduce((sum, p) => sum + p.impliedVolatility, 0) / points.length
     const daysToExpiry = points[0]?.daysToExpiry || 0
     

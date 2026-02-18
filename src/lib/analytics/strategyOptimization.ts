@@ -756,7 +756,7 @@ function assessStrategyRisk(strategy: OptimizedStrategy): StrategyRiskProfile {
     volatilityRisk: Math.abs(totalVega) > 100 ? 'high' : Math.abs(totalVega) > 50 ? 'medium' : 'low',
     directionalRisk: Math.abs(totalDelta) > 0.5 ? 'high' : Math.abs(totalDelta) > 0.25 ? 'medium' : 'low',
     assignmentRisk: shortLegs.some(leg => leg.optionType === 'call' || leg.optionType === 'put') ? 'medium' : 'none',
-    earlyExerciseRisk: shortLegs.some(leg => leg.strike! < strategy.underlyingPrice * 1.05) ? 'medium' : 'low'
+    earlyExerciseRisk: shortLegs.length > 0 ? 'medium' : 'low'
   } as any
 }
 
