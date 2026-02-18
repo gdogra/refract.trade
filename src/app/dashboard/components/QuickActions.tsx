@@ -144,6 +144,9 @@ export default function QuickActions() {
           className="w-full bg-brand-500 hover:bg-brand-600 text-white text-xs font-medium py-2 px-3 rounded-lg transition-colors"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
+          onClick={() => {
+            router.push('/upgrade')
+          }}
         >
           Upgrade Now
         </motion.button>

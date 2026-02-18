@@ -203,9 +203,9 @@ export default function SignUp() {
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 px-4 rounded-lg shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
             >
-              {isLoading ? 'Creating account...' : 'Create account'}
+              {isLoading ? 'Creating account...' : 'Start Free Trial'}
             </Button>
           </form>
           <div className="mt-6 text-center">

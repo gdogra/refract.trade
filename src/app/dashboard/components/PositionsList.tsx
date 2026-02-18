@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
-import { TrendingUp, TrendingDown, Calendar, Target, MoreHorizontal } from 'lucide-react'
+import { TrendingUp, TrendingDown, Calendar, Target, MoreHorizontal, Edit, Trash2, Settings } from 'lucide-react'
 
 interface Position {
   id: string
@@ -170,13 +170,28 @@ export default function PositionsList() {
                 </div>
               </div>
 
-              <motion.button 
-                className="ml-2 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <MoreHorizontal className="h-4 w-4" />
-              </motion.button>
+              <div className="ml-2 flex items-center space-x-1">
+                <motion.button 
+                  className="p-1 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => {
+                    alert(`Edit Position: ${position.symbol}\n\nThis would open a position editor allowing you to:\n• Adjust quantity\n• Modify stop-loss levels\n• Set profit targets\n• Roll to different expiration\n• Close or partially close position`)
+                  }}
+                >
+                  <Edit className="h-4 w-4" />
+                </motion.button>
+                <motion.button 
+                  className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => {
+                    alert(`Position Settings: ${position.symbol}\n\nAvailable actions:\n• View detailed Greeks\n• Set alerts\n• View trade history\n• Generate performance report\n• Analyze risk scenarios`)
+                  }}
+                >
+                  <Settings className="h-4 w-4" />
+                </motion.button>
+              </div>
             </div>
           </motion.div>
         ))}

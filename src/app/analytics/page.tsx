@@ -13,6 +13,9 @@ import PositionManagement from '@/components/analytics/PositionManagement'
 import AIPortfolioPilot from '@/components/analytics/AIPortfolioPilot'
 import WhatCouldHurtYou from '@/components/analytics/WhatCouldHurtYou'
 import DynamicRiskBudgeting from '@/components/analytics/DynamicRiskBudgeting'
+import AIInsightsComingSoon from '@/components/analytics/AIInsightsComingSoon'
+import { Tooltip } from '@/components/ui/tooltip'
+import PremiumGate from '@/components/ui/PremiumGate'
 import OpportunitiesScanner from '@/components/analytics/OpportunitiesScanner'
 import PortfolioHealthDashboard from '@/components/analytics/PortfolioHealthDashboard'
 import MarketIntelligence from '@/components/analytics/MarketIntelligence'
@@ -36,6 +39,7 @@ export default function Analytics() {
   const [portfolioData, setPortfolioData] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('overview')
+  const currentUserTier = 'free' // In production, get this from user session
   const [analyticsController] = useState(() => new AnalyticsController({
     updateFrequency: 5,
     riskTolerance: 'moderate',
@@ -190,49 +194,75 @@ export default function Analytics() {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <div className="grid grid-cols-2 gap-4 mb-6">
               <TabsList className="grid w-full grid-cols-5">
-                <TabsTrigger value="overview" className="flex items-center space-x-1">
-                  <Gauge className="h-4 w-4" />
-                  <span className="hidden sm:inline">Overview</span>
-                </TabsTrigger>
-                <TabsTrigger value="market-intel" className="flex items-center space-x-1">
-                  <Brain className="h-4 w-4" />
-                  <span className="hidden sm:inline">Market AI</span>
-                </TabsTrigger>
-                <TabsTrigger value="performance" className="flex items-center space-x-1">
-                  <TrendingUp className="h-4 w-4" />
-                  <span className="hidden sm:inline">Performance</span>
-                </TabsTrigger>
-                <TabsTrigger value="monitoring" className="flex items-center space-x-1">
-                  <Activity className="h-4 w-4" />
-                  <span className="hidden sm:inline">Live</span>
-                </TabsTrigger>
-                <TabsTrigger value="flow" className="flex items-center space-x-1">
-                  <Eye className="h-4 w-4" />
-                  <span className="hidden sm:inline">Flow</span>
-                </TabsTrigger>
+                <Tooltip content="Portfolio overview with key metrics and P&L summary">
+                  <TabsTrigger value="overview" className="flex items-center space-x-1">
+                    <Gauge className="h-4 w-4" />
+                    <span className="hidden sm:inline">Overview</span>
+                  </TabsTrigger>
+                </Tooltip>
+                <Tooltip content="Market intelligence with AI sentiment analysis and institutional insights">
+                  <TabsTrigger value="market-intel" className="flex items-center space-x-1">
+                    <Brain className="h-4 w-4" />
+                    <span className="hidden sm:inline">Market AI</span>
+                  </TabsTrigger>
+                </Tooltip>
+                <Tooltip content="Performance tracking with detailed analytics and strategy breakdowns">
+                  <TabsTrigger value="performance" className="flex items-center space-x-1">
+                    <TrendingUp className="h-4 w-4" />
+                    <span className="hidden sm:inline">Performance</span>
+                  </TabsTrigger>
+                </Tooltip>
+                <Tooltip content="Real-time portfolio monitoring with automated alerts">
+                  <TabsTrigger value="monitoring" className="flex items-center space-x-1">
+                    <Activity className="h-4 w-4" />
+                    <span className="hidden sm:inline">Live</span>
+                  </TabsTrigger>
+                </Tooltip>
+                <Tooltip content="Options flow analysis tracking institutional money movements">
+                  <TabsTrigger value="flow" className="flex items-center space-x-1">
+                    <Eye className="h-4 w-4" />
+                    <span className="hidden sm:inline">Flow</span>
+                  </TabsTrigger>
+                </Tooltip>
               </TabsList>
               
-              <TabsList className="grid w-full grid-cols-5">
-                <TabsTrigger value="volatility" className="flex items-center space-x-1">
-                  <BarChart3 className="h-4 w-4" />
-                  <span className="hidden sm:inline">Volatility</span>
-                </TabsTrigger>
-                <TabsTrigger value="positions" className="flex items-center space-x-1">
-                  <Target className="h-4 w-4" />
-                  <span className="hidden sm:inline">Positions</span>
-                </TabsTrigger>
-                <TabsTrigger value="ai-pilot" className="flex items-center space-x-1">
-                  <Sparkles className="h-4 w-4" />
-                  <span className="hidden sm:inline">AI Pilot</span>
-                </TabsTrigger>
-                <TabsTrigger value="risk-analysis" className="flex items-center space-x-1">
-                  <Shield className="h-4 w-4" />
-                  <span className="hidden sm:inline">Risk</span>
-                </TabsTrigger>
-                <TabsTrigger value="backtest" className="flex items-center space-x-1">
-                  <Play className="h-4 w-4" />
-                  <span className="hidden sm:inline">Backtest</span>
-                </TabsTrigger>
+              <TabsList className="grid w-full grid-cols-6">
+                <Tooltip content="Volatility intelligence with IV surface analysis and forecasting">
+                  <TabsTrigger value="volatility" className="flex items-center space-x-1">
+                    <BarChart3 className="h-4 w-4" />
+                    <span className="hidden sm:inline">Volatility</span>
+                  </TabsTrigger>
+                </Tooltip>
+                <Tooltip content="Position management with Greeks analysis and adjustment recommendations">
+                  <TabsTrigger value="positions" className="flex items-center space-x-1">
+                    <Target className="h-4 w-4" />
+                    <span className="hidden sm:inline">Positions</span>
+                  </TabsTrigger>
+                </Tooltip>
+                <Tooltip content="AI-powered portfolio assistant providing personalized guidance">
+                  <TabsTrigger value="ai-pilot" className="flex items-center space-x-1">
+                    <Sparkles className="h-4 w-4" />
+                    <span className="hidden sm:inline">AI Pilot</span>
+                  </TabsTrigger>
+                </Tooltip>
+                <Tooltip content="Advanced risk analysis showing worst-case scenarios and protection strategies">
+                  <TabsTrigger value="risk-analysis" className="flex items-center space-x-1">
+                    <Shield className="h-4 w-4" />
+                    <span className="hidden sm:inline">Risk</span>
+                  </TabsTrigger>
+                </Tooltip>
+                <Tooltip content="Strategy backtesting with historical performance analysis">
+                  <TabsTrigger value="backtest" className="flex items-center space-x-1">
+                    <Play className="h-4 w-4" />
+                    <span className="hidden sm:inline">Backtest</span>
+                  </TabsTrigger>
+                </Tooltip>
+                <Tooltip content="Advanced ML-powered trading intelligence in development">
+                  <TabsTrigger value="ai-insights-soon" className="flex items-center space-x-1">
+                    <Brain className="h-4 w-4" />
+                    <span className="hidden sm:inline">AI Future</span>
+                  </TabsTrigger>
+                </Tooltip>
               </TabsList>
             </div>
 
@@ -373,7 +403,15 @@ export default function Analytics() {
             </TabsContent>
 
             <TabsContent value="market-intel">
-              <MarketIntelligence />
+              <PremiumGate
+                feature="advancedAnalytics"
+                requiredTier="pro"
+                currentTier={currentUserTier}
+                title="Market Intelligence Dashboard"
+                description="Access real-time sentiment analysis, institutional insights, and AI-powered market intelligence to make informed trading decisions."
+              >
+                <MarketIntelligence />
+              </PremiumGate>
             </TabsContent>
 
             <TabsContent value="performance">
@@ -381,11 +419,27 @@ export default function Analytics() {
             </TabsContent>
 
             <TabsContent value="monitoring">
-              <RealTimeMonitoring />
+              <PremiumGate
+                feature="realTimeData"
+                requiredTier="pro"
+                currentTier={currentUserTier}
+                title="Real-Time Portfolio Monitoring"
+                description="Monitor your portfolio with live data feeds, instant alerts, and automated risk notifications. Never miss a critical market move again."
+              >
+                <RealTimeMonitoring />
+              </PremiumGate>
             </TabsContent>
 
             <TabsContent value="flow">
-              <OptionsFlowAnalysis />
+              <PremiumGate
+                feature="institutionalFeatures"
+                requiredTier="elite"
+                currentTier={currentUserTier}
+                title="Institutional Options Flow"
+                description="Track smart money movements with institutional-grade options flow analysis, unusual activity alerts, and block trade monitoring."
+              >
+                <OptionsFlowAnalysis />
+              </PremiumGate>
             </TabsContent>
 
             <TabsContent value="volatility">
@@ -508,7 +562,15 @@ export default function Analytics() {
             </TabsContent>
 
             <TabsContent value="ai-pilot">
-              <AIPortfolioPilot />
+              <PremiumGate
+                feature="aiInsights"
+                requiredTier="pro"
+                currentTier={currentUserTier}
+                title="AI Portfolio Pilot"
+                description="Let our advanced AI manage your portfolio with machine learning insights, automated rebalancing, and predictive position adjustments."
+              >
+                <AIPortfolioPilot />
+              </PremiumGate>
             </TabsContent>
 
             <TabsContent value="risk-analysis">
@@ -517,6 +579,10 @@ export default function Analytics() {
 
             <TabsContent value="backtest">
               <StrategyBacktester />
+            </TabsContent>
+
+            <TabsContent value="ai-insights-soon">
+              <AIInsightsComingSoon />
             </TabsContent>
           </Tabs>
         )}

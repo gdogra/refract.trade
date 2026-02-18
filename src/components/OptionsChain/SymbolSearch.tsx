@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Search, X, TrendingUp } from 'lucide-react'
 import { searchSymbols, POPULAR_SYMBOLS } from '@/lib/options/symbolSearch'
 import type { SymbolSearchResult } from '@/lib/options/symbolSearch'
+import { Tooltip } from '@/components/ui/tooltip'
 
 interface SymbolSearchProps {
   value: string
@@ -34,7 +35,7 @@ export default function SymbolSearch({ value, onChange, placeholder = "Search sy
     setLoading(true)
     try {
       const searchResults = await searchSymbols(searchQuery)
-      setResults(searchResults)
+      setResults(Array.isArray(searchResults) ? searchResults : [])
     } catch (error) {
       console.error('Symbol search error:', error)
       setResults([])
@@ -170,12 +171,14 @@ export default function SymbolSearch({ value, onChange, placeholder = "Search sy
         />
         
         {query && (
-          <button
-            onClick={handleClear}
-            className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-gray-600 dark:hover:text-gray-300"
-          >
-            <X className="h-4 w-4 text-gray-400" />
-          </button>
+          <Tooltip content="Clear search">
+            <button
+              onClick={handleClear}
+              className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-gray-600 dark:hover:text-gray-300"
+            >
+              <X className="h-4 w-4 text-gray-400" />
+            </button>
+          </Tooltip>
         )}
       </div>
       

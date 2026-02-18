@@ -251,10 +251,21 @@ export default function WhatCouldHurtYou() {
                     <h5 className="text-blue-300 font-medium mb-2">💡 Recommended Protection</h5>
                     <p className="text-blue-200 mb-3">{selectedScenario.mitigation.primary.description}</p>
                     <div className="flex space-x-3">
-                      <Button className="bg-blue-600 hover:bg-blue-700">
+                      <Button 
+                        className="bg-blue-600 hover:bg-blue-700"
+                        onClick={() => {
+                          alert(`Implementing ${selectedScenario.mitigation.primary.action}\nCost: $${selectedScenario.mitigation.cost.toLocaleString()}\nThis would connect to your broker to execute the protection strategy.`)
+                        }}
+                      >
                         Implement Protection ($${selectedScenario.mitigation.cost.toLocaleString()})
                       </Button>
-                      <Button variant="outline" className="border-blue-600 text-blue-300">
+                      <Button 
+                        variant="outline" 
+                        className="border-blue-600 text-blue-300"
+                        onClick={() => {
+                          alert(`Alternative Strategy: ${selectedScenario.mitigation.alternative.action}\nCost: $${selectedScenario.mitigation.alternative.cost.toLocaleString()}\n${selectedScenario.mitigation.alternative.description}`)
+                        }}
+                      >
                         Alternative: {selectedScenario.mitigation.alternative.action}
                       </Button>
                     </div>
@@ -350,6 +361,10 @@ export default function WhatCouldHurtYou() {
                         size="sm" 
                         variant="outline"
                         className="border-blue-600 text-blue-300 hover:bg-blue-900/30"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          alert(`Quick Protection for ${scenario.name}\nCost: $${scenario.mitigation.cost.toLocaleString()}\nStrategy: ${scenario.mitigation.primary.action}`)
+                        }}
                       >
                         Protect (${scenario.mitigation.cost.toLocaleString()})
                       </Button>
@@ -462,7 +477,12 @@ export default function WhatCouldHurtYou() {
                     </div>
                   </div>
 
-                  <Button className="w-full bg-green-600 hover:bg-green-700">
+                  <Button 
+                    className="w-full bg-green-600 hover:bg-green-700"
+                    onClick={() => {
+                      alert(`Implementing Primary Protection Strategy:\n\n${selectedScenario.mitigation.primary.action}\n\nCost: $${selectedScenario.mitigation.primary.cost.toLocaleString()}\nRisk Reduction: ${(selectedScenario.mitigation.primary.riskReduction * 100).toFixed(0)}%\n\n${selectedScenario.mitigation.primary.description}\n\nThis would connect to your broker to execute the trades.`)
+                    }}
+                  >
                     <Shield className="h-4 w-4 mr-2" />
                     Implement Protection
                   </Button>
@@ -494,7 +514,13 @@ export default function WhatCouldHurtYou() {
                     </div>
                   </div>
 
-                  <Button variant="outline" className="w-full border-blue-600 text-blue-300 hover:bg-blue-900/30">
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-blue-600 text-blue-300 hover:bg-blue-900/30"
+                    onClick={() => {
+                      alert(`Alternative Protection Strategy:\n\n${selectedScenario.mitigation.alternative.action}\n\nCost: $${selectedScenario.mitigation.alternative.cost.toLocaleString()}\nRisk Reduction: ${(selectedScenario.mitigation.alternative.riskReduction * 100).toFixed(0)}%\n\n${selectedScenario.mitigation.alternative.description}`)
+                    }}
+                  >
                     <Target className="h-4 w-4 mr-2" />
                     Consider Alternative
                   </Button>
@@ -601,17 +627,34 @@ export default function WhatCouldHurtYou() {
         transition={{ delay: 0.6 }}
         className="grid grid-cols-1 md:grid-cols-3 gap-4"
       >
-        <Button className="bg-green-600 hover:bg-green-700 h-12">
+        <Button 
+          className="bg-green-600 hover:bg-green-700 h-12"
+          onClick={() => {
+            alert('Portfolio Protection Suite\n\nThis would open a comprehensive protection wizard allowing you to:\n\n• Apply hedge strategies across your entire portfolio\n• Set automated stop-loss levels\n• Configure position size limits\n• Enable real-time risk monitoring\n\nConnecting to broker integration...')
+          }}
+        >
           <Shield className="h-5 w-5 mr-2" />
           Protect Portfolio Now
         </Button>
         
-        <Button variant="outline" className="border-blue-600 text-blue-300 h-12">
+        <Button 
+          variant="outline" 
+          className="border-blue-600 text-blue-300 h-12"
+          onClick={() => {
+            alert('Advanced Risk Analysis\n\nGenerating detailed report including:\n\n• Monte Carlo simulations\n• Stress test scenarios\n• Correlation breakdowns\n• Volatility forecasts\n• Tail risk analysis\n\nThis would generate a comprehensive PDF report.')
+          }}
+        >
           <Brain className="h-5 w-5 mr-2" />
           Get Detailed Analysis
         </Button>
         
-        <Button variant="outline" className="border-purple-600 text-purple-300 h-12">
+        <Button 
+          variant="outline" 
+          className="border-purple-600 text-purple-300 h-12"
+          onClick={() => {
+            alert('Risk Alert Configuration\n\nSet up automated alerts for:\n\n• Portfolio loss thresholds\n• VIX spike notifications\n• Individual position alerts\n• Market regime changes\n• Earnings announcements\n\nAlerts can be sent via email, SMS, or push notifications.')
+          }}
+        >
           <AlertCircle className="h-5 w-5 mr-2" />
           Set Risk Alerts
         </Button>

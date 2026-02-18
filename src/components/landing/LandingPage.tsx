@@ -76,7 +76,7 @@ export default function LandingPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/auth/signup">
-                <Button size="lg" className="bg-white text-primary-600 hover:bg-gray-100 px-8 py-4">
+                <Button size="lg" className="bg-white text-primary-600 hover:bg-gray-100 px-8 py-4 font-semibold shadow-lg">
                   Start Free Trial
                 </Button>
               </Link>
@@ -84,7 +84,7 @@ export default function LandingPage() {
                 <Button 
                   variant="outline" 
                   size="lg" 
-                  className="border-white text-white hover:bg-white hover:text-primary-600 px-8 py-4"
+                  className="border-2 border-white text-white hover:bg-white hover:text-primary-600 px-8 py-4 font-semibold shadow-lg"
                 >
                   Sign In
                 </Button>
@@ -208,14 +208,14 @@ export default function LandingPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/auth/signup">
-                <Button size="lg" className="bg-white text-primary-600 hover:bg-gray-100 px-8 py-4">
+                <Button size="lg" className="bg-white text-primary-600 hover:bg-gray-100 px-8 py-4 font-semibold shadow-lg">
                   Start Free Trial
                 </Button>
               </Link>
               <Button 
                 variant="outline" 
                 size="lg" 
-                className="border-white text-white hover:bg-white hover:text-primary-600 px-8 py-4"
+                className="border-2 border-white text-white hover:bg-white hover:text-primary-600 px-8 py-4 font-semibold shadow-lg"
                 onClick={() => {
                   const element = document.getElementById('features')
                   element?.scrollIntoView({ behavior: 'smooth' })

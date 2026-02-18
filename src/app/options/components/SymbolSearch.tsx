@@ -25,6 +25,7 @@ export default function SymbolSearch({ selectedSymbol, onSymbolChange }: SymbolS
   const [query, setQuery] = useState('')
   const [isOpen, setIsOpen] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   const { data: searchResults } = useQuery<SearchResult[]>({
     queryKey: ['symbol-search', query],
@@ -117,7 +118,7 @@ export default function SymbolSearch({ selectedSymbol, onSymbolChange }: SymbolS
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (inputRef.current && !inputRef.current.contains(event.target as Node)) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false)
       }
     }
@@ -127,7 +128,7 @@ export default function SymbolSearch({ selectedSymbol, onSymbolChange }: SymbolS
   }, [])
 
   return (
-    <div className="relative" ref={inputRef}>
+    <div className="relative" ref={containerRef}>
       <motion.div 
         className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700"
         initial={{ opacity: 0, y: -10 }}
@@ -149,6 +150,7 @@ export default function SymbolSearch({ selectedSymbol, onSymbolChange }: SymbolS
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <input
+                ref={inputRef}
                 type="text"
                 placeholder="Search symbols (e.g., AAPL, SPY, TSLA)"
                 value={query}
@@ -171,7 +173,7 @@ export default function SymbolSearch({ selectedSymbol, onSymbolChange }: SymbolS
                   exit={{ opacity: 0, y: -10, scale: 0.95 }}
                   transition={{ duration: 0.2 }}
                 >
-                  {query.length > 0 && searchResults && searchResults.length > 0 && (
+                  {query.length > 0 && searchResults && Array.isArray(searchResults) && searchResults.length > 0 && (
                     <div className="p-2">
                       <div className="text-xs text-gray-500 dark:text-gray-400 px-3 py-2 font-medium">
                         SEARCH RESULTS
@@ -240,7 +242,7 @@ export default function SymbolSearch({ selectedSymbol, onSymbolChange }: SymbolS
                     </div>
                   )}
 
-                  {query.length > 0 && (!searchResults || searchResults.length === 0) && (
+                  {query.length > 0 && (!searchResults || !Array.isArray(searchResults) || searchResults.length === 0) && (
                     <div className="p-6 text-center">
                       <div className="text-gray-500 dark:text-gray-400">
                         No symbols found for "{query}"

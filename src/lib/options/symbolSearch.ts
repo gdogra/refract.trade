@@ -28,26 +28,23 @@ export async function searchSymbols(query: string): Promise<SymbolSearchResult[]
   const cleanQuery = query.trim().toUpperCase()
   
   try {
-    const url = `https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(cleanQuery)}&quotesCount=10`
-    
-    const headers = {
-      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-      'Accept': 'application/json, text/plain, */*',
-      'Accept-Language': 'en-US,en;q=0.9',
-      'Cache-Control': 'no-cache',
-      'Pragma': 'no-cache'
-    }
-    
-    const response = await fetch(url, { headers })
+    // Use our backend proxy API to avoid CORS issues
+    const response = await fetch(`/api/symbols/search?q=${encodeURIComponent(cleanQuery)}`)
     
     if (!response.ok) {
       console.error('Symbol search API error:', response.status, response.statusText)
       return getFallbackResults(cleanQuery)
     }
     
-    const data: YahooSearchResponse = await response.json()
+    const apiResponse = await response.json()
     
-    if (!data.quotes || !Array.isArray(data.quotes)) {
+    if (!apiResponse.success || !apiResponse.data?.quotes) {
+      return getFallbackResults(cleanQuery)
+    }
+    
+    const data = apiResponse.data
+    
+    if (!Array.isArray(data.quotes)) {
       return getFallbackResults(cleanQuery)
     }
     
