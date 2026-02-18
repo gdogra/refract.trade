@@ -576,21 +576,21 @@ export class OptionsRecommendationEngine {
         },
         
         newsAnalysis: {
-          sentiment: 'bearish',
+          sentiment: 'bearish' as const,
           recentHeadlines: [
             {
               title: `${symbol} Faces Headwinds in Current Market Environment`,
               source: 'Financial Times',
-              sentiment: 'negative',
+              sentiment: 'negative' as const,
               date: new Date().toISOString(),
-              impact: 'high'
+              impact: 'high' as const
             },
             {
               title: `Analysts Express Concern Over ${symbol} Growth Prospects`,
               source: 'CNBC',
-              sentiment: 'negative',
+              sentiment: 'negative' as const,
               date: new Date(Date.now() - 86400000).toISOString(),
-              impact: 'medium'
+              impact: 'medium' as const
             }
           ],
           keyFactors: [
