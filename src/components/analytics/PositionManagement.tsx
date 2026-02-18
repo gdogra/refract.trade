@@ -16,7 +16,8 @@ import {
   ArrowRight,
   Eye,
   Calendar,
-  Activity
+  Activity,
+  Star
 } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
