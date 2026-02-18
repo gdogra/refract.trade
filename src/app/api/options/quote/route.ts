@@ -43,7 +43,11 @@ export async function GET(request: NextRequest) {
                        symbol === 'GOOGL' ? 175.80 :
                        symbol === 'TSLA' ? 248.50 :
                        symbol === 'NVDA' ? 875.30 :
-                       symbol === 'SPY' ? 525.40 : 150.00
+                       symbol === 'SPY' ? 525.40 : 
+                       symbol === 'LUV' ? 32.45 :
+                       symbol === 'DAL' ? 45.80 :
+                       symbol === 'UAL' ? 52.30 :
+                       symbol === 'AAL' ? 18.75 : 150.00
       
       const change = (Math.random() - 0.5) * 10
       
