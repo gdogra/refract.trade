@@ -36,6 +36,9 @@ model User {
   washSales WashSale[]
   learningProgress LearningProgress[]
   communityProfile CommunityProfile?
+  tradingRules TradingRule[]
+  smartNotifications SmartNotification[]
+  brokerConnections BrokerConnection[]
 
   @@map("users")
 }
@@ -411,4 +414,107 @@ model MarketData {
 
   @@unique([symbol, timestamp])
   @@map("market_data")
+}
+
+// ─── TRADING RULES & SAFETY ──────────────────────────────────────────────────
+
+model TradingRule {
+  id                  String   @id @default(cuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  name                String
+  ruleType            String   // "position_size", "timing", "frequency", "symbol", "strategy"
+  condition           Json     // Flexible rule conditions
+  action              String   // "block", "warn", "require_reason"
+  isActive            Boolean  @default(true)
+  
+  priority            Int      @default(0)
+  
+  violations          RuleViolation[]
+  
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  
+  @@index([userId, isActive])
+}
+
+model RuleViolation {
+  id                  String      @id @default(cuid())
+  ruleId              String
+  rule                TradingRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  userId              String
+  
+  positionId          String?
+  tradeId             String?
+  
+  violationType       String      // "override", "blocked", "warning_ignored"
+  overrideReason      String?
+  overridePassword    Boolean     @default(false)
+  
+  cost                Float?      // If violation led to loss, track it
+  
+  timestamp           DateTime    @default(now())
+  
+  @@index([ruleId])
+  @@index([userId, timestamp])
+}
+
+model SmartNotification {
+  id                  String   @id @default(cuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  type                String   // "position_action", "rule_violation", "trade_idea", etc.
+  priority            String   // "urgent", "high", "normal", "low"
+  category            String   // "action_required", "informational", "educational"
+  
+  title               String
+  body                String
+  explanation         String   // WHY this notification matters
+  actionRequired      Boolean  @default(false)
+  
+  contextData         Json     // Position ID, rule ID, etc.
+  
+  actionButtons       Json?    // [{label: "Close Position", action: "close", data: {...}}]
+  
+  read                Boolean  @default(false)
+  dismissed           Boolean  @default(false)
+  actioned            Boolean  @default(false)
+  
+  scheduledFor        DateTime?
+  deliveredAt         DateTime?
+  
+  channels            String[] // ["push", "email", "sms"]
+  
+  createdAt           DateTime @default(now())
+  
+  @@index([userId, read, priority])
+  @@index([scheduledFor])
+}
+
+model BrokerConnection {
+  id                  String   @id @default(cuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  broker              String   // "tastytrade", "ibkr", "schwab", "etrade"
+  accountId           String
+  
+  accessToken         String   // Encrypted
+  refreshToken        String?  // Encrypted
+  
+  status              String   @default("connected") // "connected", "disconnected", "error"
+  lastSync            DateTime?
+  
+  paperAccount        Boolean  @default(false)
+  
+  syncPositions       Boolean  @default(true)
+  enableOneClick      Boolean  @default(false)
+  
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  
+  @@unique([userId, broker, accountId])
+  @@index([userId])
 }
