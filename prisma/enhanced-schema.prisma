@@ -1,0 +1,285 @@
+// Enhanced Prisma Schema for Advanced Trading Features
+
+// ─── TRADING RULES & SAFETY ──────────────────────────────────────────────────
+
+model TradingRule {
+  id                  String   @id @default(cuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  name                String
+  ruleType            String   // "position_size", "timing", "frequency", "symbol", "strategy"
+  condition           Json     // Flexible rule conditions
+  action              String   // "block", "warn", "require_reason"
+  isActive            Boolean  @default(true)
+  
+  priority            Int      @default(0)
+  
+  violations          RuleViolation[]
+  
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  
+  @@index([userId, isActive])
+}
+
+model RuleViolation {
+  id                  String      @id @default(cuid())
+  ruleId              String
+  rule                TradingRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  userId              String
+  
+  positionId          String?
+  tradeId             String?
+  
+  violationType       String      // "override", "blocked", "warning_ignored"
+  overrideReason      String?
+  overridePassword    Boolean     @default(false)
+  
+  cost                Float?      // If violation led to loss, track it
+  
+  timestamp           DateTime    @default(now())
+  
+  @@index([ruleId])
+  @@index([userId, timestamp])
+}
+
+model PreTradeCheck {
+  id                  String   @id @default(cuid())
+  userId              String
+  
+  symbol              String
+  type                String
+  strike              Float
+  expiration          DateTime
+  quantity            Int
+  strategy            String
+  
+  checks              Json     // All check results
+  overallScore        String   // "green", "yellow", "red"
+  warnings            String[]
+  blockers            String[]
+  
+  proceeded           Boolean  @default(false)
+  positionCreated     String?  // Position ID if proceeded
+  
+  timestamp           DateTime @default(now())
+  
+  @@index([userId, timestamp])
+}
+
+model TradeIdea {
+  id                  String   @id @default(cuid())
+  userId              String
+  
+  symbol              String
+  strategy            String
+  reasoning           String
+  
+  legs                Json
+  expectedReturn      Float
+  maxRisk             Float
+  probabilityOfProfit Float
+  
+  score               Float    // 0-100
+  rank                Int?
+  
+  status              String   @default("pending") // "pending", "executed", "dismissed", "expired"
+  
+  generatedAt         DateTime @default(now())
+  expiresAt           DateTime
+  
+  @@index([userId, status])
+  @@index([generatedAt])
+}
+
+model SecondOpinion {
+  id                  String   @id @default(cuid())
+  userId              String
+  
+  tradeDetails        Json
+  
+  analysis            Json
+  verdict             String   // "strong", "acceptable", "suboptimal", "avoid"
+  confidence          Float
+  reasoning           String[]
+  warnings            String[]
+  improvements        String[]
+  
+  historicalComparison Json
+  
+  userProceeded       Boolean?
+  outcomeIfProceeded  Float?   // Track if user ignored advice
+  
+  timestamp           DateTime @default(now())
+  
+  @@index([userId, timestamp])
+}
+
+model SimulationResult {
+  id                  String   @id @default(cuid())
+  userId              String
+  
+  strategyType        String
+  symbol              String
+  legs                Json
+  
+  simulations         Int      @default(1000)
+  winRate             Float
+  avgProfit           Float
+  avgLoss             Float
+  maxProfit           Float
+  maxLoss             Float
+  expectedValue       Float
+  
+  probabilityDistribution Json
+  optimalClosingTime  Int?     // Days
+  
+  timestamp           DateTime @default(now())
+  
+  @@index([userId, timestamp])
+}
+
+model LiquidityAnalysis {
+  id                  String   @id @default(cuid())
+  symbol              String
+  contractSymbol      String
+  
+  liquidityScore      Float    // 0-100
+  avgVolume           Float
+  avgOpenInterest     Float
+  avgBidAskSpread     Float
+  
+  estimatedSlippage   Float
+  fillTimeEstimate    Int      // Seconds
+  
+  lastUpdated         DateTime @default(now())
+  
+  @@unique([contractSymbol])
+  @@index([symbol])
+  @@index([lastUpdated])
+}
+
+// ─── SMART NOTIFICATIONS ─────────────────────────────────────────────────────
+
+model SmartNotification {
+  id                  String   @id @default(cuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  type                String   // "position_action", "rule_violation", "trade_idea", etc.
+  priority            String   // "urgent", "high", "normal", "low"
+  category            String   // "action_required", "informational", "educational"
+  
+  title               String
+  body                String
+  explanation         String   // WHY this notification matters
+  actionRequired      Boolean  @default(false)
+  
+  contextData         Json     // Position ID, rule ID, etc.
+  
+  actionButtons       Json?    // [{label: "Close Position", action: "close", data: {...}}]
+  
+  read                Boolean  @default(false)
+  dismissed           Boolean  @default(false)
+  actioned            Boolean  @default(false)
+  
+  scheduledFor        DateTime?
+  deliveredAt         DateTime?
+  
+  channels            String[] // ["push", "email", "sms"]
+  
+  createdAt           DateTime @default(now())
+  
+  @@index([userId, read, priority])
+  @@index([scheduledFor])
+}
+
+model NotificationPreferences {
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  doNotDisturbStart   String?  // "22:00"
+  doNotDisturbEnd     String?  // "08:00"
+  doNotDisturbDays    String[] // ["saturday", "sunday"]
+  
+  urgentOnly          Boolean  @default(false)
+  groupSimilar        Boolean  @default(true)
+  maxPerDay           Int      @default(20)
+  
+  enablePush          Boolean  @default(true)
+  enableEmail         Boolean  @default(true)
+  enableSMS           Boolean  @default(false)
+  
+  categoryPreferences Json     // Per-category settings
+  
+  timezone            String   @default("America/New_York")
+  
+  updatedAt           DateTime @updatedAt
+}
+
+// ─── BROKER INTEGRATION ──────────────────────────────────────────────────────
+
+model BrokerConnection {
+  id                  String   @id @default(cuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  broker              String   // "tastytrade", "ibkr", "schwab", "etrade"
+  accountId           String
+  
+  accessToken         String   // Encrypted
+  refreshToken        String?  // Encrypted
+  
+  status              String   @default("connected") // "connected", "disconnected", "error"
+  lastSync            DateTime?
+  
+  paperAccount        Boolean  @default(false)
+  
+  syncPositions       Boolean  @default(true)
+  enableOneClick      Boolean  @default(false)
+  
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  
+  @@unique([userId, broker, accountId])
+  @@index([userId])
+}
+
+// ─── DEVICE SYNC ─────────────────────────────────────────────────────────────
+
+model DeviceSession {
+  id                  String   @id @default(cuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  deviceId            String
+  deviceName          String   // "iPhone 15", "MacBook Pro", etc.
+  deviceType          String   // "mobile", "desktop", "tablet"
+  platform            String   // "ios", "android", "web", "macos", "windows"
+  
+  sessionData         Json     // Current state: open charts, drafts, etc.
+  
+  lastActive          DateTime @default(now())
+  
+  @@unique([userId, deviceId])
+  @@index([userId, lastActive])
+}
+
+model DraftTrade {
+  id                  String   @id @default(cuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  symbol              String
+  legs                Json
+  notes               String?
+  
+  deviceId            String?
+  
+  lastModified        DateTime @default(now())
+  expiresAt           DateTime
+  
+  @@index([userId, lastModified])
+}
