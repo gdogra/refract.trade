@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Bell, AlertTriangle, TrendingUp, Shield, Clock, X } from 'lucide-react'
+import { Bell, AlertTriangle, TrendingUp, Shield, Clock, X, CheckCircle } from 'lucide-react'
 
 interface SmartAlert {
   id: string
