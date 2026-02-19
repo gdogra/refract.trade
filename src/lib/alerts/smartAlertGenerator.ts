@@ -72,6 +72,7 @@ export async function createSmartAlert(params: SmartAlertParams): Promise<SmartN
     dismissed: false,
     actioned: false,
     scheduledFor: alert.scheduledFor,
+    deliveredAt: null,
     channels: alert.channels,
     createdAt: new Date()
   }
