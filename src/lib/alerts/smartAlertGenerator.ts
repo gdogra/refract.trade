@@ -47,6 +47,34 @@ export interface NotificationPreferences {
   updatedAt: Date
 }
 
+export async function getActiveAlerts(
+  userId: string, 
+  filters?: { category?: string; onlyActive?: boolean }
+): Promise<SmartNotification[]> {
+  try {
+    const where: any = { userId }
+    
+    if (filters?.onlyActive) {
+      where.dismissed = false
+    }
+    
+    if (filters?.category && filters.category !== 'all') {
+      where.category = filters.category
+    }
+    
+    return await prisma.smartNotification.findMany({
+      where,
+      orderBy: [
+        { priority: 'desc' },
+        { createdAt: 'desc' }
+      ],
+      take: 50
+    })
+  } catch {
+    return []
+  }
+}
+
 export async function createSmartAlert(params: SmartAlertParams): Promise<SmartNotification> {
   const alert = await generateAlertContent(params)
   
