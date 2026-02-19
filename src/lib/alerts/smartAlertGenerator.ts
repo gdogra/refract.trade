@@ -1,35 +1,11 @@
 import { prisma } from '@/lib/prisma'
+import type { SmartNotification } from '@prisma/client'
 
 export interface SmartAlertParams {
   userId: string
   type: string
   positionId?: string
   data: any
-}
-
-export interface SmartNotification {
-  id: string
-  userId: string
-  type: string
-  priority: 'urgent' | 'high' | 'normal' | 'low'
-  category: 'action_required' | 'informational' | 'educational'
-  title: string
-  body: string
-  explanation: string
-  actionRequired: boolean
-  contextData: any
-  actionButtons?: Array<{
-    label: string
-    action: string
-    data: any
-  }>
-  read: boolean
-  dismissed: boolean
-  actioned: boolean
-  scheduledFor?: Date
-  deliveredAt?: Date
-  channels: string[]
-  createdAt: Date
 }
 
 export interface NotificationPreferences {
