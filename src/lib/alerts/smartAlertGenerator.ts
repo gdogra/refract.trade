@@ -64,7 +64,7 @@ export async function getActiveAlerts(
       where.category = filters.category
     }
     
-    return await prisma.smartNotification.findMany({
+    return await prisma!.smartNotification.findMany({
       where,
       orderBy: [
         { priority: 'desc' },
