@@ -36,13 +36,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
+    if (!['urgent', 'high', 'normal', 'low'].includes(priority)) {
+      return NextResponse.json({ error: 'Invalid priority value' }, { status: 400 })
+    }
+
     const alert = await createSmartAlert({
       userId: session.user.id!,
       type,
       data: {
         title,
         body: alertBody,
-        priority,
+        priority: priority as 'urgent' | 'high' | 'normal' | 'low',
         contextData: contextData || {},
         actionButtons: actionButtons || []
       }
