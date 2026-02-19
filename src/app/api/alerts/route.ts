@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     const category = searchParams.get('category')
     const onlyActive = searchParams.get('active') === 'true'
 
-    const alerts = await getActiveAlerts(session.user.id, { category, onlyActive })
+    const alerts = await getActiveAlerts(session.user.id!, { category: category || undefined, onlyActive })
     return NextResponse.json({ alerts })
   } catch (error) {
     console.error('Get alerts error:', error)
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     }
 
     const alert = await createSmartAlert({
-      userId: session.user.id,
+      userId: session.user.id!,
       type,
       priority,
       title,
