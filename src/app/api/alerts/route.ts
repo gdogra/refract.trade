@@ -39,11 +39,13 @@ export async function POST(req: NextRequest) {
     const alert = await createSmartAlert({
       userId: session.user.id!,
       type,
-      priority,
-      title,
-      body: alertBody,
-      contextData: contextData || {},
-      actionButtons: actionButtons || []
+      data: {
+        title,
+        body: alertBody,
+        priority,
+        contextData: contextData || {},
+        actionButtons: actionButtons || []
+      }
     })
 
     return NextResponse.json({ alert })
