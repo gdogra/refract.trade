@@ -110,6 +110,24 @@ async function generateAlertContent(params: SmartAlertParams) {
   }
 }
 
+function generatePriceAlert(data: any) {
+  const { symbol, currentPrice, targetPrice, direction } = data
+  
+  return {
+    priority: 'normal' as const,
+    category: 'informational' as const,
+    title: `${symbol} Price Alert`,
+    body: `${symbol} has ${direction === 'up' ? 'risen' : 'fallen'} to $${currentPrice.toFixed(2)}`,
+    explanation: `You set a ${direction} price alert at $${targetPrice.toFixed(2)}. This could affect your options positions.`,
+    actionRequired: false,
+    actionButtons: [
+      { label: 'View Positions', action: 'view_positions', data: { symbol } }
+    ],
+    scheduledFor: undefined,
+    channels: ['push']
+  }
+}
+
 function generateProfitTargetAlert(data: any) {
   const { position, currentProfit, targetProfit } = data
 
