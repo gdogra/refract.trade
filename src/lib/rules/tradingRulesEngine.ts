@@ -67,10 +67,15 @@ export class TradingRulesEngine {
 
   static async getUserRules(userId: string): Promise<TradingRule[]> {
     try {
-      return await prisma.tradingRule.findMany({
+      if (!prisma) return []
+      const rules = await prisma.tradingRule.findMany({
         where: { userId, isActive: true },
         orderBy: { priority: 'desc' }
       })
+      return rules.map(rule => ({
+        ...rule,
+        action: rule.action as 'block' | 'warn' | 'require_reason'
+      }))
     } catch {
       return []
     }
@@ -321,10 +326,11 @@ export class TradingRulesEngine {
     today.setHours(0, 0, 0, 0)
     
     try {
-      return await prisma.trade.count({
+      if (!prisma) return 0
+      return await prisma.position.count({
         where: {
           userId,
-          openedAt: { gte: today }
+          entryDate: { gte: today }
         }
       })
     } catch {
@@ -337,11 +343,12 @@ export class TradingRulesEngine {
     today.setHours(0, 0, 0, 0)
     
     try {
-      return await prisma.trade.count({
+      if (!prisma) return 0
+      return await prisma.position.count({
         where: {
           userId,
           symbol,
-          openedAt: { gte: today }
+          entryDate: { gte: today }
         }
       })
     } catch {
@@ -351,12 +358,13 @@ export class TradingRulesEngine {
 
   static async getLastTradeTime(userId: string, symbol: string): Promise<Date | null> {
     try {
-      const lastTrade = await prisma.trade.findFirst({
+      if (!prisma) return null
+      const lastTrade = await prisma.position.findFirst({
         where: { userId, symbol },
-        orderBy: { openedAt: 'desc' },
-        select: { openedAt: true }
+        orderBy: { entryDate: 'desc' },
+        select: { entryDate: true }
       })
-      return lastTrade?.openedAt || null
+      return lastTrade?.entryDate || null
     } catch {
       return null
     }
@@ -367,15 +375,16 @@ export class TradingRulesEngine {
     today.setHours(0, 0, 0, 0)
     
     try {
-      const trades = await prisma.trade.findMany({
+      if (!prisma) return 0
+      const positions = await prisma.position.findMany({
         where: {
           userId,
-          closedAt: { gte: today }
+          exitDate: { gte: today }
         },
-        select: { realizedPnL: true }
+        select: { realizedPnl: true }
       })
       
-      return trades.reduce((sum, trade) => sum + (trade.realizedPnL || 0), 0)
+      return positions.reduce((sum: number, position: any) => sum + (position.realizedPnl || 0), 0)
     } catch {
       return 0
     }
@@ -389,6 +398,7 @@ export class TradingRulesEngine {
     action: 'block' | 'warn' | 'require_reason',
     priority: number = 0
   ): Promise<TradingRule> {
+    if (!prisma) throw new Error('Database not available')
     const rule = await prisma.tradingRule.create({
       data: {
         userId,
@@ -401,20 +411,29 @@ export class TradingRulesEngine {
       }
     })
     
-    return rule
+    return {
+      ...rule,
+      action: rule.action as 'block' | 'warn' | 'require_reason'
+    }
   }
 
   static async updateRule(
     ruleId: string,
     updates: Partial<Pick<TradingRule, 'name' | 'condition' | 'action' | 'isActive' | 'priority'>>
   ): Promise<TradingRule> {
-    return await prisma.tradingRule.update({
+    if (!prisma) throw new Error('Database not available')
+    const rule = await prisma.tradingRule.update({
       where: { id: ruleId },
       data: updates
     })
+    return {
+      ...rule,
+      action: rule.action as 'block' | 'warn' | 'require_reason'
+    }
   }
 
   static async deleteRule(ruleId: string): Promise<void> {
+    if (!prisma) throw new Error('Database not available')
     await prisma.tradingRule.delete({
       where: { id: ruleId }
     })
@@ -427,6 +446,7 @@ export class TradingRulesEngine {
     overrideReason?: string,
     positionId?: string
   ): Promise<void> {
+    if (!prisma) return
     await prisma.ruleViolation.create({
       data: {
         ruleId,
