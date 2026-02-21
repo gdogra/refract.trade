@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { TrendingUp, TrendingDown, Calendar, AlertTriangle, RefreshCw, Clock } from 'lucide-react'
 import { useOptionsChain } from '@/hooks/useOptionsChain'
@@ -169,6 +169,13 @@ export default function OptionsChain({
   const [selectedExpiration, setSelectedExpiration] = useState<string | undefined>(initialExpiration)
   const [view, setView] = useState<'split' | 'calls' | 'puts'>('split')
   const [compact, setCompact] = useState(false)
+  
+  // Update symbol when initialSymbol prop changes
+  useEffect(() => {
+    if (initialSymbol && initialSymbol !== symbol) {
+      setSymbol(initialSymbol)
+    }
+  }, [initialSymbol, symbol])
   
   const { data, loading, error, refetch, isStale } = useOptionsChain(symbol, selectedExpiration)
   
