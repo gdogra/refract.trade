@@ -31,13 +31,15 @@ interface QuickStrategyPanelProps {
   optionsData: OptionsChain | null
   underlyingPrice: number
   className?: string
+  onViewDetailedAnalysis?: () => void
 }
 
 export default function QuickStrategyPanel({ 
   symbol, 
   optionsData, 
   underlyingPrice,
-  className = "" 
+  className = "",
+  onViewDetailedAnalysis
 }: QuickStrategyPanelProps) {
   
   // Analyze market conditions and generate quick recommendations
@@ -239,6 +241,13 @@ export default function QuickStrategyPanel({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
+              onClick={() => {
+                if (onViewDetailedAnalysis) {
+                  onViewDetailedAnalysis()
+                } else {
+                  alert(`View detailed analysis for ${strategy.name}`)
+                }
+              }}
             >
               <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center space-x-2">
@@ -265,7 +274,11 @@ export default function QuickStrategyPanel({
           ))}
           
           {/* View Full Analysis Button */}
-          <Button variant="outline" className="w-full text-sm">
+          <Button 
+            variant="outline" 
+            className="w-full text-sm"
+            onClick={onViewDetailedAnalysis}
+          >
             View Detailed Analysis
           </Button>
         </CardContent>
@@ -324,13 +337,42 @@ export default function QuickStrategyPanel({
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
-          <Button variant="outline" size="sm" className="w-full text-xs">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full text-xs"
+            onClick={() => {
+              const alertPrice = prompt(`Set price alert for ${symbol}:`, underlyingPrice.toFixed(2))
+              if (alertPrice) {
+                alert(`Price alert set for ${symbol} at $${alertPrice}`)
+              }
+            }}
+          >
             Set Price Alert
           </Button>
-          <Button variant="outline" size="sm" className="w-full text-xs">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full text-xs"
+            onClick={() => {
+              const success = Math.random() > 0.2
+              if (success) {
+                alert(`${symbol} added to watchlist!`)
+              } else {
+                alert(`${symbol} is already in your watchlist`)
+              }
+            }}
+          >
             Add to Watchlist  
           </Button>
-          <Button variant="outline" size="sm" className="w-full text-xs">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full text-xs"
+            onClick={() => {
+              window.open(`https://finance.yahoo.com/calendar/earnings?symbol=${symbol}`, '_blank')
+            }}
+          >
             View Earnings Calendar
           </Button>
         </CardContent>

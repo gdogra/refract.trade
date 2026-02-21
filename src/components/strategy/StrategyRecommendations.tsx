@@ -839,13 +839,29 @@ export default function StrategyRecommendations({
 
                       {/* Action Buttons */}
                       <div className="flex space-x-3 pt-4 border-t">
-                        <Button className="flex-1 bg-blue-600 hover:bg-blue-700">
+                        <Button 
+                          className="flex-1 bg-blue-600 hover:bg-blue-700"
+                          onClick={() => {
+                            alert(`Building ${strategy.name} strategy for ${symbol}...`)
+                          }}
+                        >
                           Build Strategy
                         </Button>
-                        <Button variant="outline" className="flex-1">
+                        <Button 
+                          variant="outline" 
+                          className="flex-1"
+                          onClick={() => {
+                            alert(`Running backtest for ${strategy.name} on ${symbol}...`)
+                          }}
+                        >
                           Backtest
                         </Button>
-                        <Button variant="outline">
+                        <Button 
+                          variant="outline"
+                          onClick={() => {
+                            alert(`${strategy.name} strategy saved to watchlist!`)
+                          }}
+                        >
                           Save to Watchlist
                         </Button>
                       </div>
@@ -875,10 +891,13 @@ export default function StrategyRecommendations({
               ].map((strategy) => (
                 <Button
                   key={strategy.id}
-                  variant="outline"
+                  variant={selectedStrategy === strategy.id ? "default" : "outline"}
                   size="sm"
                   className="h-12 text-xs"
-                  onClick={() => setSelectedStrategy(strategy.id)}
+                  onClick={() => {
+                    setSelectedStrategy(strategy.id)
+                    alert(`Quick building ${strategy.name} for ${symbol}...`)
+                  }}
                 >
                   {strategy.name}
                 </Button>

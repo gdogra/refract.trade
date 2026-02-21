@@ -153,6 +153,7 @@ export default function OptionsChainClient() {
                 symbol={selectedSymbol}
                 optionsData={optionsData}
                 underlyingPrice={optionsData?.underlyingPrice || 0}
+                onViewDetailedAnalysis={() => setViewMode('strategy')}
               />
             </motion.div>
           </div>
