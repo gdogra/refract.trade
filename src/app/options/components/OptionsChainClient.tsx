@@ -12,7 +12,7 @@ import MarketDataPanel from './MarketDataPanel'
 
 export default function OptionsChainClient() {
   const searchParams = useSearchParams()
-  const [selectedSymbol, setSelectedSymbol] = useState('')
+  const [selectedSymbol, setSelectedSymbol] = useState('AAPL')
   const [selectedExpiry, setSelectedExpiry] = useState('')
   const [selectedStrike, setSelectedStrike] = useState<number | null>(null)
   const [viewMode, setViewMode] = useState<'chain' | 'strategy' | 'analysis'>('chain')
