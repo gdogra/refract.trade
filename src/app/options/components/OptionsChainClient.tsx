@@ -9,6 +9,9 @@ import StrategyBuilder from './StrategyBuilder'
 import GreeksChart from './GreeksChart'
 import ImpliedVolatilityChart from './ImpliedVolatilityChart'
 import MarketDataPanel from './MarketDataPanel'
+import StrategyRecommendations from '@/components/strategy/StrategyRecommendations'
+import QuickStrategyPanel from '@/components/strategy/QuickStrategyPanel'
+import { useOptionsChain } from '@/hooks/useOptionsChain'
 
 export default function OptionsChainClient() {
   const searchParams = useSearchParams()
@@ -16,6 +19,9 @@ export default function OptionsChainClient() {
   const [selectedExpiry, setSelectedExpiry] = useState('')
   const [selectedStrike, setSelectedStrike] = useState<number | null>(null)
   const [viewMode, setViewMode] = useState<'chain' | 'strategy' | 'analysis'>('chain')
+  
+  // Get options data for strategy recommendations
+  const { data: optionsData } = useOptionsChain(selectedSymbol, selectedExpiry)
 
   // Set symbol from URL parameter
   useEffect(() => {
@@ -98,10 +104,16 @@ export default function OptionsChainClient() {
 
             {viewMode === 'strategy' && (
               <motion.div
+                className="space-y-6"
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.2 }}
               >
+                <StrategyRecommendations 
+                  symbol={selectedSymbol}
+                  optionsData={optionsData}
+                  underlyingPrice={optionsData?.underlyingPrice || 0}
+                />
                 <StrategyBuilder 
                   symbol={selectedSymbol}
                 />
@@ -122,13 +134,26 @@ export default function OptionsChainClient() {
           </div>
 
           {/* Sidebar */}
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-3 space-y-6">
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3 }}
             >
               <MarketDataPanel symbol={selectedSymbol} />
+            </motion.div>
+            
+            {/* Strategy Panel */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <QuickStrategyPanel 
+                symbol={selectedSymbol}
+                optionsData={optionsData}
+                underlyingPrice={optionsData?.underlyingPrice || 0}
+              />
             </motion.div>
           </div>
         </div>
