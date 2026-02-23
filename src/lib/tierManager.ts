@@ -1,4 +1,4 @@
-export type UserTier = 'free' | 'pro' | 'elite'
+export type UserTier = 'trial' | 'premium'
 
 export interface TierLimits {
   maxPositions: number
@@ -13,29 +13,18 @@ export interface TierLimits {
 }
 
 export const tierLimits: Record<UserTier, TierLimits> = {
-  free: {
-    maxPositions: 5,
-    realTimeData: false,
-    advancedAnalytics: false,
-    aiInsights: false,
-    customAlerts: false,
-    apiAccess: false,
-    prioritySupport: false,
-    unlimitedBacktests: false,
-    institutionalFeatures: false
-  },
-  pro: {
-    maxPositions: -1, // unlimited
+  trial: {
+    maxPositions: -1, // unlimited during trial
     realTimeData: true,
     advancedAnalytics: true,
     aiInsights: true,
     customAlerts: true,
-    apiAccess: false,
+    apiAccess: true,
     prioritySupport: true,
     unlimitedBacktests: true,
-    institutionalFeatures: false
+    institutionalFeatures: true
   },
-  elite: {
+  premium: {
     maxPositions: -1, // unlimited
     realTimeData: true,
     advancedAnalytics: true,
@@ -57,15 +46,11 @@ export function getPositionLimit(userTier: UserTier): number {
 }
 
 export function getRequiredTierForFeature(feature: keyof TierLimits): UserTier {
-  if (tierLimits.free[feature]) return 'free'
-  if (tierLimits.pro[feature]) return 'pro'
-  return 'elite'
+  // All features are available in both tiers now
+  return 'trial'
 }
 
 export function canAccessFeature(userTier: UserTier, feature: keyof TierLimits): boolean {
-  const tiers: UserTier[] = ['free', 'pro', 'elite']
-  const userTierIndex = tiers.indexOf(userTier)
-  const requiredTierIndex = tiers.indexOf(getRequiredTierForFeature(feature))
-  
-  return userTierIndex >= requiredTierIndex
+  // All features are available to both trial and premium users
+  return true
 }

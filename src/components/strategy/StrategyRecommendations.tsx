@@ -89,16 +89,21 @@ export default function StrategyRecommendations({
     if (!optionsData) return null
 
     // Calculate IV rank (simplified)
-    const avgIV = optionsData.calls.reduce((sum, call) => sum + call.impliedVolatility, 0) / optionsData.calls.length
+    const calls = optionsData.calls || []
+    const puts = optionsData.puts || []
+    
+    if (calls.length === 0) return null
+    
+    const avgIV = calls.reduce((sum, call) => sum + call.impliedVolatility, 0) / calls.length
     const ivRank = Math.min(100, Math.max(0, (avgIV - 0.15) / 0.4 * 100)) // Normalize to 0-100
 
     // Analyze skew
-    const atmStrike = optionsData.calls.reduce((closest, call) => 
+    const atmStrike = calls.reduce((closest, call) => 
       Math.abs(call.strike - underlyingPrice) < Math.abs(closest.strike - underlyingPrice) ? call : closest
     ).strike
 
-    const putSkew = optionsData.puts.find(put => put.strike === atmStrike)?.impliedVolatility || 0
-    const callSkew = optionsData.calls.find(call => call.strike === atmStrike)?.impliedVolatility || 0
+    const putSkew = puts.find(put => put.strike === atmStrike)?.impliedVolatility || 0
+    const callSkew = calls.find(call => call.strike === atmStrike)?.impliedVolatility || 0
     const skew = putSkew - callSkew
 
     return {
@@ -107,13 +112,19 @@ export default function StrategyRecommendations({
       skew,
       atmStrike,
       marketCondition: ivRank > 70 ? 'high_volatility' : ivRank < 30 ? 'low_volatility' : 'normal',
-      daysToExpiry: optionsData.calls[0]?.daysToExpiry || 7
+      daysToExpiry: calls[0]?.daysToExpiry || 7
     }
   }, [optionsData, underlyingPrice])
 
   // Generate strategy recommendations based on market conditions and user outlook
   const recommendations = useMemo((): StrategyRecommendation[] => {
     if (!optionsData || !marketAnalysis) return []
+
+    // Safely access arrays
+    const calls = optionsData.calls || []
+    const puts = optionsData.puts || []
+    
+    if (calls.length === 0) return []
 
     const strategies: StrategyRecommendation[] = []
 
@@ -125,10 +136,10 @@ export default function StrategyRecommendations({
       const putSpreadStrike = atmStrike - 20
       const callSpreadStrike = atmStrike + 20
 
-      const sellPut = optionsData.puts.find(p => p.strike === putStrike)
-      const buyPut = optionsData.puts.find(p => p.strike === putSpreadStrike)
-      const sellCall = optionsData.calls.find(c => c.strike === callStrike)
-      const buyCall = optionsData.calls.find(c => c.strike === callSpreadStrike)
+      const sellPut = puts.find(p => p.strike === putStrike)
+      const buyPut = puts.find(p => p.strike === putSpreadStrike)
+      const sellCall = calls.find(c => c.strike === callStrike)
+      const buyCall = calls.find(c => c.strike === callSpreadStrike)
 
       if (sellPut && buyPut && sellCall && buyCall) {
         const credit = (sellPut.bid + sellCall.bid) - (buyPut.ask + buyCall.ask)
@@ -188,7 +199,7 @@ export default function StrategyRecommendations({
     // Covered Call - Neutral to Slightly Bullish
     if ((marketOutlook === 'neutral' || marketOutlook === 'bullish') && marketAnalysis.ivRank > 40) {
       const callStrike = Math.ceil(underlyingPrice * 1.05 / 5) * 5 // 5% OTM
-      const callOption = optionsData.calls.find(c => c.strike >= callStrike)
+      const callOption = calls.find(c => c.strike >= callStrike)
 
       if (callOption) {
         const premium = callOption.bid * 100
@@ -249,8 +260,8 @@ export default function StrategyRecommendations({
       const sellStrike = Math.floor(underlyingPrice * 0.95 / 5) * 5 // 5% OTM
       const buyStrike = sellStrike - 5
 
-      const sellPut = optionsData.puts.find(p => p.strike === sellStrike)
-      const buyPut = optionsData.puts.find(p => p.strike === buyStrike)
+      const sellPut = puts.find(p => p.strike === sellStrike)
+      const buyPut = puts.find(p => p.strike === buyStrike)
 
       if (sellPut && buyPut) {
         const credit = (sellPut.bid - buyPut.ask) * 100
@@ -308,8 +319,8 @@ export default function StrategyRecommendations({
     // Long Straddle - High Volatility Expected
     if (volatilityView === 'increasing') {
       const atmStrike = marketAnalysis.atmStrike
-      const atmCall = optionsData.calls.find(c => c.strike === atmStrike)
-      const atmPut = optionsData.puts.find(p => p.strike === atmStrike)
+      const atmCall = calls.find(c => c.strike === atmStrike)
+      const atmPut = puts.find(p => p.strike === atmStrike)
 
       if (atmCall && atmPut) {
         const totalCost = (atmCall.ask + atmPut.ask) * 100
@@ -371,10 +382,10 @@ export default function StrategyRecommendations({
       const lowerStrike = atmStrike - 5
       const upperStrike = atmStrike + 5
 
-      const atmCall = optionsData.calls.find(c => c.strike === atmStrike)
-      const atmPut = optionsData.puts.find(p => p.strike === atmStrike)
-      const upperCall = optionsData.calls.find(c => c.strike === upperStrike)
-      const lowerPut = optionsData.puts.find(p => p.strike === lowerStrike)
+      const atmCall = calls.find(c => c.strike === atmStrike)
+      const atmPut = puts.find(p => p.strike === atmStrike)
+      const upperCall = calls.find(c => c.strike === upperStrike)
+      const lowerPut = puts.find(p => p.strike === lowerStrike)
 
       if (atmCall && atmPut && upperCall && lowerPut) {
         const credit = (atmCall.bid + atmPut.bid - upperCall.ask - lowerPut.ask) * 100
@@ -434,7 +445,7 @@ export default function StrategyRecommendations({
     // Cash-Secured Put - Bullish, Want to Own Stock
     if (marketOutlook === 'bullish') {
       const putStrike = Math.floor(underlyingPrice * 0.95 / 5) * 5 // 5% OTM
-      const targetPut = optionsData.puts.find(p => p.strike === putStrike)
+      const targetPut = puts.find(p => p.strike === putStrike)
 
       if (targetPut) {
         const premium = targetPut.bid * 100
@@ -491,7 +502,7 @@ export default function StrategyRecommendations({
     // Long Put - Bearish Protection
     if (marketOutlook === 'bearish') {
       const putStrike = Math.floor(underlyingPrice * 0.95 / 5) * 5
-      const protectionPut = optionsData.puts.find(p => p.strike === putStrike)
+      const protectionPut = puts.find(p => p.strike === putStrike)
 
       if (protectionPut) {
         const cost = protectionPut.ask * 100

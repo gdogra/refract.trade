@@ -53,12 +53,12 @@ export default function SymbolSearch({ selectedSymbol, onSymbolChange }: SymbolS
       const filteredSymbols = commonSymbols.filter(result => 
         result.symbol.toLowerCase().includes(query.toLowerCase()) ||
         result.name.toLowerCase().includes(query.toLowerCase())
-      )
+      ) || []
       
       // Add dynamic symbol search for any ticker not in our predefined list
       const upperQuery = query.toUpperCase()
       const isSymbolQuery = /^[A-Z]{1,5}$/i.test(query.trim())
-      const symbolExists = filteredSymbols.some(result => 
+      const symbolExists = filteredSymbols.length > 0 && filteredSymbols.some(result => 
         result.symbol.toUpperCase() === upperQuery
       )
       

@@ -1,4 +1,4 @@
-export type SubscriptionTier = 'free' | 'pro' | 'elite' | 'enterprise'
+export type SubscriptionTier = 'trial' | 'premium'
 
 export interface SubscriptionFeatures {
   // Data Access
@@ -46,45 +46,15 @@ export interface SubscriptionFeatures {
 }
 
 export const SUBSCRIPTION_FEATURES: Record<SubscriptionTier, SubscriptionFeatures> = {
-  free: {
-    realTimeData: false,
-    delayedData: true,
-    historicalDepth: '1M',
-    dailyRecommendations: 3,
-    scanLimit: 5,
-    portfolioRecommendations: false,
-    advancedGreeks: false,
-    volatilitySurface: false,
-    riskScenarios: false,
-    probabilityModeling: false,
-    strategyBuilder: true,
-    backtesting: false,
-    portfolioOptimization: false,
-    tradeJournaling: true,
-    basicAlerts: true,
-    advancedAlerts: false,
-    riskMonitoring: false,
-    customAlerts: 3,
-    apiAccess: false,
-    apiCallsPerMonth: 0,
-    brokerIntegrations: [],
-    communityAccess: true,
-    postCreation: true,
-    followUsers: true,
-    leaderboards: true,
-    supportLevel: 'community',
-    responseTime: '48h'
-  },
-  
-  pro: {
+  trial: {
     realTimeData: true,
     delayedData: true,
     historicalDepth: '1Y',
-    dailyRecommendations: 25,
-    scanLimit: -1, // unlimited
+    dailyRecommendations: -1, // unlimited during trial
+    scanLimit: -1, // unlimited during trial
     portfolioRecommendations: true,
     advancedGreeks: true,
-    volatilitySurface: false,
+    volatilitySurface: true,
     riskScenarios: true,
     probabilityModeling: true,
     strategyBuilder: true,
@@ -94,10 +64,10 @@ export const SUBSCRIPTION_FEATURES: Record<SubscriptionTier, SubscriptionFeature
     basicAlerts: true,
     advancedAlerts: true,
     riskMonitoring: true,
-    customAlerts: 25,
+    customAlerts: -1, // unlimited
     apiAccess: true,
     apiCallsPerMonth: 1000,
-    brokerIntegrations: ['td_ameritrade', 'schwab'],
+    brokerIntegrations: ['td_ameritrade', 'schwab', 'ibkr', 'tastyworks'],
     communityAccess: true,
     postCreation: true,
     followUsers: true,
@@ -106,10 +76,10 @@ export const SUBSCRIPTION_FEATURES: Record<SubscriptionTier, SubscriptionFeature
     responseTime: '24h'
   },
   
-  elite: {
+  premium: {
     realTimeData: true,
     delayedData: true,
-    historicalDepth: '5Y',
+    historicalDepth: 'unlimited',
     dailyRecommendations: -1, // unlimited
     scanLimit: -1, // unlimited
     portfolioRecommendations: true,
@@ -126,44 +96,14 @@ export const SUBSCRIPTION_FEATURES: Record<SubscriptionTier, SubscriptionFeature
     riskMonitoring: true,
     customAlerts: -1, // unlimited
     apiAccess: true,
-    apiCallsPerMonth: 10000,
-    brokerIntegrations: ['td_ameritrade', 'schwab', 'ibkr', 'tastyworks'],
-    communityAccess: true,
-    postCreation: true,
-    followUsers: true,
-    leaderboards: true,
-    supportLevel: 'priority',
-    responseTime: '4h'
-  },
-  
-  enterprise: {
-    realTimeData: true,
-    delayedData: true,
-    historicalDepth: 'unlimited',
-    dailyRecommendations: -1,
-    scanLimit: -1,
-    portfolioRecommendations: true,
-    advancedGreeks: true,
-    volatilitySurface: true,
-    riskScenarios: true,
-    probabilityModeling: true,
-    strategyBuilder: true,
-    backtesting: true,
-    portfolioOptimization: true,
-    tradeJournaling: true,
-    basicAlerts: true,
-    advancedAlerts: true,
-    riskMonitoring: true,
-    customAlerts: -1,
-    apiAccess: true,
     apiCallsPerMonth: -1, // unlimited
     brokerIntegrations: ['td_ameritrade', 'schwab', 'ibkr', 'tastyworks', 'custom'],
     communityAccess: true,
     postCreation: true,
     followUsers: true,
     leaderboards: true,
-    supportLevel: 'dedicated',
-    responseTime: '1h'
+    supportLevel: 'priority',
+    responseTime: '4h'
   }
 }
 
@@ -180,73 +120,27 @@ export interface SubscriptionPlan {
 }
 
 export const SUBSCRIPTION_PLANS: Record<SubscriptionTier, SubscriptionPlan[]> = {
-  free: [{
-    id: 'free',
-    name: 'Free',
+  trial: [{
+    id: 'trial',
+    name: '30-Day Free Trial',
     price: 0,
     currency: 'USD',
     interval: 'month',
-    features: SUBSCRIPTION_FEATURES.free,
-    description: 'Perfect for getting started with options trading',
-    cta: 'Get Started'
+    features: SUBSCRIPTION_FEATURES.trial,
+    description: 'Full access to all premium features for 30 days',
+    cta: 'Start Free Trial'
   }],
   
-  pro: [
-    {
-      id: 'pro-monthly',
-      name: 'Pro',
-      price: 39,
-      currency: 'USD',
-      interval: 'month',
-      features: SUBSCRIPTION_FEATURES.pro,
-      popular: true,
-      description: 'Advanced analytics for active traders',
-      cta: 'Start Pro Trial'
-    },
-    {
-      id: 'pro-yearly',
-      name: 'Pro (Annual)',
-      price: 390, // 2 months free
-      currency: 'USD', 
-      interval: 'year',
-      features: SUBSCRIPTION_FEATURES.pro,
-      description: 'Save 17% with annual billing',
-      cta: 'Save with Annual'
-    }
-  ],
-  
-  elite: [
-    {
-      id: 'elite-monthly',
-      name: 'Elite',
-      price: 149,
-      currency: 'USD',
-      interval: 'month',
-      features: SUBSCRIPTION_FEATURES.elite,
-      description: 'Institutional-grade tools for serious traders',
-      cta: 'Go Elite'
-    },
-    {
-      id: 'elite-yearly',
-      name: 'Elite (Annual)',
-      price: 1490, // 2 months free
-      currency: 'USD',
-      interval: 'year',
-      features: SUBSCRIPTION_FEATURES.elite,
-      description: 'Ultimate trading intelligence platform',
-      cta: 'Maximize Returns'
-    }
-  ],
-  
-  enterprise: [{
-    id: 'enterprise',
-    name: 'Enterprise',
-    price: 0, // Custom pricing
+  premium: [{
+    id: 'premium',
+    name: 'Premium',
+    price: 39.99,
     currency: 'USD',
     interval: 'month',
-    features: SUBSCRIPTION_FEATURES.enterprise,
-    description: 'Custom solutions for institutions and funds',
-    cta: 'Contact Sales'
+    features: SUBSCRIPTION_FEATURES.premium,
+    popular: true,
+    description: 'Professional options trading platform with unlimited features',
+    cta: 'Upgrade to Premium'
   }]
 }
 
@@ -268,11 +162,9 @@ export class SubscriptionManager {
       return null // No upgrade needed
     }
     
-    // Find minimum tier that has this feature
-    for (const tier of ['pro', 'elite', 'enterprise'] as SubscriptionTier[]) {
-      if (this.canAccess(tier, requestedFeature)) {
-        return tier
-      }
+    // Only upgrade path is from trial to premium
+    if (userTier === 'trial') {
+      return 'premium'
     }
     
     return null
@@ -286,13 +178,8 @@ export class SubscriptionManager {
   }
   
   static getRecommendedTier(monthlyTradeVolume: number, portfolioValue: number): SubscriptionTier {
-    if (portfolioValue > 500000 || monthlyTradeVolume > 100) {
-      return 'elite'
-    }
-    if (portfolioValue > 50000 || monthlyTradeVolume > 20) {
-      return 'pro'
-    }
-    return 'free'
+    // Everyone starts with trial, then upgrades to premium
+    return 'trial'
   }
 }
 
@@ -305,6 +192,36 @@ export interface UsageMetrics {
   recommendationsUsed: number
   apiCallsUsed: number
   alertsCreated: number
+}
+
+// Trial and subscription management
+export interface TrialInfo {
+  userId: string
+  startDate: Date
+  endDate: Date
+  isActive: boolean
+  extendedByReferral: boolean
+}
+
+export interface ReferralInfo {
+  userId: string
+  referralCode: string
+  referredUsers: string[]
+  totalRewards: number // months of free service
+  isActive: boolean
+}
+
+export interface SubscriptionInfo {
+  userId: string
+  tier: SubscriptionTier
+  status: 'trial' | 'active' | 'expired' | 'cancelled'
+  trialStartDate?: Date
+  trialEndDate?: Date
+  subscriptionStartDate?: Date
+  nextBillingDate?: Date
+  stripeCustomerId?: string
+  stripeSubscriptionId?: string
+  referralCode?: string
 }
 
 export class UsageTracker {
@@ -342,5 +259,103 @@ export class UsageTracker {
   ): Promise<void> {
     // TODO: Implement usage tracking in database
     console.log(`User ${userId} used ${amount} ${resource}`)
+  }
+}
+
+export class TrialManager {
+  static TRIAL_DURATION_DAYS = 30
+  
+  static async startTrial(userId: string): Promise<TrialInfo> {
+    const startDate = new Date()
+    const endDate = new Date(startDate)
+    endDate.setDate(endDate.getDate() + this.TRIAL_DURATION_DAYS)
+    
+    const trialInfo: TrialInfo = {
+      userId,
+      startDate,
+      endDate,
+      isActive: true,
+      extendedByReferral: false
+    }
+    
+    // TODO: Save to database
+    console.log(`Started trial for user ${userId} until ${endDate.toISOString()}`)
+    
+    return trialInfo
+  }
+  
+  static async extendTrialByReferral(userId: string, days: number = 30): Promise<void> {
+    // TODO: Extend trial in database
+    console.log(`Extended trial for user ${userId} by ${days} days`)
+  }
+  
+  static async isTrialActive(userId: string): Promise<boolean> {
+    // TODO: Check database
+    return true // Placeholder
+  }
+  
+  static async getTrialInfo(userId: string): Promise<TrialInfo | null> {
+    // TODO: Fetch from database
+    return null // Placeholder
+  }
+  
+  static getDaysRemaining(trialInfo: TrialInfo): number {
+    const now = new Date()
+    const diffTime = trialInfo.endDate.getTime() - now.getTime()
+    return Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)))
+  }
+}
+
+export class ReferralManager {
+  static async generateReferralCode(userId: string): Promise<string> {
+    // Generate a unique referral code
+    const code = `REF${userId.substring(0, 4).toUpperCase()}${Math.random().toString(36).substring(2, 6).toUpperCase()}`
+    
+    const referralInfo: ReferralInfo = {
+      userId,
+      referralCode: code,
+      referredUsers: [],
+      totalRewards: 0,
+      isActive: true
+    }
+    
+    // TODO: Save to database
+    console.log(`Generated referral code ${code} for user ${userId}`)
+    
+    return code
+  }
+  
+  static async processReferral(referralCode: string, newUserId: string): Promise<boolean> {
+    // TODO: Validate referral code and apply rewards
+    const referrerId = await this.getUserByReferralCode(referralCode)
+    
+    if (!referrerId) {
+      return false
+    }
+    
+    // Extend referrer's subscription by 1 month
+    await this.addReferralReward(referrerId, 30) // 30 days
+    
+    // Extend new user's trial by 1 month
+    await TrialManager.extendTrialByReferral(newUserId, 30)
+    
+    console.log(`Processed referral: ${referrerId} referred ${newUserId}`)
+    
+    return true
+  }
+  
+  static async getUserByReferralCode(code: string): Promise<string | null> {
+    // TODO: Query database
+    return null // Placeholder
+  }
+  
+  static async addReferralReward(userId: string, days: number): Promise<void> {
+    // TODO: Add reward to database
+    console.log(`Added ${days} days reward to user ${userId}`)
+  }
+  
+  static async getReferralStats(userId: string): Promise<{ totalReferrals: number; totalRewards: number }> {
+    // TODO: Query database
+    return { totalReferrals: 0, totalRewards: 0 }
   }
 }

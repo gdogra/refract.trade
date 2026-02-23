@@ -47,24 +47,30 @@ export default function QuickStrategyPanel({
   const analysis = useMemo(() => {
     if (!optionsData || !underlyingPrice) return null
 
+    // Safely access arrays
+    const calls = optionsData.calls || []
+    const puts = optionsData.puts || []
+    
+    if (calls.length === 0) return null
+
     // Calculate IV metrics
-    const avgCallIV = optionsData.calls.reduce((sum, call) => sum + call.impliedVolatility, 0) / optionsData.calls.length
-    const avgPutIV = optionsData.puts.reduce((sum, put) => sum + put.impliedVolatility, 0) / optionsData.puts.length
+    const avgCallIV = calls.reduce((sum, call) => sum + call.impliedVolatility, 0) / calls.length
+    const avgPutIV = puts.length > 0 ? puts.reduce((sum, put) => sum + put.impliedVolatility, 0) / puts.length : avgCallIV
     const ivRank = Math.min(100, Math.max(0, (avgCallIV - 0.15) / 0.4 * 100))
     const skew = avgPutIV - avgCallIV
 
     // Find ATM options
-    const atmStrike = optionsData.calls.reduce((closest, call) => 
+    const atmStrike = calls.reduce((closest, call) => 
       Math.abs(call.strike - underlyingPrice) < Math.abs(closest.strike - underlyingPrice) ? call : closest
     ).strike
 
-    const atmCall = optionsData.calls.find(c => c.strike === atmStrike)
-    const atmPut = optionsData.puts.find(p => p.strike === atmStrike)
+    const atmCall = calls.find(c => c.strike === atmStrike)
+    const atmPut = puts.find(p => p.strike === atmStrike)
 
     // Calculate volume metrics
-    const totalCallVolume = optionsData.calls.reduce((sum, call) => sum + call.volume, 0)
-    const totalPutVolume = optionsData.puts.reduce((sum, put) => sum + put.volume, 0)
-    const putCallVolumeRatio = totalPutVolume / totalCallVolume
+    const totalCallVolume = calls.reduce((sum, call) => sum + call.volume, 0)
+    const totalPutVolume = puts.reduce((sum, put) => sum + put.volume, 0)
+    const putCallVolumeRatio = totalCallVolume > 0 ? totalPutVolume / totalCallVolume : 0
 
     // Generate quick strategies
     const strategies: QuickStrategy[] = []
@@ -115,7 +121,7 @@ export default function QuickStrategyPanel({
     }
 
     // Time decay strategies for short expiry
-    const daysToExpiry = optionsData.calls[0]?.daysToExpiry || 0
+    const daysToExpiry = calls[0]?.daysToExpiry || 0
     if (daysToExpiry < 10 && ivRank > 50) {
       strategies.push({
         name: 'Time Decay Play',

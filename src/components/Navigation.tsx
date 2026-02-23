@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
+import { signOut } from 'next-auth/react'
 import { 
   Home, 
   BarChart3, 
@@ -193,6 +194,17 @@ export default function Navigation() {
     searchInputRef.current?.blur()
   }
 
+  const handleSignOut = async () => {
+    try {
+      await signOut({ 
+        callbackUrl: '/auth/signin',
+        redirect: true 
+      })
+    } catch (error) {
+      console.error('Sign out error:', error)
+    }
+  }
+
   // Don't show navigation on auth pages
   if (pathname?.startsWith('/auth')) {
     return null
@@ -353,7 +365,10 @@ export default function Navigation() {
                       </div>
                     </Link>
                     <hr className="my-1 border-gray-200 dark:border-gray-700" />
-                    <button className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <button 
+                      onClick={handleSignOut}
+                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
                       <div className="flex items-center space-x-2">
                         <LogOut className="h-4 w-4" />
                         <span>Sign Out</span>
