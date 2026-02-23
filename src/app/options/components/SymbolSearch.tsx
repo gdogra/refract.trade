@@ -138,10 +138,10 @@ export default function SymbolSearch({ selectedSymbol, onSymbolChange }: SymbolS
           {/* Current Symbol Display */}
           <div className="flex items-center space-x-3">
             <div className="text-2xl font-bold text-gray-900 dark:text-white">
-              {selectedSymbol}
+              {selectedSymbol || 'Select Symbol'}
             </div>
             <div className="text-sm text-gray-600 dark:text-gray-400">
-              Current Selection
+              {selectedSymbol ? 'Current Selection' : 'No Symbol Selected'}
             </div>
           </div>
 

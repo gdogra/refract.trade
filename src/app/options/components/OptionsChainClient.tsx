@@ -11,6 +11,7 @@ import ImpliedVolatilityChart from './ImpliedVolatilityChart'
 import MarketDataPanel from './MarketDataPanel'
 import StrategyRecommendations from '@/components/strategy/StrategyRecommendations'
 import QuickStrategyPanel from '@/components/strategy/QuickStrategyPanel'
+import PriceAlertsPanel from '@/components/alerts/PriceAlertsPanel'
 import { useOptionsChain } from '@/hooks/useOptionsChain'
 
 export default function OptionsChainClient() {
@@ -154,6 +155,18 @@ export default function OptionsChainClient() {
                 optionsData={optionsData}
                 underlyingPrice={optionsData?.underlyingPrice || 0}
                 onViewDetailedAnalysis={() => setViewMode('strategy')}
+              />
+            </motion.div>
+
+            {/* Price Alerts Panel */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <PriceAlertsPanel 
+                symbol={selectedSymbol}
+                currentPrice={optionsData?.underlyingPrice || 0}
               />
             </motion.div>
           </div>

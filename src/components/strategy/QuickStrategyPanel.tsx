@@ -16,6 +16,7 @@ import {
   AlertTriangle
 } from 'lucide-react'
 import { OptionsChain } from '@/lib/options/yahooOptions'
+import { priceAlertsManager } from '@/lib/priceAlerts'
 
 interface QuickStrategy {
   name: string
@@ -343,8 +344,16 @@ export default function QuickStrategyPanel({
             className="w-full text-xs"
             onClick={() => {
               const alertPrice = prompt(`Set price alert for ${symbol}:`, underlyingPrice.toFixed(2))
-              if (alertPrice) {
-                alert(`Price alert set for ${symbol} at $${alertPrice}`)
+              if (alertPrice && !isNaN(parseFloat(alertPrice))) {
+                try {
+                  priceAlertsManager.addAlert(symbol, parseFloat(alertPrice), underlyingPrice)
+                  const direction = parseFloat(alertPrice) > underlyingPrice ? 'above' : 'below'
+                  alert(`Price alert set for ${symbol} ${direction} $${parseFloat(alertPrice).toFixed(2)}`)
+                } catch (error) {
+                  alert('Failed to set price alert')
+                }
+              } else if (alertPrice) {
+                alert('Please enter a valid price')
               }
             }}
           >
