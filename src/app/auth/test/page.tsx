@@ -7,10 +7,21 @@ export default function AuthTest() {
   const { data: session, status } = useSession()
   const [providers, setProviders] = useState<any>(null)
   const [baseUrl, setBaseUrl] = useState<string>('Server-side')
+  const [debugInfo, setDebugInfo] = useState<any>(null)
 
   useEffect(() => {
     getProviders().then(setProviders)
     setBaseUrl(window.location.origin)
+    
+    // Fetch debug info
+    fetch('/api/debug/env', {
+      headers: {
+        'x-debug-auth': 'refract-debug-2024'
+      }
+    })
+    .then(r => r.json())
+    .then(setDebugInfo)
+    .catch(err => console.error('Debug fetch error:', err))
   }, [])
 
   return (
@@ -41,6 +52,15 @@ export default function AuthTest() {
           <p>Vercel: {process.env.VERCEL ? 'Yes' : 'No'}</p>
           <p>Netlify: {process.env.NETLIFY ? 'Yes' : 'No'}</p>
         </div>
+
+        {debugInfo && (
+          <div className="border rounded-lg p-4">
+            <h2 className="font-semibold mb-2">Server Environment Debug</h2>
+            <pre className="bg-gray-100 p-2 rounded text-sm overflow-auto">
+              {JSON.stringify(debugInfo, null, 2)}
+            </pre>
+          </div>
+        )}
 
         <div className="border rounded-lg p-4">
           <h2 className="font-semibold mb-2">Test Sign-In</h2>
