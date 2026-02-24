@@ -1,17 +1,15 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Get environment variables with fallbacks
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-
 // Client-side Supabase client
 export const createSupabaseClient = () => {
-  if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error('Supabase configuration is missing')
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  
+  if (!url || !anonKey) {
+    throw new Error('Supabase configuration is missing. Please check NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY environment variables.')
   }
   
-  return createClient(supabaseUrl, supabaseAnonKey, {
+  return createClient(url, anonKey, {
     auth: {
       persistSession: true,
       autoRefreshToken: true,
@@ -21,11 +19,14 @@ export const createSupabaseClient = () => {
 
 // Server-side Supabase client
 export const createSupabaseServerClient = () => {
-  if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error('Supabase configuration is missing')
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  
+  if (!url || !anonKey) {
+    throw new Error('Supabase configuration is missing. Please check NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY environment variables.')
   }
   
-  return createClient(supabaseUrl, supabaseAnonKey, {
+  return createClient(url, anonKey, {
     auth: {
       persistSession: false,
       autoRefreshToken: false,
@@ -35,11 +36,20 @@ export const createSupabaseServerClient = () => {
 
 // Admin Supabase client with service role key
 export const createSupabaseAdmin = () => {
-  if (!supabaseUrl || !supabaseServiceKey) {
-    throw new Error('Supabase admin configuration is missing')
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  
+  // During build time, environment variables may not be available
+  if (typeof window === 'undefined' && (!url || !serviceKey)) {
+    if (process.env.NODE_ENV === 'production' || process.env.NETLIFY) {
+      throw new Error('Supabase admin configuration is missing. Please check NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY environment variables.')
+    }
+    // During build, return a mock client that won't be used
+    console.warn('Supabase admin client not available during build process')
+    throw new Error('Supabase admin configuration is missing during build process')
   }
   
-  return createClient(supabaseUrl, supabaseServiceKey, {
+  return createClient(url!, serviceKey!, {
     auth: {
       autoRefreshToken: false,
       persistSession: false

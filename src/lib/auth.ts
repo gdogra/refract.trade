@@ -50,7 +50,11 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
-          // Environment variables validated in createSupabaseAdmin
+          // Check if we're in a build environment
+          if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+            console.warn('Skipping auth during build process - environment variables not available')
+            return null
+          }
 
           const supabase = createSupabaseAdmin()
           
@@ -104,6 +108,12 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user, account, profile }) {
       if (account?.provider === 'google') {
         try {
+          // Check if we're in a build environment
+          if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+            console.warn('Skipping Google sign-in during build process - environment variables not available')
+            return true
+          }
+
           const supabase = createSupabaseAdmin()
           
           // Check if user already exists
@@ -162,6 +172,12 @@ export const authOptions: NextAuthOptions = {
         // For Google users, fetch subscription info from database
         if (account?.provider === 'google') {
           try {
+            // Check if we're in a build environment
+            if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+              console.warn('Skipping JWT callback during build process - environment variables not available')
+              return token
+            }
+
             const supabase = createSupabaseAdmin()
             const { data: userData } = await supabase
               .from('users')
