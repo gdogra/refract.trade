@@ -129,25 +129,42 @@ export default function SignIn() {
 
             <Button
               type="button"
-              onClick={async () => {
-                console.log('Google sign-in button clicked')
+              onClick={async (e) => {
+                e.preventDefault()
+                console.log('=== GOOGLE SIGN-IN DEBUG ===')
+                console.log('Button clicked at:', new Date().toISOString())
                 console.log('Available providers:', providers)
+                console.log('Current session:', session)
+                console.log('Is loading:', isLoading)
+                
+                if (!providers) {
+                  console.log('No providers loaded yet')
+                  setError('Authentication providers not loaded')
+                  return
+                }
                 
                 if (!providers?.google) {
-                  setError('Google authentication is not available')
+                  console.log('Google provider not found in:', Object.keys(providers))
+                  setError('Google authentication is not configured')
                   return
                 }
                 
                 try {
                   setError('')
-                  console.log('Attempting Google sign-in...')
-                  const result = await signIn('google', { 
-                    callbackUrl: '/dashboard'
+                  setIsLoading(true)
+                  console.log('Starting Google sign-in process...')
+                  
+                  // Try with redirect first
+                  await signIn('google', { 
+                    callbackUrl: '/dashboard',
+                    redirect: true
                   })
-                  console.log('Google sign-in result:', result)
+                  
+                  console.log('Sign-in initiated successfully')
                 } catch (error) {
                   console.error('Google sign-in error:', error)
-                  setError('Failed to sign in with Google')
+                  setError(`Failed to sign in with Google: ${error}`)
+                  setIsLoading(false)
                 }
               }}
               disabled={isLoading || !providers}
