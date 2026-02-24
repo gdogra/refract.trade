@@ -1,12 +1,13 @@
 'use client'
 
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 
 export default function AuthError() {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const error = searchParams.get('error')
   
   const getErrorMessage = (error: string | null) => {
@@ -73,11 +74,18 @@ export default function AuthError() {
           )}
           
           <div className="flex flex-col space-y-2">
-            <Button asChild className="w-full">
-              <Link href="/auth/signup">Try Email Sign-up</Link>
+            <Button 
+              onClick={() => router.push('/auth/signup')}
+              className="w-full"
+            >
+              Try Email Sign-up
             </Button>
-            <Button variant="outline" asChild className="w-full">
-              <Link href="/auth/signin">Back to Sign In</Link>
+            <Button 
+              variant="outline" 
+              onClick={() => router.push('/auth/signin')}
+              className="w-full"
+            >
+              Back to Sign In
             </Button>
           </div>
         </CardContent>
