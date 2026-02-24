@@ -68,8 +68,15 @@ export default function SignIn() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <div className="text-4xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-              Refract.trade
+            <div className="flex items-center space-x-3">
+              <img 
+                src="/images/refract-logo-light.svg" 
+                alt="RefractTrade"
+                className="w-10 h-10"
+              />
+              <div className="text-3xl font-bold text-gray-900">
+                RefractTrade
+              </div>
             </div>
           </div>
           <CardTitle>Welcome back</CardTitle>
@@ -168,7 +175,7 @@ export default function SignIn() {
                 }
               }}
               disabled={isLoading || !providers}
-              className="w-full mt-4 bg-white hover:bg-gray-50 text-gray-900 font-semibold py-3 px-4 border border-gray-300 rounded-lg shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center space-x-2"
+              className="w-full mt-4 bg-gray-50 hover:bg-gray-100 text-gray-900 font-semibold py-3 px-4 border-2 border-gray-300 rounded-lg shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center space-x-2 hover:shadow-lg"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>

@@ -80,8 +80,15 @@ export default function SignUp() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <div className="text-4xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-              Refract.trade
+            <div className="flex items-center space-x-3">
+              <img 
+                src="/images/refract-logo-light.svg" 
+                alt="RefractTrade"
+                className="w-10 h-10"
+              />
+              <div className="text-3xl font-bold text-gray-900">
+                RefractTrade
+              </div>
             </div>
           </div>
           <CardTitle>Create your account</CardTitle>

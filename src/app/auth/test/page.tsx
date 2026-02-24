@@ -37,6 +37,9 @@ export default function AuthTest() {
           <h2 className="font-semibold mb-2">Environment Check</h2>
           <p>Base URL: {baseUrl}</p>
           <p>NextAuth URL: {process.env.NEXT_PUBLIC_NEXTAUTH_URL || 'Not set'}</p>
+          <p>Environment: {process.env.NODE_ENV || 'unknown'}</p>
+          <p>Vercel: {process.env.VERCEL ? 'Yes' : 'No'}</p>
+          <p>Netlify: {process.env.NETLIFY ? 'Yes' : 'No'}</p>
         </div>
 
         <div className="border rounded-lg p-4">

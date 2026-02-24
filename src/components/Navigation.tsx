@@ -216,12 +216,21 @@ export default function Navigation() {
         <div className="flex justify-between items-center h-16">
           {/* Logo and Brand */}
           <div className="flex items-center space-x-8">
-            <Link href="/dashboard" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-primary-600 to-secondary-600 rounded-lg flex items-center justify-center">
-                <Zap className="h-5 w-5 text-white" />
+            <Link href="/dashboard" className="flex items-center space-x-3">
+              <div className="w-10 h-10 flex items-center justify-center">
+                <img 
+                  src="/images/refract-logo-light.svg" 
+                  alt="RefractTrade"
+                  className="w-8 h-8 dark:hidden"
+                />
+                <img 
+                  src="/images/refract-logo-dark.svg" 
+                  alt="RefractTrade"
+                  className="w-8 h-8 hidden dark:block"
+                />
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-                Refract.trade
+              <span className="text-xl font-bold text-gray-900 dark:text-white">
+                RefractTrade
               </span>
             </Link>
 
