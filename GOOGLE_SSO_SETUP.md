@@ -25,7 +25,7 @@ GOOGLE_CLIENT_SECRET="your-google-client-secret"
 4. Go to "Credentials" and create OAuth 2.0 Client ID
 5. Add authorized redirect URIs:
    - `http://localhost:3000/api/auth/callback/google` (development)
-   - `https://yourdomain.com/api/auth/callback/google` (production)
+   - `https://your-netlify-site.netlify.app/api/auth/callback/google` (production)
 
 ## Implementation Details
 
@@ -207,7 +207,46 @@ signIn('google', {
 3. **Referral Flow**: Test referral processing with Google sign-up
 4. **Session Persistence**: Verify sessions persist across page loads
 
-### Production Testing
+### Production Deployment
+
+### Netlify Environment Variables
+Set these in your Netlify dashboard under Site Settings → Environment Variables:
+
+```bash
+# NextAuth Configuration
+NEXTAUTH_SECRET="your-production-secret-key"
+NEXTAUTH_URL="https://your-netlify-site.netlify.app"
+
+# Google OAuth (use your actual credentials)
+GOOGLE_CLIENT_ID="your-google-client-id"
+GOOGLE_CLIENT_SECRET="your-google-client-secret"
+
+# Database (your existing Supabase values)
+NEXT_PUBLIC_SUPABASE_URL="https://pfeikjkqqotksxwijcwh.supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="your-supabase-anon-key"
+SUPABASE_SERVICE_ROLE_KEY="your-supabase-service-role-key"
+
+# Stripe Configuration  
+STRIPE_SECRET_KEY="your-stripe-secret-key"
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="your-stripe-publishable-key"
+STRIPE_WEBHOOK_SECRET="whsec_..."
+STRIPE_PRICE_ID="price_..."
+
+# Optional Services
+RESEND_API_KEY="re_placeholder_key"
+ALPHA_VANTAGE_API_KEY="your-alpha-vantage-key"
+```
+
+### Google Console Production Setup
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Navigate to your OAuth 2.0 Client ID
+3. **Add production redirect URI**:
+   ```
+   https://your-netlify-site.netlify.app/api/auth/callback/google
+   ```
+4. Save the configuration
+
+## Production Testing
 1. **Domain Verification**: Ensure redirect URIs match production domain
 2. **SSL Certificate**: Verify HTTPS is working properly
 3. **Error Handling**: Test various error scenarios
