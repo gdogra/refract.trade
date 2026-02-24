@@ -6,9 +6,11 @@ import { useState, useEffect } from 'react'
 export default function AuthTest() {
   const { data: session, status } = useSession()
   const [providers, setProviders] = useState<any>(null)
+  const [baseUrl, setBaseUrl] = useState<string>('Server-side')
 
   useEffect(() => {
     getProviders().then(setProviders)
+    setBaseUrl(window.location.origin)
   }, [])
 
   return (
@@ -33,7 +35,7 @@ export default function AuthTest() {
 
         <div className="border rounded-lg p-4">
           <h2 className="font-semibold mb-2">Environment Check</h2>
-          <p>Base URL: {window.location.origin}</p>
+          <p>Base URL: {baseUrl}</p>
           <p>NextAuth URL: {process.env.NEXT_PUBLIC_NEXTAUTH_URL || 'Not set'}</p>
         </div>
 
