@@ -1,10 +1,16 @@
 import Stripe from 'stripe'
 import { SubscriptionInfo } from './subscription'
 
-// Initialize Stripe
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2026-01-28.clover'
-})
+// Lazy Stripe initialization to avoid build-time errors
+const getStripe = () => {
+  const secretKey = process.env.STRIPE_SECRET_KEY
+  if (!secretKey) {
+    throw new Error('STRIPE_SECRET_KEY environment variable is required')
+  }
+  return new Stripe(secretKey, {
+    apiVersion: '2026-01-28.clover'
+  })
+}
 
 export interface PaymentMethodInfo {
   id: string
@@ -31,7 +37,7 @@ export class PaymentProcessor {
     userId: string
   ): Promise<{ customerId: string; error?: string }> {
     try {
-      const customer = await stripe.customers.create({
+      const customer = await getStripe().customers.create({
         email,
         name,
         metadata: {
@@ -53,19 +59,19 @@ export class PaymentProcessor {
   ): Promise<PaymentResult> {
     try {
       // Attach payment method to customer
-      await stripe.paymentMethods.attach(paymentMethodId, {
+      await getStripe().paymentMethods.attach(paymentMethodId, {
         customer: customerId,
       })
       
       // Set as default payment method
-      await stripe.customers.update(customerId, {
+      await getStripe().customers.update(customerId, {
         invoice_settings: {
           default_payment_method: paymentMethodId,
         },
       })
       
       // Create subscription for $39.99/month
-      const subscription = await stripe.subscriptions.create({
+      const subscription = await getStripe().subscriptions.create({
         customer: customerId,
         items: [
           {
@@ -96,7 +102,7 @@ export class PaymentProcessor {
   
   static async cancelSubscription(subscriptionId: string): Promise<{ success: boolean; error?: string }> {
     try {
-      await stripe.subscriptions.cancel(subscriptionId)
+      await getStripe().subscriptions.cancel(subscriptionId)
       return { success: true }
     } catch (error: any) {
       console.error('Failed to cancel subscription:', error)
@@ -109,11 +115,11 @@ export class PaymentProcessor {
     newPaymentMethodId: string
   ): Promise<{ success: boolean; error?: string }> {
     try {
-      await stripe.paymentMethods.attach(newPaymentMethodId, {
+      await getStripe().paymentMethods.attach(newPaymentMethodId, {
         customer: customerId,
       })
       
-      await stripe.customers.update(customerId, {
+      await getStripe().customers.update(customerId, {
         invoice_settings: {
           default_payment_method: newPaymentMethodId,
         },
@@ -128,7 +134,7 @@ export class PaymentProcessor {
   
   static async getPaymentMethods(customerId: string): Promise<PaymentMethodInfo[]> {
     try {
-      const paymentMethods = await stripe.paymentMethods.list({
+      const paymentMethods = await getStripe().paymentMethods.list({
         customer: customerId,
         type: 'card',
       })
@@ -153,7 +159,7 @@ export class PaymentProcessor {
     cancelAtPeriodEnd: boolean
   } | null> {
     try {
-      const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+      const subscription = await getStripe().subscriptions.retrieve(subscriptionId)
       
       return {
         status: subscription.status,
@@ -168,7 +174,7 @@ export class PaymentProcessor {
   
   static async handleWebhook(rawBody: string, signature: string): Promise<void> {
     try {
-      const event = stripe.webhooks.constructEvent(
+      const event = getStripe().webhooks.constructEvent(
         rawBody,
         signature,
         process.env.STRIPE_WEBHOOK_SECRET!

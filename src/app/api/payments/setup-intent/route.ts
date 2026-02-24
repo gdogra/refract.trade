@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2026-01-28.clover'
-})
+const getStripe = () => {
+  const secretKey = process.env.STRIPE_SECRET_KEY
+  if (!secretKey) {
+    throw new Error('STRIPE_SECRET_KEY environment variable is required')
+  }
+  return new Stripe(secretKey, {
+    apiVersion: '2026-01-28.clover'
+  })
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,7 +23,7 @@ export async function POST(req: NextRequest) {
     }
     
     // Create a SetupIntent for saving payment method
-    const setupIntent = await stripe.setupIntents.create({
+    const setupIntent = await getStripe().setupIntents.create({
       customer: customerId,
       usage: 'off_session',
     })
