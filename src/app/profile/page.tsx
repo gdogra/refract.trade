@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useUser } from '@/contexts/UserContext'
+import { useSession } from 'next-auth/react'
 import { motion } from 'framer-motion'
 import { 
   User, 
@@ -26,43 +26,58 @@ import { Button } from '@/components/ui/Button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 
 export default function Profile() {
-  const { user, updateUser, isLoggedIn } = useUser()
+  const { data: session, status } = useSession()
   const [isEditing, setIsEditing] = useState(false)
+  
+  // Extract real user data from NextAuth session
+  const sessionUser = session?.user
   const [profileData, setProfileData] = useState({
-    firstName: user?.firstName || '',
-    lastName: user?.lastName || '',
-    email: user?.email || '',
-    phone: user?.phone || '',
-    location: user?.location || '',
-    joinDate: user?.joinDate || new Date().toISOString().split('T')[0],
-    accountType: user?.accountType || 'Basic',
+    firstName: sessionUser?.name?.split(' ')[0] || '',
+    lastName: sessionUser?.name?.split(' ').slice(1).join(' ') || '',
+    email: sessionUser?.email || '',
+    phone: '',
+    location: '',
+    joinDate: new Date().toISOString().split('T')[0],
+    accountType: sessionUser?.subscriptionTier || 'Basic',
     tradingExperience: '',
     bio: ''
   })
 
   useEffect(() => {
-    // Load profile data from localStorage or user context
-    const savedProfile = localStorage.getItem('userProfile')
-    if (savedProfile) {
-      const parsed = JSON.parse(savedProfile)
-      setProfileData(parsed)
-      setEditedData(parsed)
-    } else if (user) {
+    // Update profile data when session changes
+    if (sessionUser) {
       const defaultProfile = {
-        firstName: user.firstName || '',
-        lastName: user.lastName || '',
-        email: user.email || '',
-        phone: user.phone || '',
-        location: user.location || '',
-        joinDate: user.joinDate || new Date().toISOString().split('T')[0],
-        accountType: user.accountType || 'Basic',
+        firstName: sessionUser.name?.split(' ')[0] || '',
+        lastName: sessionUser.name?.split(' ').slice(1).join(' ') || '',
+        email: sessionUser.email || '',
+        phone: '',
+        location: '',
+        joinDate: new Date().toISOString().split('T')[0],
+        accountType: sessionUser.subscriptionTier || 'Basic',
         tradingExperience: '',
         bio: ''
       }
-      setProfileData(defaultProfile)
-      setEditedData(defaultProfile)
+      
+      // Load any saved profile customizations
+      const savedProfile = localStorage.getItem('userProfile')
+      if (savedProfile) {
+        const parsed = JSON.parse(savedProfile)
+        // Merge saved customizations with session data
+        const mergedProfile = {
+          ...defaultProfile,
+          ...parsed,
+          // Always use session data for these fields
+          email: sessionUser.email || '',
+          accountType: sessionUser.subscriptionTier || 'Basic'
+        }
+        setProfileData(mergedProfile)
+        setEditedData(mergedProfile)
+      } else {
+        setProfileData(defaultProfile)
+        setEditedData(defaultProfile)
+      }
     }
-  }, [user])
+  }, [sessionUser])
 
   const [editedData, setEditedData] = useState(profileData)
   const [activeTab, setActiveTab] = useState<'personal' | 'trading' | 'security' | 'preferences'>('personal')
@@ -70,18 +85,14 @@ export default function Profile() {
   const handleSave = () => {
     setProfileData(editedData)
     
-    // Save to localStorage
-    localStorage.setItem('userProfile', JSON.stringify(editedData))
-    
-    // Update user context using the new updateUser function
-    updateUser({
-      firstName: editedData.firstName,
-      lastName: editedData.lastName,
-      email: editedData.email,
-      phone: editedData.phone,
-      location: editedData.location,
-      accountType: editedData.accountType as 'Basic' | 'Pro' | 'Premium'
-    })
+    // Save to localStorage (excluding session-controlled fields)
+    const profileToSave = {
+      ...editedData,
+      // Don't save these as they come from session
+      email: undefined,
+      accountType: undefined
+    }
+    localStorage.setItem('userProfile', JSON.stringify(profileToSave))
     
     setIsEditing(false)
     alert('Profile updated successfully!')
@@ -109,6 +120,40 @@ export default function Profile() {
     marketDataNotifications: true,
     orderConfirmations: true,
     priceAlerts: true
+  }
+
+  // Show loading state
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Loading profile...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Show login prompt if not authenticated
+  if (status === 'unauthenticated') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardContent className="p-6 text-center">
+            <User className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              Please Sign In
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              You need to be logged in to view your profile.
+            </p>
+            <Button onClick={() => window.location.href = '/auth/signin'}>
+              Sign In
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
   return (
@@ -139,9 +184,17 @@ export default function Profile() {
               <CardContent className="p-6">
                 <div className="text-center">
                   <div className="relative inline-block">
-                    <div className="w-24 h-24 bg-gradient-to-r from-brand-500 to-brand-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
-                      {(profileData.firstName[0] || 'U')}{(profileData.lastName[0] || 'U')}
-                    </div>
+                    {sessionUser?.image ? (
+                      <img 
+                        src={sessionUser.image} 
+                        alt="Profile"
+                        className="w-24 h-24 rounded-full mx-auto mb-4"
+                      />
+                    ) : (
+                      <div className="w-24 h-24 bg-gradient-to-r from-brand-500 to-brand-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
+                        {(profileData.firstName[0] || 'U')}{(profileData.lastName[0] || 'U')}
+                      </div>
+                    )}
                     <button className="absolute bottom-0 right-0 w-8 h-8 bg-white dark:bg-gray-800 rounded-full border-2 border-gray-200 dark:border-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-brand-600">
                       <Camera className="h-4 w-4" />
                     </button>
