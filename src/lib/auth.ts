@@ -139,7 +139,7 @@ export const authOptions: NextAuthOptions = {
                 name: user.name,
                 avatar: user.image,
                 email_verified: true, // Google users are pre-verified
-                subscription_tier: 'trial',
+                subscription_tier: 'basic',
                 subscription_expiry: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
               })
               .select()
@@ -152,13 +152,19 @@ export const authOptions: NextAuthOptions = {
             
             // Start trial and check for referrals
             if (newUser) {
-              await TrialManager.startTrial(newUser.id)
+              try {
+                await TrialManager.startTrial(newUser.id)
+              } catch (error) {
+                console.error('Failed to start trial:', error)
+                // Don't fail the sign-in process for trial setup issues
+              }
               
               // Generate referral code for new user
               try {
                 await ReferralManager.generateReferralCode(newUser.id)
               } catch (error) {
                 console.error('Failed to generate referral code:', error)
+                // Don't fail the sign-in process for referral setup issues
               }
             }
           }
@@ -166,6 +172,11 @@ export const authOptions: NextAuthOptions = {
           return true
         } catch (error) {
           console.error('Google sign-in error:', error)
+          console.error('Error details:', {
+            message: error.message,
+            stack: error.stack,
+            userEmail: user.email
+          })
           return false
         }
       }
@@ -212,6 +223,8 @@ export const authOptions: NextAuthOptions = {
     }
   },
   pages: {
-    signIn: '/auth/signin'
-  }
+    signIn: '/auth/signin',
+    error: '/auth/error'
+  },
+  debug: process.env.NODE_ENV === 'development'
 }
