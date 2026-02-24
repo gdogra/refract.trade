@@ -173,8 +173,8 @@ export const authOptions: NextAuthOptions = {
         } catch (error) {
           console.error('Google sign-in error:', error)
           console.error('Error details:', {
-            message: error.message,
-            stack: error.stack,
+            message: error instanceof Error ? error.message : String(error),
+            stack: error instanceof Error ? error.stack : 'No stack trace available',
             userEmail: user.email
           })
           return false
