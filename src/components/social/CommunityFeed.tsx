@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import * as React from 'react'
 import { motion } from 'framer-motion'
 import { Heart, MessageCircle, Share2, TrendingUp, TrendingDown, Eye, Star, Clock } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/Card'
@@ -38,7 +39,8 @@ interface CommunityPost {
   tags: string[]
 }
 
-const mockPosts: CommunityPost[] = [
+// Generate more realistic and current posts
+const generateMockPosts = (): CommunityPost[] => [
   {
     id: '1',
     user: {
@@ -48,75 +50,207 @@ const mockPosts: CommunityPost[] = [
       tier: 'elite',
       followers: 1247
     },
-    timestamp: new Date(Date.now() - 3600000),
-    content: "NVDA showing strong momentum above $140. Bought calls for earnings play. The technical setup is textbook with volume confirmation.",
+    timestamp: new Date(Date.now() - 1800000), // 30 min ago
+    content: "🚀 NVDA breaking out above $145 resistance with massive volume. Added 0DTE calls at $147 strike. Risk management set at 50% loss. This is not financial advice - sharing my play.",
     position: {
       symbol: 'NVDA',
       type: 'call',
       action: 'bought',
-      price: 142.50,
-      quantity: 10
+      price: 147.00,
+      quantity: 5
     },
     engagement: {
-      likes: 23,
-      comments: 7,
-      shares: 3,
+      likes: 87,
+      comments: 23,
+      shares: 12,
       liked: false
     },
     performance: {
-      returns: 12.3,
-      timeframe: '7d'
+      returns: 28.5,
+      timeframe: '2h'
     },
-    tags: ['earnings', 'bullish', 'tech']
+    tags: ['0DTE', 'momentum', 'tech', 'breakout']
   },
   {
     id: '2',
     user: {
-      name: 'TechAnalyst',
-      avatar: 'TA',
-      verified: false,
+      name: 'VegaHunter',
+      avatar: 'VH',
+      verified: true,
       tier: 'pro',
-      followers: 823
+      followers: 2156
     },
-    timestamp: new Date(Date.now() - 7200000),
-    content: "Market showing signs of weakness. VIX climbing and put/call ratio spiking. Defensive positioning recommended.",
+    timestamp: new Date(Date.now() - 3600000), // 1hr ago
+    content: "VIX term structure showing backwardation - classic setup for vol crush plays. Selling TSLA iron condors 30 DTE, collecting $3.20 premium with $12 wide strikes. IV rank 85th percentile.",
+    position: {
+      symbol: 'TSLA',
+      type: 'call',
+      action: 'sold',
+      price: 3.20,
+      quantity: 10
+    },
     engagement: {
-      likes: 45,
-      comments: 12,
-      shares: 8,
+      likes: 156,
+      comments: 34,
+      shares: 28,
       liked: true
     },
-    tags: ['market', 'vix', 'defensive']
+    performance: {
+      returns: 15.7,
+      timeframe: '5d'
+    },
+    tags: ['vix', 'volatility', 'iron-condor', 'tesla']
   },
   {
     id: '3',
     user: {
-      name: 'RetailTrader',
-      avatar: 'RT',
+      name: 'ThetaGang',
+      avatar: 'TG',
       verified: false,
-      tier: 'free',
-      followers: 156
+      tier: 'pro',
+      followers: 934
     },
-    timestamp: new Date(Date.now() - 10800000),
-    content: "First time trying iron condors on SPY. The risk/reward seems attractive with IV rank at 40th percentile.",
+    timestamp: new Date(Date.now() - 7200000), // 2hr ago
+    content: "SPY put credit spreads printing money this week 💰 Sold the 480/475 spread for $1.85, now worth $0.40. Taking profits at 75% max gain as planned. Discipline pays!",
     position: {
       symbol: 'SPY',
-      type: 'call',
-      action: 'bought'
+      type: 'put',
+      action: 'sold',
+      price: 1.85,
+      quantity: 25
     },
     engagement: {
-      likes: 18,
-      comments: 5,
-      shares: 2,
+      likes: 203,
+      comments: 45,
+      shares: 31,
       liked: false
     },
-    tags: ['spy', 'iron-condor', 'neutral']
+    performance: {
+      returns: 78.4,
+      timeframe: '3d'
+    },
+    tags: ['spy', 'credit-spread', 'theta', 'profit-taking']
+  },
+  {
+    id: '4',
+    user: {
+      name: 'MarketSurfer',
+      avatar: 'MS',
+      verified: false,
+      tier: 'free',
+      followers: 287
+    },
+    timestamp: new Date(Date.now() - 10800000), // 3hr ago
+    content: "Learning options the hard way... My AAPL calls expired worthless today 😅 $500 lesson on why I need to understand time decay better. Back to paper trading for a while!",
+    position: {
+      symbol: 'AAPL',
+      type: 'call',
+      action: 'bought',
+      price: 2.45,
+      quantity: 2
+    },
+    engagement: {
+      likes: 67,
+      comments: 28,
+      shares: 5,
+      liked: false
+    },
+    performance: {
+      returns: -100,
+      timeframe: '7d'
+    },
+    tags: ['aapl', 'learning', 'theta-decay', 'paper-trading']
+  },
+  {
+    id: '5',
+    user: {
+      name: 'QuantTrader',
+      avatar: 'QT',
+      verified: true,
+      tier: 'elite',
+      followers: 3421
+    },
+    timestamp: new Date(Date.now() - 14400000), // 4hr ago
+    content: "🔥 High conviction play: QQQ strangle before Fed announcement. Selling puts and calls around current price, expecting big move either direction. Vol is underpriced at 22 IV.",
+    position: {
+      symbol: 'QQQ',
+      type: 'call',
+      action: 'sold',
+      price: 4.80,
+      quantity: 20
+    },
+    engagement: {
+      likes: 312,
+      comments: 89,
+      shares: 67,
+      liked: true
+    },
+    performance: {
+      returns: 45.2,
+      timeframe: '1d'
+    },
+    tags: ['qqq', 'strangle', 'fed', 'volatility', 'high-conviction']
+  },
+  {
+    id: '6',
+    user: {
+      name: 'RetailWarrior',
+      avatar: 'RW',
+      verified: false,
+      tier: 'free',
+      followers: 145
+    },
+    timestamp: new Date(Date.now() - 18000000), // 5hr ago
+    content: "First successful wheel trade! AMD assignment at $135, been selling covered calls for 3 weeks. Just got called away at $140 for nice profit. Time to find the next wheel candidate.",
+    position: {
+      symbol: 'AMD',
+      type: 'call',
+      action: 'sold',
+      price: 140.00,
+      quantity: 1
+    },
+    engagement: {
+      likes: 89,
+      comments: 19,
+      shares: 8,
+      liked: false
+    },
+    performance: {
+      returns: 12.8,
+      timeframe: '21d'
+    },
+    tags: ['amd', 'wheel', 'assignment', 'covered-calls']
   }
 ]
 
 export default function CommunityFeed() {
-  const [posts, setPosts] = useState<CommunityPost[]>(mockPosts)
+  const [allPosts] = useState<CommunityPost[]>(generateMockPosts())
   const [filter, setFilter] = useState<'all' | 'following' | 'trending'>('all')
+  const [followedUsers] = useState<Set<string>>(new Set(['OptionsWizard', 'VegaHunter', 'QuantTrader']))
+  
+  // Filter posts based on selected tab
+  const filteredPosts = React.useMemo(() => {
+    switch (filter) {
+      case 'following':
+        return allPosts.filter(post => followedUsers.has(post.user.name))
+      case 'trending':
+        // Sort by engagement score: likes + comments * 2 + shares * 3
+        return [...allPosts].sort((a, b) => {
+          const scoreA = a.engagement.likes + (a.engagement.comments * 2) + (a.engagement.shares * 3)
+          const scoreB = b.engagement.likes + (b.engagement.comments * 2) + (b.engagement.shares * 3)
+          return scoreB - scoreA
+        }).slice(0, 4) // Show top 4 trending
+      default:
+        return allPosts.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+    }
+  }, [filter, allPosts, followedUsers])
+
+  const [posts, setPosts] = useState<CommunityPost[]>(filteredPosts)
+  
+  // Update posts when filter changes
+  React.useEffect(() => {
+    setPosts(filteredPosts)
+  }, [filteredPosts])
 
   const handleLike = (postId: string) => {
     setPosts(prev => prev.map(post => 
@@ -159,16 +293,43 @@ export default function CommunityFeed() {
           <button
             key={tab}
             onClick={() => setFilter(tab)}
-            className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
+            className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors relative ${
               filter === tab
                 ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
             }`}
           >
+            {tab === 'following' && (
+              <span className="mr-1">👥</span>
+            )}
+            {tab === 'trending' && (
+              <span className="mr-1">🔥</span>
+            )}
             {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            {tab === 'following' && (
+              <span className="ml-1 text-xs bg-blue-500 text-white rounded-full px-1.5 py-0.5">
+                {followedUsers.size}
+              </span>
+            )}
           </button>
         ))}
       </div>
+
+      {/* Filter Info */}
+      {filter !== 'all' && (
+        <div className="text-sm text-gray-600 dark:text-gray-400 flex items-center space-x-2">
+          {filter === 'following' && (
+            <>
+              <span>📋 Showing posts from {followedUsers.size} followed traders</span>
+            </>
+          )}
+          {filter === 'trending' && (
+            <>
+              <span>🚀 Top performing posts by engagement</span>
+            </>
+          )}
+        </div>
+      )}
 
       {/* Posts Feed */}
       <div className="space-y-3">
@@ -311,12 +472,66 @@ export default function CommunityFeed() {
         ))}
       </div>
 
+      {/* Empty State */}
+      {posts.length === 0 && (
+        <div className="text-center py-12">
+          <div className="text-gray-400 mb-4">
+            {filter === 'following' ? '👥' : filter === 'trending' ? '📈' : '📱'}
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            {filter === 'following' ? 'No posts from followed users' : 
+             filter === 'trending' ? 'No trending posts yet' : 'No posts available'}
+          </h3>
+          <p className="text-gray-500 dark:text-gray-400 mb-4">
+            {filter === 'following' ? 'Follow some traders to see their posts here' :
+             filter === 'trending' ? 'Check back later for trending content' : 'Be the first to share a trade!'}
+          </p>
+          {filter === 'following' && (
+            <Button 
+              variant="outline" 
+              onClick={() => setFilter('all')}
+              className="mt-2"
+            >
+              Browse All Posts
+            </Button>
+          )}
+        </div>
+      )}
+
       {/* Load More */}
-      <div className="text-center py-4">
-        <Button variant="outline" className="w-full">
-          Load More Posts
-        </Button>
-      </div>
+      {posts.length > 0 && (
+        <div className="text-center py-4">
+          <Button 
+            variant="outline" 
+            className="w-full"
+            onClick={() => {
+              // Simulate loading more posts
+              const morePost = {
+                id: `${Date.now()}`,
+                user: {
+                  name: 'TradeNewbie',
+                  avatar: 'TN',
+                  verified: false,
+                  tier: 'free' as const,
+                  followers: 42
+                },
+                timestamp: new Date(Date.now() - 21600000),
+                content: "Just started learning options trading! Any advice for a beginner? Looking at covered calls on my MSFT shares.",
+                engagement: {
+                  likes: 12,
+                  comments: 8,
+                  shares: 1,
+                  liked: false
+                },
+                tags: ['beginner', 'covered-calls', 'msft']
+              }
+              setPosts(prev => [...prev, morePost])
+            }}
+          >
+            Load More Posts
+          </Button>
+        </div>
+      )}
     </div>
   )
 }
