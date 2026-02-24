@@ -3,7 +3,7 @@ import { SubscriptionInfo } from './subscription'
 
 // Initialize Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2023-10-16'
+  apiVersion: '2026-01-28.clover'
 })
 
 export interface PaymentMethodInfo {
@@ -157,8 +157,8 @@ export class PaymentProcessor {
       
       return {
         status: subscription.status,
-        currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-        cancelAtPeriodEnd: subscription.cancel_at_period_end
+        currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
+        cancelAtPeriodEnd: (subscription as any).cancel_at_period_end || false
       }
     } catch (error) {
       console.error('Failed to get subscription status:', error)

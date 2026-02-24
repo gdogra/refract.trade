@@ -116,9 +116,9 @@ export interface RecommendationFilters {
 
 export class OptionsRecommendationEngine {
   private portfolioContext?: PortfolioContext
-  private userTier: SubscriptionTier = 'free'
+  private userTier: SubscriptionTier = 'trial'
   
-  constructor(portfolioContext?: PortfolioContext, userTier: SubscriptionTier = 'free') {
+  constructor(portfolioContext?: PortfolioContext, userTier: SubscriptionTier = 'trial') {
     this.portfolioContext = portfolioContext
     this.userTier = userTier
   }
@@ -146,7 +146,7 @@ export class OptionsRecommendationEngine {
     
     const maxRecommendations = Math.min(
       recommendationLimit.remaining,
-      this.userTier === 'free' ? 3 : 15
+      this.userTier === 'trial' ? 3 : 15
     )
     
     const [calls, puts] = await Promise.all([

@@ -23,7 +23,7 @@ export default function PremiumGate({
   children,
   feature,
   requiredTier,
-  currentTier = 'free',
+  currentTier = 'trial',
   title,
   description,
   className = ''
@@ -37,16 +37,14 @@ export default function PremiumGate({
 
   const getTierIcon = (tier: UserTier) => {
     switch (tier) {
-      case 'pro': return <Star className="h-5 w-5 text-blue-500" />
-      case 'elite': return <Crown className="h-5 w-5 text-purple-500" />
+      case 'premium': return <Crown className="h-5 w-5 text-purple-500" />
       default: return <Zap className="h-5 w-5 text-green-500" />
     }
   }
 
   const getTierColor = (tier: UserTier) => {
     switch (tier) {
-      case 'pro': return 'from-blue-500/20 to-blue-600/20 border-blue-200 dark:border-blue-800'
-      case 'elite': return 'from-purple-500/20 to-purple-600/20 border-purple-200 dark:border-purple-800'
+      case 'premium': return 'from-purple-500/20 to-purple-600/20 border-purple-200 dark:border-purple-800'
       default: return 'from-green-500/20 to-green-600/20 border-green-200 dark:border-green-800'
     }
   }
@@ -79,8 +77,7 @@ export default function PremiumGate({
               <Badge 
                 variant="outline" 
                 className={`mb-3 ${
-                  requiredTier === 'pro' ? 'text-blue-600 border-blue-600' :
-                  requiredTier === 'elite' ? 'text-purple-600 border-purple-600' :
+                  requiredTier === 'premium' ? 'text-purple-600 border-purple-600' :
                   'text-green-600 border-green-600'
                 }`}
               >
@@ -98,11 +95,7 @@ export default function PremiumGate({
               <div className="space-y-3">
                 <Button
                   onClick={() => router.push('/upgrade')}
-                  className={`w-full ${
-                    requiredTier === 'pro' 
-                      ? 'bg-blue-600 hover:bg-blue-700' 
-                      : 'bg-purple-600 hover:bg-purple-700'
-                  }`}
+                  className="w-full bg-purple-600 hover:bg-purple-700"
                 >
                   <ArrowRight className="h-4 w-4 mr-2" />
                   Upgrade to {requiredTier.charAt(0).toUpperCase() + requiredTier.slice(1)}

@@ -39,7 +39,7 @@ export default function Analytics() {
   const [portfolioData, setPortfolioData] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('overview')
-  const currentUserTier = 'free' // In production, get this from user session
+  const currentUserTier = 'trial' // In production, get this from user session
   const [analyticsController] = useState(() => new AnalyticsController({
     updateFrequency: 5,
     riskTolerance: 'moderate',
@@ -405,7 +405,7 @@ export default function Analytics() {
             <TabsContent value="market-intel">
               <PremiumGate
                 feature="advancedAnalytics"
-                requiredTier="pro"
+                requiredTier="premium"
                 currentTier={currentUserTier}
                 title="Market Intelligence Dashboard"
                 description="Access real-time sentiment analysis, institutional insights, and AI-powered market intelligence to make informed trading decisions."
@@ -421,7 +421,7 @@ export default function Analytics() {
             <TabsContent value="monitoring">
               <PremiumGate
                 feature="realTimeData"
-                requiredTier="pro"
+                requiredTier="premium"
                 currentTier={currentUserTier}
                 title="Real-Time Portfolio Monitoring"
                 description="Monitor your portfolio with live data feeds, instant alerts, and automated risk notifications. Never miss a critical market move again."
@@ -433,7 +433,7 @@ export default function Analytics() {
             <TabsContent value="flow">
               <PremiumGate
                 feature="institutionalFeatures"
-                requiredTier="elite"
+                requiredTier="premium"
                 currentTier={currentUserTier}
                 title="Institutional Options Flow"
                 description="Track smart money movements with institutional-grade options flow analysis, unusual activity alerts, and block trade monitoring."
@@ -564,7 +564,7 @@ export default function Analytics() {
             <TabsContent value="ai-pilot">
               <PremiumGate
                 feature="aiInsights"
-                requiredTier="pro"
+                requiredTier="premium"
                 currentTier={currentUserTier}
                 title="AI Portfolio Pilot"
                 description="Let our advanced AI manage your portfolio with machine learning insights, automated rebalancing, and predictive position adjustments."
