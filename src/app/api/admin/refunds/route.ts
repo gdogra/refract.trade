@@ -333,6 +333,14 @@ export async function PATCH(request: NextRequest) {
       }, { status: 404 })
     }
     
+    // Get existing details first
+    const existingAction = await prisma.adminAction.findUnique({
+      where: { id: adminActionId },
+      select: { details: true }
+    })
+
+    const existingDetails = (existingAction?.details as Record<string, any>) || {}
+
     // Update the admin action with new status
     const updatedAction = await prisma.adminAction.update({
       where: { 
@@ -341,10 +349,7 @@ export async function PATCH(request: NextRequest) {
       },
       data: {
         details: {
-          ...await prisma.adminAction.findUnique({
-            where: { id: adminActionId },
-            select: { details: true }
-          }).then(action => (action?.details as Record<string, any>) || {}),
+          ...existingDetails,
           status,
           notes,
           updatedAt: new Date().toISOString(),
