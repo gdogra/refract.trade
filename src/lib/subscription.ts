@@ -351,6 +351,10 @@ export class ReferralManager {
     error?: string
   }> {
     try {
+      if (!prisma) {
+        return { success: false, error: 'Database connection not available' }
+      }
+
       const referralCodeRecord = await prisma.referralCode.findFirst({
         where: {
           code: referralCode,

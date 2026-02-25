@@ -10,7 +10,11 @@ import { Copy, Gift, Users, Clock, TrendingUp } from 'lucide-react'
 // Simple toast function replacement
 const toast = {
   success: (message: string) => {
-    console.log('Toast:', message)
+    console.log('Toast Success:', message)
+    // In a real app, you'd use a proper toast library
+  },
+  error: (message: string) => {
+    console.log('Toast Error:', message)
     // In a real app, you'd use a proper toast library
   }
 }

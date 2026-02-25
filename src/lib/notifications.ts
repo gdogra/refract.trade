@@ -238,6 +238,12 @@ export async function createFeedbackSubmittedNotification(feedback: {
   priority: string
 }) {
   try {
+    // Skip notification creation if no userId (anonymous feedback)
+    if (!feedback.userId) {
+      console.log('Skipping notification creation for anonymous feedback')
+      return null
+    }
+
     const notification = await prisma.smartNotification.create({
       data: {
         userId: feedback.userId,
