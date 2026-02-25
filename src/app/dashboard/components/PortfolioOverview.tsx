@@ -28,34 +28,97 @@ export default function PortfolioOverview() {
   const { data: portfolio, isLoading } = useQuery<PortfolioStats>({
     queryKey: ['portfolio-overview'],
     queryFn: async () => {
-      // Mock data for now - will connect to API later
-      const generatePerformanceHistory = () => {
-        let portfolioValue = 110000
-        let benchmarkValue = 110000
-        return Array.from({ length: 30 }, (_, i) => {
-          const portfolioChange = (Math.random() - 0.45) * 0.02 // Slightly positive bias
-          const benchmarkChange = (Math.random() - 0.5) * 0.015 // Market movement
+      try {
+        // Fetch real portfolio data from positions API
+        const response = await fetch('/api/positions?includeGreeks=true&includeAnalytics=true')
+        
+        if (!response.ok) {
+          // If API fails, use fallback data
+          throw new Error(`API failed: ${response.status}`)
+        }
+        
+        const result = await response.json()
+        
+        if (!result.success || !result.data) {
+          throw new Error('Invalid API response')
+        }
+        
+        const { positions, summary } = result.data
+        
+        // Generate performance history (placeholder - could be stored in DB later)
+        const generatePerformanceHistory = () => {
+          const currentValue = summary.totalValue || 110000
+          let portfolioValue = currentValue * 0.9 // Start 30 days ago with lower value
+          let benchmarkValue = currentValue * 0.9
           
-          portfolioValue *= (1 + portfolioChange)
-          benchmarkValue *= (1 + benchmarkChange)
-          
-          return {
-            date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            value: portfolioValue,
-            benchmark: benchmarkValue
-          }
-        })
-      }
+          return Array.from({ length: 30 }, (_, i) => {
+            const portfolioChange = (Math.random() - 0.45) * 0.02
+            const benchmarkChange = (Math.random() - 0.5) * 0.015
+            
+            portfolioValue *= (1 + portfolioChange)
+            benchmarkValue *= (1 + benchmarkChange)
+            
+            return {
+              date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+              value: portfolioValue,
+              benchmark: benchmarkValue
+            }
+          })
+        }
 
-      return {
-        totalValue: 125840.32,
-        dailyChange: 2340.50,
-        dailyChangePercent: 1.89,
-        totalPnL: 15840.32,
-        totalPnLPercent: 14.39,
-        buyingPower: 45600.00,
-        riskUtilization: 0.68,
-        performanceHistory: generatePerformanceHistory()
+        // Calculate daily change (placeholder - would need historical data)
+        const dailyChange = summary.totalPnl * 0.1 // Assume 10% of total P&L happened today
+        const dailyChangePercent = summary.totalValue > 0 ? (dailyChange / summary.totalValue) * 100 : 0
+        
+        // Calculate buying power (placeholder - would need account data)
+        const buyingPower = Math.max(0, 50000 - (summary.totalValue * 0.5)) // Simplified calculation
+        
+        // Calculate risk utilization (placeholder)
+        const riskUtilization = Math.min(1, (summary.totalValue || 0) / 100000) // Risk relative to $100k portfolio
+
+        return {
+          totalValue: summary.totalValue || 0,
+          dailyChange,
+          dailyChangePercent,
+          totalPnL: summary.totalPnl || 0,
+          totalPnLPercent: summary.totalPnlPercent || 0,
+          buyingPower,
+          riskUtilization,
+          performanceHistory: generatePerformanceHistory()
+        }
+        
+      } catch (error) {
+        console.error('Failed to fetch portfolio data, using fallback:', error)
+        
+        // Fallback to demo data if real API fails
+        const generatePerformanceHistory = () => {
+          let portfolioValue = 110000
+          let benchmarkValue = 110000
+          return Array.from({ length: 30 }, (_, i) => {
+            const portfolioChange = (Math.random() - 0.45) * 0.02
+            const benchmarkChange = (Math.random() - 0.5) * 0.015
+            
+            portfolioValue *= (1 + portfolioChange)
+            benchmarkValue *= (1 + benchmarkChange)
+            
+            return {
+              date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+              value: portfolioValue,
+              benchmark: benchmarkValue
+            }
+          })
+        }
+
+        return {
+          totalValue: 0, // Show zero when no real data
+          dailyChange: 0,
+          dailyChangePercent: 0,
+          totalPnL: 0,
+          totalPnLPercent: 0,
+          buyingPower: 50000, // Default buying power
+          riskUtilization: 0,
+          performanceHistory: generatePerformanceHistory()
+        }
       }
     }
   })

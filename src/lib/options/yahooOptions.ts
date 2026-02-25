@@ -74,25 +74,21 @@ interface YahooOptionResponse {
 // Cache and rate limiting
 const cache = new Map<string, { data: any; timestamp: number; ttl: number }>()
 const requestQueue: Array<() => Promise<any>> = []
-let requestCount = 0
-let resetTime = Date.now() + 1000
+let lastRequestTime = 0
+const MIN_REQUEST_INTERVAL = 2000 // 2 seconds between requests
 
-// Rate limiting: Max 10 requests per second
+// Very conservative rate limiting for Yahoo Finance
 async function throttleRequest<T>(fn: () => Promise<T>): Promise<T> {
   const now = Date.now()
+  const timeSinceLastRequest = now - lastRequestTime
   
-  if (now > resetTime) {
-    requestCount = 0
-    resetTime = now + 1000
-  }
-  
-  if (requestCount >= 10) {
-    const delay = resetTime - now
+  if (timeSinceLastRequest < MIN_REQUEST_INTERVAL) {
+    const delay = MIN_REQUEST_INTERVAL - timeSinceLastRequest
+    console.log(`Rate limiting: waiting ${delay}ms before next request`)
     await new Promise(resolve => setTimeout(resolve, delay))
-    return throttleRequest(fn)
   }
   
-  requestCount++
+  lastRequestTime = Date.now()
   return fn()
 }
 
@@ -192,8 +188,8 @@ export async function getOptionsChain(symbol: string, expiration?: string): Prom
   try {
     const chain = parseYahooResponse(result, expiration)
     
-    // Cache for 60 seconds
-    setCache(cacheKey, chain, 60)
+    // Cache for 10 minutes to reduce API calls
+    setCache(cacheKey, chain, 600)
     
     return chain
   } catch (error) {
