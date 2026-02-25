@@ -62,11 +62,14 @@ export async function sendPushNotification(options: {
 
 // Process notifications from the smart notification queue
 export async function processNotificationQueue() {
+  let processed = 0
+  let failed = 0
+  
   try {
-    // Get unprocessed notifications
+    // Get unprocessed notifications - using correct schema fields
     const notifications = await prisma.smartNotification.findMany({
       where: {
-        status: 'pending',
+        deliveredAt: null, // Not yet delivered
         scheduledFor: {
           lte: new Date()
         }
@@ -86,32 +89,28 @@ export async function processNotificationQueue() {
       try {
         await processSingleNotification(notification)
         
-        // Mark as processed
+        // Mark as processed using deliveredAt field
         await prisma.smartNotification.update({
           where: { id: notification.id },
           data: {
-            status: 'sent',
-            sentAt: new Date()
+            deliveredAt: new Date()
           }
         })
+        
+        processed++
         
       } catch (error) {
         console.error(`Failed to process notification ${notification.id}:`, error)
+        failed++
         
-        // Mark as failed and increment retry count
-        await prisma.smartNotification.update({
-          where: { id: notification.id },
-          data: {
-            status: 'failed',
-            retryCount: notification.retryCount + 1,
-            lastError: error instanceof Error ? error.message : 'Unknown error'
-          }
-        })
+        // Note: We can't mark as "failed" because there's no status field
+        // In a real implementation, you might add error tracking fields to the schema
       }
     }
     
     return {
-      processed: notifications.length,
+      processed,
+      failed,
       timestamp: new Date()
     }
     
