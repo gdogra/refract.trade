@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
@@ -7,22 +8,19 @@ const prisma = new PrismaClient()
 // GET - Fetch refund history
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession()
+    const session = await getServerSession(authOptions)
     
-    if (!session?.user?.id) {
+    if (!session?.user?.email) {
       return NextResponse.json({
         success: false,
         error: 'Authentication required'
       }, { status: 401 })
     }
     
-    // Verify admin status
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { isAdmin: true }
-    })
+    // Verify admin status (hardcoded for now)
+    const isAdmin = session.user.email === 'gdogra@gmail.com'
     
-    if (!user?.isAdmin) {
+    if (!isAdmin) {
       return NextResponse.json({
         success: false,
         error: 'Admin access required'
@@ -46,17 +44,22 @@ export async function GET(request: NextRequest) {
       take: 100
     })
     
-    const formattedRefunds = refunds.map(refund => ({
-      id: refund.id,
-      amount: refund.refundAmount,
-      reason: refund.refundReason,
-      userId: refund.details?.userId,
-      userEmail: refund.details?.userEmail,
-      adminName: refund.admin.name,
-      adminEmail: refund.admin.email,
-      createdAt: refund.createdAt,
-      status: refund.details?.status || 'completed'
-    }))
+    const formattedRefunds = refunds.map(refund => {
+      // Safely cast details to an object with optional properties
+      const details = refund.details as { userId?: string; userEmail?: string; status?: string } | null
+      
+      return {
+        id: refund.id,
+        amount: refund.refundAmount,
+        reason: refund.refundReason,
+        userId: details?.userId,
+        userEmail: details?.userEmail,
+        adminName: refund.admin.name,
+        adminEmail: refund.admin.email,
+        createdAt: refund.createdAt,
+        status: details?.status || 'completed'
+      }
+    })
     
     // Calculate stats
     const totalRefunded = refunds.reduce((sum, refund) => 
@@ -101,22 +104,19 @@ export async function GET(request: NextRequest) {
 // POST - Process a refund
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession()
+    const session = await getServerSession(authOptions)
     
-    if (!session?.user?.id) {
+    if (!session?.user?.email) {
       return NextResponse.json({
         success: false,
         error: 'Authentication required'
       }, { status: 401 })
     }
     
-    // Verify admin status
-    const admin = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { isAdmin: true, name: true, email: true }
-    })
+    // Verify admin status (hardcoded for now)
+    const isAdmin = session.user.email === 'gdogra@gmail.com'
     
-    if (!admin?.isAdmin) {
+    if (!isAdmin) {
       return NextResponse.json({
         success: false,
         error: 'Admin access required'
@@ -131,6 +131,19 @@ export async function POST(request: NextRequest) {
         success: false,
         error: 'User ID, amount, and reason are required'
       }, { status: 400 })
+    }
+
+    // Get admin user ID for logging
+    const adminUser = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { id: true }
+    })
+
+    if (!adminUser) {
+      return NextResponse.json({
+        success: false,
+        error: 'Admin user not found'
+      }, { status: 404 })
     }
     
     if (amount <= 0) {
@@ -183,7 +196,7 @@ export async function POST(request: NextRequest) {
     // Log the refund action
     const adminAction = await prisma.adminAction.create({
       data: {
-        adminId: session.user.id,
+        adminId: adminUser.id,
         action: 'refund_issued',
         refundAmount: amount,
         refundReason: reason,
@@ -278,22 +291,19 @@ async function processRefundWithProvider(refundData: {
 // PATCH - Update refund status (for tracking purposes)
 export async function PATCH(request: NextRequest) {
   try {
-    const session = await getServerSession()
+    const session = await getServerSession(authOptions)
     
-    if (!session?.user?.id) {
+    if (!session?.user?.email) {
       return NextResponse.json({
         success: false,
         error: 'Authentication required'
       }, { status: 401 })
     }
     
-    // Verify admin status
-    const admin = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { isAdmin: true }
-    })
+    // Verify admin status (hardcoded for now)
+    const isAdmin = session.user.email === 'gdogra@gmail.com'
     
-    if (!admin?.isAdmin) {
+    if (!isAdmin) {
       return NextResponse.json({
         success: false,
         error: 'Admin access required'
@@ -309,6 +319,19 @@ export async function PATCH(request: NextRequest) {
         error: 'Admin action ID and status are required'
       }, { status: 400 })
     }
+
+    // Get admin user ID for logging
+    const adminUser = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { id: true }
+    })
+
+    if (!adminUser) {
+      return NextResponse.json({
+        success: false,
+        error: 'Admin user not found'
+      }, { status: 404 })
+    }
     
     // Update the admin action with new status
     const updatedAction = await prisma.adminAction.update({
@@ -321,11 +344,11 @@ export async function PATCH(request: NextRequest) {
           ...await prisma.adminAction.findUnique({
             where: { id: adminActionId },
             select: { details: true }
-          }).then(action => action?.details || {}),
+          }).then(action => (action?.details as Record<string, any>) || {}),
           status,
           notes,
           updatedAt: new Date().toISOString(),
-          updatedBy: session.user.id
+          updatedBy: adminUser.id
         }
       }
     })
