@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
@@ -7,22 +8,19 @@ const prisma = new PrismaClient()
 // GET - Fetch all users for admin
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession()
+    const session = await getServerSession(authOptions)
     
-    if (!session?.user?.id) {
+    if (!session?.user?.email) {
       return NextResponse.json({
         success: false,
         error: 'Authentication required'
       }, { status: 401 })
     }
     
-    // Verify admin status
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { isAdmin: true }
-    })
+    // Verify admin status (hardcoded for now)
+    const isAdmin = session.user.email === 'gdogra@gmail.com'
     
-    if (!user?.isAdmin) {
+    if (!isAdmin) {
       return NextResponse.json({
         success: false,
         error: 'Admin access required'
@@ -66,14 +64,13 @@ export async function GET(request: NextRequest) {
           id: true,
           name: true,
           email: true,
-          image: true,
+          avatar: true,
           isAdmin: true,
           createdAt: true,
           updatedAt: true,
           _count: {
             select: {
-              feedback: true,
-              notes: true
+              feedback: true
             }
           }
         },
@@ -110,22 +107,19 @@ export async function GET(request: NextRequest) {
 // PATCH - Update user (admin status, notes, etc.)
 export async function PATCH(request: NextRequest) {
   try {
-    const session = await getServerSession()
+    const session = await getServerSession(authOptions)
     
-    if (!session?.user?.id) {
+    if (!session?.user?.email) {
       return NextResponse.json({
         success: false,
         error: 'Authentication required'
       }, { status: 401 })
     }
     
-    // Verify admin status
-    const admin = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { isAdmin: true }
-    })
+    // Verify admin status (hardcoded for now)
+    const isAdmin = session.user.email === 'gdogra@gmail.com'
     
-    if (!admin?.isAdmin) {
+    if (!isAdmin) {
       return NextResponse.json({
         success: false,
         error: 'Admin access required'
@@ -133,7 +127,7 @@ export async function PATCH(request: NextRequest) {
     }
     
     const body = await request.json()
-    const { userId, isAdmin, note } = body
+    const { userId, isAdmin: makeAdmin, note } = body
     
     if (!userId) {
       return NextResponse.json({
@@ -142,8 +136,21 @@ export async function PATCH(request: NextRequest) {
       }, { status: 400 })
     }
     
+    // Get admin user ID for logging
+    const adminUser = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { id: true }
+    })
+
+    if (!adminUser) {
+      return NextResponse.json({
+        success: false,
+        error: 'Admin user not found'
+      }, { status: 404 })
+    }
+    
     // Prevent self-demotion
-    if (userId === session.user.id && isAdmin === false) {
+    if (userId === adminUser.id && makeAdmin === false) {
       return NextResponse.json({
         success: false,
         error: 'Cannot remove admin status from yourself'
@@ -152,8 +159,8 @@ export async function PATCH(request: NextRequest) {
     
     // Update user
     const updateData: any = {}
-    if (typeof isAdmin === 'boolean') {
-      updateData.isAdmin = isAdmin
+    if (typeof makeAdmin === 'boolean') {
+      updateData.isAdmin = makeAdmin
     }
     
     const updatedUser = await prisma.user.update({
@@ -174,9 +181,8 @@ export async function PATCH(request: NextRequest) {
       await prisma.userNote.create({
         data: {
           userId,
-          adminId: session.user.id,
-          note: note.trim(),
-          type: isAdmin !== undefined ? 'admin_update' : 'general'
+          adminId: adminUser.id,
+          note: note.trim()
         }
       })
     }
@@ -184,7 +190,7 @@ export async function PATCH(request: NextRequest) {
     // Log admin action
     await prisma.adminAction.create({
       data: {
-        adminId: session.user.id,
+        adminId: adminUser.id,
         action: 'user_updated',
         details: {
           userId,
@@ -212,22 +218,19 @@ export async function PATCH(request: NextRequest) {
 // DELETE - Delete user account
 export async function DELETE(request: NextRequest) {
   try {
-    const session = await getServerSession()
+    const session = await getServerSession(authOptions)
     
-    if (!session?.user?.id) {
+    if (!session?.user?.email) {
       return NextResponse.json({
         success: false,
         error: 'Authentication required'
       }, { status: 401 })
     }
     
-    // Verify admin status
-    const admin = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { isAdmin: true }
-    })
+    // Verify admin status (hardcoded for now)
+    const isAdmin = session.user.email === 'gdogra@gmail.com'
     
-    if (!admin?.isAdmin) {
+    if (!isAdmin) {
       return NextResponse.json({
         success: false,
         error: 'Admin access required'
@@ -244,8 +247,21 @@ export async function DELETE(request: NextRequest) {
       }, { status: 400 })
     }
     
+    // Get admin user ID for logging
+    const adminUser = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { id: true }
+    })
+
+    if (!adminUser) {
+      return NextResponse.json({
+        success: false,
+        error: 'Admin user not found'
+      }, { status: 404 })
+    }
+    
     // Prevent self-deletion
-    if (userId === session.user.id) {
+    if (userId === adminUser.id) {
       return NextResponse.json({
         success: false,
         error: 'Cannot delete your own account'
@@ -273,7 +289,7 @@ export async function DELETE(request: NextRequest) {
     // Log admin action
     await prisma.adminAction.create({
       data: {
-        adminId: session.user.id,
+        adminId: adminUser.id,
         action: 'user_deleted',
         details: {
           deletedUserId: userId,
