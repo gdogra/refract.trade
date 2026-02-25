@@ -18,7 +18,7 @@ export default function FeedbackButton({
   category = '',
   subject = '',
   className = '',
-  size = 'md'
+  size = 'default'
 }: FeedbackButtonProps) {
   const [isFormOpen, setIsFormOpen] = useState(false)
 

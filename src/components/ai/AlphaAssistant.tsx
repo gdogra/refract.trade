@@ -97,7 +97,7 @@ export default function AlphaAssistant() {
     try {
       // Get real market data from free sources
       const stockData = await getLiveQuote(symbol)
-      const freshness = getDataFreshness(stockData.timestamp)
+      const freshness = getDataFreshness(stockData.timestamp?.toString())
       
       // Determine trend based on price action
       const trend: 'bullish' | 'bearish' | 'neutral' = 
@@ -113,11 +113,11 @@ export default function AlphaAssistant() {
         `${symbol} trading at $${stockData.price.toFixed(2)}, ${stockData.changePercent >= 0 ? '+' : ''}${stockData.changePercent.toFixed(2)}% today`,
         `Volume: ${stockData.volume.toLocaleString()} ${stockData.volume > 1000000 ? '(Above average)' : '(Normal)'}`,
         `Trading range: $${stockData.low.toFixed(2)} - $${stockData.high.toFixed(2)}`,
-        `Data source: ${stockData.dataSource} • ${freshness.description}`
+        `Data source: ${stockData.dataSource} • ${freshness}`
       ]
       
       return {
-        summary: `Based on market data from ${stockData.dataSource}, ${symbol} is showing ${trend} signals. The stock is trading at $${stockData.price.toFixed(2)}, ${stockData.changePercent >= 0 ? 'up' : 'down'} ${Math.abs(stockData.changePercent).toFixed(2)}% from yesterday's close. ${trend === 'bullish' ? 'Momentum indicators suggest continued strength.' : trend === 'bearish' ? 'Technical indicators suggest downward pressure.' : 'Mixed signals indicate consolidation phase.'} Note: ${MARKET_DATA_DISCLAIMER.short}`,
+        summary: `Based on market data from ${stockData.dataSource}, ${symbol} is showing ${trend} signals. The stock is trading at $${stockData.price.toFixed(2)}, ${stockData.changePercent >= 0 ? 'up' : 'down'} ${Math.abs(stockData.changePercent).toFixed(2)}% from yesterday's close. ${trend === 'bullish' ? 'Momentum indicators suggest continued strength.' : trend === 'bearish' ? 'Technical indicators suggest downward pressure.' : 'Mixed signals indicate consolidation phase.'} Note: ${MARKET_DATA_DISCLAIMER}`,
         
         keyPoints,
         
