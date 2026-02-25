@@ -164,8 +164,8 @@ export class OptionsRecommendationEngine {
       : puts
     
     // Track usage
-    await UsageTracker.incrementUsage(userId, 'dailyRecommendations', maxRecommendations)
-    await UsageTracker.incrementUsage(userId, 'scanLimit', 1)
+    await UsageTracker.incrementUsage(userId, 'recommendations')
+    await UsageTracker.incrementUsage(userId, 'api_requests')
     
     const result: any = {
       callRecommendations: filteredCalls.slice(0, Math.ceil(maxRecommendations / 2)),

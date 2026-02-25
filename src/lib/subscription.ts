@@ -147,6 +147,29 @@ export class SubscriptionManager {
         return false
     }
   }
+
+  static canAccess(tier: SubscriptionTier, feature: string): boolean {
+    const limits = this.getLimitsForTier(tier)
+    const features = this.getFeaturesForTier(tier)
+    
+    // Check feature-based access
+    if (features.includes(feature)) {
+      return true
+    }
+    
+    // Check limit-based access
+    switch (feature) {
+      case 'riskAnalytics':
+      case 'riskMonitoring':
+        return limits.riskAnalytics
+      case 'advancedCharts':
+        return limits.advancedCharts
+      case 'aiInsights':
+        return limits.aiInsights
+      default:
+        return false
+    }
+  }
 }
 
 export class UsageTracker {
@@ -202,9 +225,99 @@ export class UsageTracker {
       return false
     }
   }
+
+  static async checkLimit(userId: string, tier: SubscriptionTier, limitType: string): Promise<{
+    allowed: boolean
+    upgradeRequired?: SubscriptionTier
+    currentUsage?: number
+    limit?: number
+    remaining?: number
+  }> {
+    try {
+      const subscription = await SubscriptionManager.getUserSubscription(userId)
+      const usage = await this.getUserUsage(userId)
+      
+      if (!subscription) {
+        return { allowed: false, upgradeRequired: 'trial' }
+      }
+
+      const limits = SubscriptionManager.getLimitsForTier(tier)
+      let currentUsage = 0
+      let limit = 0
+      let allowed = false
+
+      switch (limitType) {
+        case 'dailyRecommendations':
+        case 'monthlyRecommendations':
+          currentUsage = usage.monthlyRecommendations
+          limit = limits.monthlyRecommendations
+          allowed = limit === -1 || currentUsage < limit
+          break
+        case 'scanLimit':
+        case 'dailyAPIRequests':
+          currentUsage = usage.dailyAPIRequests
+          limit = limits.dailyAPIRequests
+          allowed = limit === -1 || currentUsage < limit
+          break
+        case 'portfolioPositions':
+          currentUsage = usage.portfolioPositions
+          limit = limits.portfolioPositions
+          allowed = limit === -1 || currentUsage < limit
+          break
+        default:
+          return { allowed: false }
+      }
+
+      const upgradeRequired = this.getUpgradeTier(tier, allowed)
+      const remaining = limit === -1 ? 999999 : Math.max(0, limit - currentUsage)
+
+      return {
+        allowed,
+        upgradeRequired,
+        currentUsage,
+        limit,
+        remaining
+      }
+    } catch (error) {
+      console.error('Error checking usage limits:', error)
+      return { allowed: false, upgradeRequired: 'trial' }
+    }
+  }
+
+  private static getUpgradeTier(currentTier: SubscriptionTier, isAllowed: boolean): SubscriptionTier | undefined {
+    if (isAllowed) return undefined
+
+    switch (currentTier) {
+      case 'free':
+        return 'trial'
+      case 'trial':
+        return 'basic'
+      case 'basic':
+        return 'pro'
+      case 'pro':
+        return 'elite'
+      default:
+        return undefined
+    }
+  }
 }
 
 export class ReferralManager {
+  static async processReferral(code: string, userId: string): Promise<{
+    success: boolean
+    error?: string
+  }> {
+    const result = await this.processReferralSignup(code, userId)
+    return {
+      success: result.success,
+      error: result.error
+    }
+  }
+
+  static async getReferralStats(userId: string) {
+    return this.getUserReferralStats(userId)
+  }
+
   static async generateReferralCode(userId: string): Promise<string> {
     const code = Math.random().toString(36).substring(2, 8).toUpperCase()
     

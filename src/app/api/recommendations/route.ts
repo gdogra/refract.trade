@@ -109,7 +109,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Track successful recommendation generation
-    await UsageTracker.incrementUsage(session.user.id, 'dailyRecommendations', recommendations.callRecommendations.length + recommendations.putRecommendations.length)
+    await UsageTracker.incrementUsage(session.user.id, 'recommendations')
 
     return NextResponse.json({
       success: true,
@@ -187,7 +187,7 @@ export async function POST(request: NextRequest) {
     )
 
     // Track scan usage
-    await UsageTracker.incrementUsage(session.user.id, 'scanLimit', 1)
+    await UsageTracker.incrementUsage(session.user.id, 'api_requests')
 
     return NextResponse.json({
       success: true,
