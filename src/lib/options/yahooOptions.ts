@@ -247,6 +247,17 @@ export async function getUnderlyingPrice(symbol: string): Promise<{ price: numbe
   }
 }
 
+export async function getFullQuoteData(symbol: string): Promise<any> {
+  const result = await throttleRequest(() => fetchYahooOptions(symbol))
+  
+  const quote = result.quote
+  if (!quote || typeof quote.regularMarketPrice !== 'number') {
+    throw new Error(`Unable to get quote data for ${symbol}`)
+  }
+  
+  return quote
+}
+
 // Parse Yahoo Finance response
 function parseYahooResponse(result: any, selectedExpiration?: string): OptionsChain {
   const symbol = result.quote.symbol

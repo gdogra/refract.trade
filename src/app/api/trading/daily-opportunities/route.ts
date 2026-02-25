@@ -271,6 +271,7 @@ function createCoveredCallOpportunity(symbol: string, currentPrice: number, call
     ask,
     last,
     midpoint: (bid + ask) / 2,
+    currentPrice,
     
     volume: call.volume,
     openInterest: call.openInterest,
@@ -337,6 +338,7 @@ function createCashSecuredPutOpportunity(symbol: string, currentPrice: number, p
     ask,
     last,
     midpoint: (bid + ask) / 2,
+    currentPrice,
     
     volume: put.volume,
     openInterest: put.openInterest,
@@ -403,6 +405,7 @@ function createLongCallOpportunity(symbol: string, currentPrice: number, call: a
     ask,
     last,
     midpoint: (bid + ask) / 2,
+    currentPrice,
     
     volume: call.volume,
     openInterest: call.openInterest,
@@ -469,6 +472,7 @@ function createLongPutOpportunity(symbol: string, currentPrice: number, put: any
     ask,
     last,
     midpoint: (bid + ask) / 2,
+    currentPrice,
     
     volume: put.volume,
     openInterest: put.openInterest,
@@ -584,6 +588,7 @@ function getFallbackOpportunities(): TradeOpportunity[] {
       bid: 3.20,
       ask: 3.40,
       last: 3.30,
+      midpoint: 3.30,
       volume: 1250,
       openInterest: 8900,
       impliedVolatility: 0.285,
@@ -632,6 +637,7 @@ function getFallbackOpportunities(): TradeOpportunity[] {
       bid: 2.80,
       ask: 2.95,
       last: 2.87,
+      midpoint: 2.88,
       volume: 15600,
       openInterest: 25400,
       impliedVolatility: 0.195,
@@ -680,6 +686,7 @@ function getFallbackOpportunities(): TradeOpportunity[] {
       bid: 18.50,
       ask: 19.20,
       last: 18.85,
+      midpoint: 18.85,
       volume: 3200,
       openInterest: 12800,
       impliedVolatility: 0.420,
@@ -728,6 +735,7 @@ function getFallbackOpportunities(): TradeOpportunity[] {
       bid: 1.80,
       ask: 2.10,
       last: 1.95,
+      midpoint: 1.95,
       volume: 980,
       openInterest: 4200,
       impliedVolatility: 0.235,

@@ -332,7 +332,7 @@ export default function FeedbackForm({
                       <Button
                         type="submit"
                         disabled={isSubmitting}
-                        className="bg-blue-600 hover:bg-blue-700 flex items-center space-x-2"
+                        className="flex items-center space-x-2"
                       >
                         {isSubmitting ? (
                           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -362,7 +362,7 @@ export default function FeedbackForm({
                     We've received your {selectedCategory?.label.toLowerCase()} and will review it soon. 
                     {session?.user ? ' You\'ll be notified when we respond.' : ' We\'ll email you when we have an update.'}
                   </p>
-                  <Button onClick={onClose} className="bg-blue-600 hover:bg-blue-700">
+                  <Button onClick={onClose}>
                     Close
                   </Button>
                 </motion.div>

@@ -851,7 +851,7 @@ export default function StrategyRecommendations({
                       {/* Action Buttons */}
                       <div className="flex space-x-3 pt-4 border-t">
                         <Button 
-                          className="flex-1 bg-blue-600 hover:bg-blue-700"
+                          className="flex-1"
                           onClick={() => {
                             alert(`Building ${strategy.name} strategy for ${symbol}...`)
                           }}

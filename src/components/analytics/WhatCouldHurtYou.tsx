@@ -252,7 +252,6 @@ export default function WhatCouldHurtYou() {
                     <p className="text-blue-200 mb-3">{selectedScenario.mitigation.primary.description}</p>
                     <div className="flex space-x-3">
                       <Button 
-                        className="bg-blue-600 hover:bg-blue-700"
                         onClick={() => {
                           alert(`Implementing ${selectedScenario.mitigation.primary.action}\nCost: $${selectedScenario.mitigation.cost.toLocaleString()}\nThis would connect to your broker to execute the protection strategy.`)
                         }}

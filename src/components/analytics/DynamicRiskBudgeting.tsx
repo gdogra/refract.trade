@@ -322,7 +322,7 @@ export default function DynamicRiskBudgeting() {
 
               <Button 
                 onClick={() => setIsEditingSettings(false)}
-                className="w-full bg-blue-600 hover:bg-blue-700"
+                className="w-full"
               >
                 <CheckCircle className="h-4 w-4 mr-2" />
                 Apply Settings

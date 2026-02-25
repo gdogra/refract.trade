@@ -73,7 +73,7 @@ export default function VerifyEmail() {
           {status === 'success' && (
             <Button
               onClick={() => router.push('/auth/signin')}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md"
+              className="w-full text-white font-medium py-2 px-4 rounded-md"
             >
               Go to Sign In
             </Button>

@@ -467,7 +467,7 @@ export default function LandingPage() {
             <Button 
               size="lg"
               onClick={handleSignup}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4"
+              className="text-white px-8 py-4"
             >
               Get All Recommendations Free
               <ArrowRight className="ml-2 h-5 w-5" />

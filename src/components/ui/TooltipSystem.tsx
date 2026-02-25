@@ -390,7 +390,7 @@ export function ContextualHelp({ isOpen, onClose, helpPoints }: ContextualHelpPr
                 {currentStep < helpPoints.length - 1 ? (
                   <button
                     onClick={() => setCurrentStep(currentStep + 1)}
-                    className="px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded"
+                    className="px-3 py-1 text-xs text-white rounded"
                   >
                     Next
                   </button>

@@ -37,6 +37,9 @@ interface TradeOpportunity {
   expiration: string
   daysToExpiry: number
   
+  // Underlying price
+  currentPrice: number
+  
   // Pricing
   bid: number
   ask: number
@@ -462,6 +465,7 @@ function OpportunityRow({ opportunity, index }: { opportunity: TradeOpportunity;
             <div>
               <div className="font-medium text-sm">{opportunity.symbol}</div>
               <div className="text-xs text-gray-500 truncate max-w-20">{opportunity.companyName}</div>
+              <div className="text-xs text-blue-600 font-medium">${opportunity.currentPrice?.toFixed(2) || 'N/A'}</div>
             </div>
           </div>
         </td>

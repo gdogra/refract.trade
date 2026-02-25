@@ -36,7 +36,7 @@ export default function UserMenu() {
           </Button>
         </Link>
         <Link href="/auth/signup">
-          <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+          <Button size="sm">
             Get Started
           </Button>
         </Link>

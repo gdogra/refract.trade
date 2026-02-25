@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getUnderlyingPrice } from '@/lib/options/yahooOptions'
+import { getFullQuoteData } from '@/lib/options/yahooOptions'
 
 export async function GET(request: NextRequest) {
   try {
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     
     let quoteData
     try {
-      quoteData = await getUnderlyingPrice(symbol)
+      quoteData = await getFullQuoteData(symbol)
     } catch (error) {
       console.error(`Failed to get real market data for ${symbol}:`, error)
       

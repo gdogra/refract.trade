@@ -423,7 +423,7 @@ export default function AIPortfolioPilot() {
                   </div>
 
                   <div className="flex space-x-3">
-                    <Button className="flex-1 bg-blue-600 hover:bg-blue-700">
+                    <Button className="flex-1">
                       Execute Trade
                     </Button>
                     <Button variant="outline" className="flex-1">
@@ -480,7 +480,7 @@ export default function AIPortfolioPilot() {
                     <p className="text-slate-200 text-sm">{biggestThreat.mitigation}</p>
                   </div>
 
-                  <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                  <Button className="w-full">
                     Implement Protection
                   </Button>
                 </CardContent>
