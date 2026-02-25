@@ -215,8 +215,7 @@ export async function createFeedbackResponseNotification(feedback: {
           }
         ],
         channels: ['push', 'email'],
-        scheduledFor: new Date(), // Send immediately
-        status: 'pending'
+        scheduledFor: new Date() // Send immediately
       }
     })
     
@@ -263,8 +262,7 @@ export async function createFeedbackSubmittedNotification(feedback: {
           }
         ],
         channels: ['email'], // Only email for submission confirmation
-        scheduledFor: new Date(),
-        status: 'pending'
+        scheduledFor: new Date()
       }
     })
     
@@ -300,8 +298,7 @@ export async function createRefundProcessedNotification(refund: {
           estimatedArrival: refund.estimatedArrival
         },
         channels: ['push', 'email'],
-        scheduledFor: new Date(),
-        status: 'pending'
+        scheduledFor: new Date()
       }
     })
     
@@ -322,8 +319,8 @@ export async function cleanupOldNotifications(daysOld = 30) {
       createdAt: {
         lt: cutoffDate
       },
-      status: {
-        in: ['sent', 'failed']
+      deliveredAt: {
+        not: null // Only delete delivered notifications
       }
     }
   })

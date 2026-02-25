@@ -8,7 +8,7 @@ interface TradeOpportunity {
   id: string
   symbol: string
   companyName: string
-  type: 'call' | 'put'
+  type: 'call' | 'put' | 'combo'
   strategy: string
   inPortfolio: boolean
   
@@ -22,6 +22,7 @@ interface TradeOpportunity {
   ask: number
   last: number
   midpoint: number
+  currentPrice: number
   
   // Volume & Interest
   volume: number
@@ -39,6 +40,7 @@ interface TradeOpportunity {
   maxProfit: number
   maxLoss: number
   riskRewardRatio: number
+  premium?: number
   
   // Scoring
   opportunityScore: number
@@ -88,7 +90,7 @@ export async function GET(request: NextRequest) {
     const userPortfolioSymbols = await getUserPortfolioSymbols(session.user.id)
     
     // Combine portfolio and market symbols
-    const allSymbols = [...new Set([...userPortfolioSymbols, ...MARKET_SYMBOLS])]
+    const allSymbols = Array.from(new Set([...userPortfolioSymbols, ...MARKET_SYMBOLS]))
     
     // Try to get real opportunities, but fallback to demo data if API fails
     let opportunities
@@ -132,7 +134,7 @@ async function getUserPortfolioSymbols(userId: string): Promise<string[]> {
       .eq('is_active', true)
     
     if (positions && positions.length > 0) {
-      return [...new Set(positions.map(p => p.symbol))]
+      return Array.from(new Set(positions.map(p => p.symbol)))
     }
   } catch (error) {
     console.log('Could not fetch user portfolio, using mock data:', error)

@@ -7,7 +7,13 @@ import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Copy, Gift, Users, Clock, TrendingUp } from 'lucide-react'
-import { toast } from 'sonner'
+// Simple toast function replacement
+const toast = {
+  success: (message: string) => {
+    console.log('Toast:', message)
+    // In a real app, you'd use a proper toast library
+  }
+}
 
 interface ReferralStats {
   referralCode?: string

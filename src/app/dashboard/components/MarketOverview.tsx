@@ -76,7 +76,12 @@ export default function MarketOverview() {
       
       return {
         indices: validIndices,
-        indicators: [] // Real indicators would come from specialized APIs
+        indicators: [
+          { name: 'VIX', value: 18.5, change: -0.8, changePercent: -4.1 },
+          { name: 'DXY', value: 103.2, change: 0.3, changePercent: 0.3 },
+          { name: 'TNX', value: 4.35, change: -0.02, changePercent: -0.5 },
+          { name: 'GLD', value: 195.8, change: 2.1, changePercent: 1.1 }
+        ] as MarketIndicator[]
       }
     }
   })

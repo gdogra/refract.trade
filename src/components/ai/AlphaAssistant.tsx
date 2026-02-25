@@ -8,6 +8,20 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/badge'
 import { getLiveQuote, type StockQuote } from '@/lib/liveMarketData'
 
+function getDataFreshness(timestamp?: string): string {
+  if (!timestamp) return 'unknown'
+  const now = new Date()
+  const dataTime = new Date(timestamp)
+  const diffMinutes = Math.floor((now.getTime() - dataTime.getTime()) / (1000 * 60))
+  
+  if (diffMinutes < 5) return 'real-time'
+  if (diffMinutes < 15) return 'near real-time'
+  if (diffMinutes < 60) return 'recent'
+  return 'delayed'
+}
+
+const MARKET_DATA_DISCLAIMER = "Market data is provided for informational purposes only and may be delayed. This analysis is not investment advice."
+
 interface AlphaQuery {
   id: string
   query: string

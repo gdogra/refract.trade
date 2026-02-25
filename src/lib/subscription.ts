@@ -28,11 +28,13 @@ export interface UsageStats {
 export class SubscriptionManager {
   static async getUserSubscription(userId: string): Promise<SubscriptionInfo | null> {
     try {
+      if (!prisma) {
+        console.error('Prisma client not initialized')
+        return null
+      }
+      
       const user = await prisma.user.findUnique({
-        where: { id: userId },
-        include: {
-          subscription: true
-        }
+        where: { id: userId }
       })
 
       if (!user) return null
@@ -322,6 +324,10 @@ export class ReferralManager {
     const code = Math.random().toString(36).substring(2, 8).toUpperCase()
     
     try {
+      if (!prisma) {
+        throw new Error('Prisma client not initialized')
+      }
+      
       await prisma.referralCode.create({
         data: {
           userId,
@@ -361,9 +367,13 @@ export class ReferralManager {
 
       const referrerId = referralCodeRecord.userId
 
+      if (!prisma) {
+        return { success: false, error: 'Prisma client not initialized' }
+      }
+
       // Check if referrer has reached maximum referrals (3 for 90 days total)
       const existingReferrals = await prisma.referral.count({
-        where: { referrerId }
+        where: { referrerCodeId: referralCodeRecord.id }
       })
 
       if (existingReferrals >= 3) {
@@ -373,12 +383,15 @@ export class ReferralManager {
       // Create referral record
       await prisma.referral.create({
         data: {
-          referrerId,
-          refereeId: newUserId,
-          createdAt: new Date(),
-          rewardGiven: true
+          referrerCodeId: referralCodeRecord.id,
+          referredUserId: newUserId,
+          rewardDelivered: true
         }
       })
+
+      if (!prisma) {
+        return { success: false, error: 'Prisma client not initialized' }
+      }
 
       // Extend referrer's trial by 30 days
       const referrer = await prisma.user.findUnique({
@@ -386,18 +399,20 @@ export class ReferralManager {
       })
 
       if (referrer) {
-        const currentTrialDays = referrer.trialDaysLeft || 0
-        const newTrialDays = Math.min(currentTrialDays + 30, 90) // Max 90 days
+        const now = new Date()
+        const currentExpiry = referrer.trialExpiry || now
+        const newExpiry = new Date(Math.max(currentExpiry.getTime(), now.getTime()) + 30 * 24 * 60 * 60 * 1000)
 
         await prisma.user.update({
           where: { id: referrerId },
-          data: { trialDaysLeft: newTrialDays }
+          data: { trialExpiry: newExpiry }
         })
 
         // Give new user 30 days trial
+        const newUserExpiry = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
         await prisma.user.update({
           where: { id: newUserId },
-          data: { trialDaysLeft: 30 }
+          data: { trialExpiry: newUserExpiry }
         })
 
         return {
@@ -421,12 +436,20 @@ export class ReferralManager {
     totalTrialDaysEarned: number
   }> {
     try {
-      const referrals = await prisma.referral.findMany({
-        where: { referrerId: userId }
+      if (!prisma) {
+        throw new Error('Prisma client not initialized')
+      }
+
+      // First get the user's referral codes
+      const referralCodes = await prisma.referralCode.findMany({
+        where: { userId },
+        include: { successfulReferrals: true }
       })
 
-      const totalReferrals = referrals.length
-      const successfulReferrals = referrals.filter(r => r.rewardGiven).length
+      const allReferrals = referralCodes.flatMap(code => code.successfulReferrals)
+      
+      const totalReferrals = allReferrals.length
+      const successfulReferrals = allReferrals.filter(r => r.rewardDelivered).length
       const remainingReferrals = Math.max(0, 3 - totalReferrals)
       const totalTrialDaysEarned = successfulReferrals * 30
 

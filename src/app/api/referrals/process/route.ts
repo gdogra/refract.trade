@@ -56,7 +56,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       referralCode,
       totalReferrals: stats.totalReferrals,
-      totalRewards: stats.totalRewards
+      totalRewards: stats.totalTrialDaysEarned
     })
   } catch (error: any) {
     console.error('Failed to get referral stats:', error)

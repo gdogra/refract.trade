@@ -57,8 +57,11 @@ interface OptionsChain {
 class AlphaVantageProvider implements MarketDataProvider {
   name = 'AlphaVantage'
   rateLimits = { requestsPerSecond: 0.083, requestsPerDay: 25 }
+  apiKey: string
   
-  constructor(private apiKey: string) {}
+  constructor(apiKey: string) {
+    this.apiKey = apiKey
+  }
 
   async fetchStock(symbol: string): Promise<StockQuote> {
     const url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${this.apiKey}`
@@ -265,8 +268,11 @@ class YahooFinanceProvider implements MarketDataProvider {
 class FinnhubProvider implements MarketDataProvider {
   name = 'Finnhub'
   rateLimits = { requestsPerSecond: 1, requestsPerDay: 1000 }
+  apiKey: string
   
-  constructor(private apiKey: string) {}
+  constructor(apiKey: string) {
+    this.apiKey = apiKey
+  }
 
   async fetchStock(symbol: string): Promise<StockQuote> {
     const url = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${this.apiKey}`

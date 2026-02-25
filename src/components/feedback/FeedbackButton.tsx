@@ -10,7 +10,7 @@ interface FeedbackButtonProps {
   category?: string
   subject?: string
   className?: string
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'default' | 'sm' | 'lg' | 'icon'
 }
 
 export default function FeedbackButton({ 

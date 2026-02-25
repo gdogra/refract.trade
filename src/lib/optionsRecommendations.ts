@@ -145,7 +145,7 @@ export class OptionsRecommendationEngine {
     }
     
     const maxRecommendations = Math.min(
-      recommendationLimit.remaining,
+      recommendationLimit.remaining || 0,
       this.userTier === 'trial' ? 3 : 15
     )
     
@@ -171,8 +171,8 @@ export class OptionsRecommendationEngine {
       callRecommendations: filteredCalls.slice(0, Math.ceil(maxRecommendations / 2)),
       putRecommendations: filteredPuts.slice(0, Math.floor(maxRecommendations / 2)),
       usageRemaining: {
-        dailyRecommendations: recommendationLimit.remaining - maxRecommendations,
-        scansRemaining: scanLimit.remaining - 1
+        dailyRecommendations: (recommendationLimit.remaining || 0) - maxRecommendations,
+        scansRemaining: (scanLimit.remaining || 0) - 1
       }
     }
     
