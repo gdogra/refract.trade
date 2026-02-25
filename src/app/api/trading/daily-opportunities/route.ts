@@ -75,6 +75,28 @@ const COMPANY_NAMES: Record<string, string> = {
 const PORTFOLIO_SYMBOLS = ['AAPL', 'MSFT', 'NVDA', 'SPY'] // Mock portfolio
 const MARKET_SYMBOLS = ['GOOGL', 'AMZN', 'TSLA', 'META', 'QQQ', 'NFLX', 'AMD', 'CRM', 'ORCL', 'ADBE']
 
+// Fallback prices for when API fails
+function getFallbackPrice(symbol: string): number {
+  const fallbackPrices: Record<string, number> = {
+    'AAPL': 185.0,
+    'MSFT': 375.0,
+    'GOOGL': 140.0,
+    'AMZN': 155.0,
+    'TSLA': 200.0,
+    'NVDA': 875.0,
+    'META': 485.0,
+    'SPY': 445.0,
+    'QQQ': 375.0,
+    'NFLX': 485.0,
+    'AMD': 135.0,
+    'CRM': 245.0,
+    'ORCL': 115.0,
+    'ADBE': 485.0
+  }
+  
+  return fallbackPrices[symbol] || 100.0 // Default fallback
+}
+
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
@@ -147,16 +169,22 @@ async function getUserPortfolioSymbols(userId: string): Promise<string[]> {
 async function generateTradeOpportunities(symbols: string[], portfolioSymbols: string[]): Promise<TradeOpportunity[]> {
   const opportunities: TradeOpportunity[] = []
   
-  for (const symbol of symbols.slice(0, 10)) { // Limit to 10 symbols to avoid API rate limits
+  for (const symbol of symbols.slice(0, 8)) { // Limit to 8 symbols to avoid API rate limits
     try {
-      // Get real market data using Alpha Vantage
-      const stockData = await getStockData(symbol)
-      const currentPrice = stockData.price
+      let currentPrice: number
       
-      console.log(`✅ Got real price for ${symbol}: $${currentPrice}`)
+      try {
+        // Get real market data using Alpha Vantage
+        const stockData = await getStockData(symbol)
+        currentPrice = stockData.price
+        console.log(`✅ Got real price for ${symbol}: $${currentPrice}`)
+      } catch (marketDataError) {
+        // Fallback to reasonable estimates if API fails
+        currentPrice = getFallbackPrice(symbol)
+        console.log(`⚠️ Using fallback price for ${symbol}: $${currentPrice}`)
+      }
       
-      // For now, generate mock opportunities with real prices
-      // In the future, this would integrate with actual options data provider
+      // Generate mock opportunities with real or fallback prices
       const mockOpportunities = generateMockOpportunitiesWithRealPrices(
         symbol, 
         currentPrice, 
@@ -165,8 +193,11 @@ async function generateTradeOpportunities(symbols: string[], portfolioSymbols: s
       
       opportunities.push(...mockOpportunities)
       
+      // Add small delay to avoid overwhelming the API
+      await new Promise(resolve => setTimeout(resolve, 500))
+      
     } catch (error) {
-      console.log(`Error getting real data for ${symbol}:`, error)
+      console.log(`Error generating opportunities for ${symbol}:`, error)
       continue
     }
   }
