@@ -40,42 +40,61 @@ export default function MarketDataPanel({ symbol }: MarketDataPanelProps) {
     queryFn: async () => {
       if (!symbol) throw new Error('No symbol provided')
       
+      console.log(`Fetching market data for ${symbol}...`) // Debug log
+      
       const response = await fetch(`/api/options/quote?symbol=${symbol}`, {
         credentials: 'include'
       })
       
+      console.log(`Response status for ${symbol}:`, response.status) // Debug log
+      
       if (!response.ok) {
-        throw new Error('Failed to fetch market data')
+        throw new Error(`Failed to fetch market data: ${response.status}`)
       }
       
       const result = await response.json()
+      console.log(`API result for ${symbol}:`, result) // Debug log
+      
       if (!result.success) {
         throw new Error(result.error || 'Market data request failed')
       }
       
       // Transform API response to match expected interface
       const apiData = result.data
+      console.log('MarketDataPanel API response:', { symbol, apiData }) // Debug log
+      
+      // Validate that we got actual price data
+      const price = apiData.regularMarketPrice || apiData.price
+      if (!price || price <= 0) {
+        throw new Error(`No valid price data received for ${symbol}`)
+      }
+      
       return {
-        symbol: apiData.symbol,
-        price: apiData.regularMarketPrice,
-        change: apiData.regularMarketChange,
-        changePercent: apiData.regularMarketChangePercent,
-        dayRange: { low: apiData.regularMarketDayLow, high: apiData.regularMarketDayHigh },
-        volume: apiData.regularMarketVolume || 0,
-        avgVolume: apiData.averageDailyVolume10Day || 0,
+        symbol: apiData.symbol || symbol,
+        price: price,
+        change: apiData.regularMarketChange || apiData.change || 0,
+        changePercent: apiData.regularMarketChangePercent || apiData.changePercent || 0,
+        dayRange: { 
+          low: apiData.regularMarketDayLow || apiData.dayLow || price * 0.95, 
+          high: apiData.regularMarketDayHigh || apiData.dayHigh || price * 1.05 
+        },
+        volume: apiData.regularMarketVolume || apiData.volume || 0,
+        avgVolume: apiData.averageDailyVolume10Day || apiData.avgVolume || 0,
         marketCap: apiData.marketCap || 0,
-        pe: apiData.trailingPE || 0,
-        beta: apiData.beta || 0,
+        pe: apiData.trailingPE || apiData.pe || 0,
+        beta: apiData.beta || 1.0,
         iv30: apiData.impliedVolatility || 25,
         ivRank: 50, // Default IV rank
         earnings: apiData.earningsTimestamp ? new Date(apiData.earningsTimestamp * 1000).toISOString() : 'N/A',
-        dividend: apiData.dividendRate || 0,
-        divYield: apiData.dividendYield || 0
+        dividend: apiData.dividendRate || apiData.dividend || 0,
+        divYield: apiData.dividendYield || apiData.divYield || 0
       }
     },
     enabled: !!symbol, // Enable query when symbol is provided
     refetchInterval: 30000, // Refetch every 30 seconds
-    staleTime: 15000 // Consider data stale after 15 seconds
+    staleTime: 15000, // Consider data stale after 15 seconds
+    retry: 3, // Retry failed requests
+    retryDelay: 1000 // Wait 1 second between retries
   })
 
   // Show loading or error states
