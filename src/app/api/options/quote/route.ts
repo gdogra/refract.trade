@@ -35,39 +35,18 @@ export async function GET(request: NextRequest) {
     try {
       quoteData = await getUnderlyingPrice(symbol)
     } catch (error) {
-      console.warn(`Yahoo Finance failed for ${symbol}, using fallback data:`, error)
+      console.error(`Failed to get real market data for ${symbol}:`, error)
       
-      // Fallback to mock data with realistic prices
-      const basePrice = symbol === 'AAPL' ? 185.50 : 
-                       symbol === 'MSFT' ? 415.20 :
-                       symbol === 'GOOGL' ? 175.80 :
-                       symbol === 'TSLA' ? 248.50 :
-                       symbol === 'NVDA' ? 875.30 :
-                       symbol === 'SPY' ? 525.40 : 
-                       symbol === 'LUV' ? 32.45 :
-                       symbol === 'DAL' ? 45.80 :
-                       symbol === 'UAL' ? 52.30 :
-                       symbol === 'AAL' ? 18.75 : 150.00
-      
-      const change = (Math.random() - 0.5) * 10
-      
-      quoteData = {
-        symbol,
-        price: basePrice + change,
-        change: change,
-        changePercent: (change / basePrice) * 100,
-        regularMarketPrice: basePrice + change,
-        regularMarketChange: change,
-        regularMarketChangePercent: (change / basePrice) * 100,
-        regularMarketDayLow: basePrice - Math.abs(change) * 2,
-        regularMarketDayHigh: basePrice + Math.abs(change) * 2,
-        regularMarketVolume: Math.floor(Math.random() * 10000000),
-        averageDailyVolume10Day: Math.floor(Math.random() * 5000000),
-        marketCap: basePrice * 1000000000,
-        trailingPE: 15 + Math.random() * 20,
-        beta: 0.8 + Math.random() * 0.8,
-        impliedVolatility: 0.20 + Math.random() * 0.30
-      }
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Unable to fetch real market data for ${symbol}. Real data only - no mock fallbacks.`,
+          symbol,
+          timestamp: new Date().toISOString(),
+          details: error instanceof Error ? error.message : 'Unknown error'
+        },
+        { status: 503 } // Service Unavailable
+      )
     }
     
     const response = NextResponse.json({

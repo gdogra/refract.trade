@@ -19,6 +19,11 @@ export default async function DashboardPage() {
       redirect('/auth/signin')
     }
 
+    // Redirect admin users to admin console
+    if (session.user.isAdmin) {
+      redirect('/admin')
+    }
+
     return <DashboardClient />
   } catch (error) {
     console.error('Dashboard page error:', error)

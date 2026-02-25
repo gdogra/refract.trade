@@ -37,7 +37,7 @@ export default function UserMenu() {
         </Link>
         <Link href="/auth/signup">
           <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-            Start Trial
+            Get Started
           </Button>
         </Link>
       </div>
@@ -52,24 +52,12 @@ export default function UserMenu() {
   }
 
   const getSubscriptionBadge = () => {
-    const tier = session.user.subscriptionTier
-    if (tier === 'trial') {
-      return (
-        <Badge variant="secondary" className="bg-blue-100 text-blue-700">
-          <Clock className="h-3 w-3 mr-1" />
-          Trial
-        </Badge>
-      )
-    }
-    if (tier === 'premium') {
-      return (
-        <Badge variant="default" className="bg-green-100 text-green-700">
-          <Crown className="h-3 w-3 mr-1" />
-          Premium
-        </Badge>
-      )
-    }
-    return null
+    return (
+      <Badge variant="default" className="bg-green-100 text-green-700">
+        <Crown className="h-3 w-3 mr-1" />
+        Active
+      </Badge>
+    )
   }
 
   return (
@@ -125,7 +113,9 @@ export default function UserMenu() {
                     <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                       {session.user.email}
                     </p>
-                    {getSubscriptionBadge()}
+                    <div className="mt-1">
+                      {getSubscriptionBadge()}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -142,21 +132,12 @@ export default function UserMenu() {
                 </Link>
 
                 <Link
-                  href="/subscription"
+                  href="/profile"
                   onClick={() => setIsOpen(false)}
                   className="flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 >
-                  <CreditCard className="h-4 w-4" />
-                  <span>Subscription & Billing</span>
-                </Link>
-
-                <Link
-                  href="/referral"
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                >
-                  <Gift className="h-4 w-4" />
-                  <span>Referral Program</span>
+                  <User className="h-4 w-4" />
+                  <span>Profile</span>
                 </Link>
 
                 <div className="border-t border-gray-200 dark:border-gray-700 my-2" />

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { getUnderlyingPrice } from '@/lib/options/yahooOptions'
 
 export async function POST(req: NextRequest) {
   try {
@@ -38,6 +39,15 @@ async function runTradeSimulation(params: {
   legs: any[]
   simulations: number
 }) {
+  // Fetch real current price for the symbol
+  let currentPrice = 150 // Fallback price
+  try {
+    const priceData = await getUnderlyingPrice(params.symbol)
+    currentPrice = priceData.price
+  } catch (error) {
+    console.warn(`Failed to fetch real price for ${params.symbol}, using fallback:`, error)
+  }
+
   const results = []
   
   for (let i = 0; i < params.simulations; i++) {
@@ -48,7 +58,7 @@ async function runTradeSimulation(params: {
     let profit = 0
     
     for (const leg of params.legs) {
-      const intrinsicValue = calculateIntrinsicValue(leg, marketMove)
+      const intrinsicValue = calculateIntrinsicValue(leg, marketMove, currentPrice)
       const timeValue = leg.price * (1 - timeDecay)
       const vegaEffect = leg.price * ivChange * 0.1 // Simplified vega
       
@@ -94,8 +104,7 @@ async function runTradeSimulation(params: {
   }
 }
 
-function calculateIntrinsicValue(leg: any, marketMove: number): number {
-  const currentPrice = 150 // Mock underlying price
+function calculateIntrinsicValue(leg: any, marketMove: number, currentPrice: number): number {
   const newPrice = currentPrice * (1 + marketMove)
   
   if (leg.type === 'call') {

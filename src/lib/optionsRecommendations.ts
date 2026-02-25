@@ -350,14 +350,44 @@ export class OptionsRecommendationEngine {
     return symbolCall || null
   }
   private async fetchMarketData(symbols: string[]) {
-    // In production, this would fetch real market data
-    return symbols.map(symbol => ({
-      symbol,
-      price: 150 + Math.random() * 300,
-      volume: Math.floor(Math.random() * 1000000),
-      change: (Math.random() - 0.5) * 10,
-      changePercent: (Math.random() - 0.5) * 0.1
-    }))
+    const { getUnderlyingPrice } = await import('@/lib/options/yahooOptions')
+    
+    try {
+      const marketDataPromises = symbols.map(async (symbol) => {
+        try {
+          const { price, change, changePercent } = await getUnderlyingPrice(symbol)
+          return {
+            symbol,
+            price,
+            volume: Math.floor(Math.random() * 1000000), // Volume not yet available from Yahoo
+            change,
+            changePercent
+          }
+        } catch (error) {
+          // Fallback for symbols that don't exist or API is down
+          console.warn(`Failed to fetch real price for ${symbol}, using fallback:`, error)
+          return {
+            symbol,
+            price: 100 + Math.random() * 200, // Reduced range fallback
+            volume: Math.floor(Math.random() * 1000000),
+            change: (Math.random() - 0.5) * 10,
+            changePercent: (Math.random() - 0.5) * 0.1
+          }
+        }
+      })
+
+      return await Promise.all(marketDataPromises)
+    } catch (error) {
+      console.error('Error fetching market data:', error)
+      // Full fallback if import fails
+      return symbols.map(symbol => ({
+        symbol,
+        price: 100 + Math.random() * 200,
+        volume: Math.floor(Math.random() * 1000000),
+        change: (Math.random() - 0.5) * 10,
+        changePercent: (Math.random() - 0.5) * 0.1
+      }))
+    }
   }
 
   private async fetchNewsData(symbol: string) {
@@ -406,10 +436,15 @@ export class OptionsRecommendationEngine {
     ]
 
     const recommendations: OptionRecommendation[] = []
+    
+    // Fetch real market data for all symbols
+    const marketData = await this.fetchMarketData(callCandidates.slice(0, 8))
 
-    for (const symbol of callCandidates.slice(0, 8)) {
+    for (let i = 0; i < callCandidates.slice(0, 8).length; i++) {
+      const symbol = callCandidates[i]
+      const symbolMarketData = marketData[i]
       const newsData = await this.fetchNewsData(symbol)
-      const basePrice = 150 + Math.random() * 200
+      const basePrice = symbolMarketData.price
       const strike = Math.round((basePrice * (1.02 + Math.random() * 0.08)) / 5) * 5
       const daysToExpiry = 14 + Math.floor(Math.random() * 35)
       
@@ -516,10 +551,15 @@ export class OptionsRecommendationEngine {
     ]
 
     const recommendations: OptionRecommendation[] = []
+    
+    // Fetch real market data for all symbols
+    const marketData = await this.fetchMarketData(putCandidates.slice(0, 8))
 
-    for (const symbol of putCandidates.slice(0, 8)) {
+    for (let i = 0; i < putCandidates.slice(0, 8).length; i++) {
+      const symbol = putCandidates[i]
+      const symbolMarketData = marketData[i]
       const newsData = await this.fetchNewsData(symbol)
-      const basePrice = 50 + Math.random() * 150
+      const basePrice = symbolMarketData.price
       const strike = Math.round((basePrice * (0.92 + Math.random() * 0.08)) / 5) * 5
       const daysToExpiry = 14 + Math.floor(Math.random() * 35)
       

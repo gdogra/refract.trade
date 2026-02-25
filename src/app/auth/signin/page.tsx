@@ -29,7 +29,9 @@ export default function SignIn() {
   useEffect(() => {
     console.log('Current session:', session)
     if (session?.user) {
-      router.push('/dashboard')
+      // Redirect admin users to admin console, regular users to dashboard
+      const redirectPath = session.user.isAdmin ? '/admin' : '/dashboard'
+      router.push(redirectPath)
     }
   }, [session, router])
 
@@ -50,10 +52,11 @@ export default function SignIn() {
         return
       }
 
-      // Check session and redirect
+      // Check session and redirect based on admin status
       const session = await getSession()
       if (session) {
-        router.push('/dashboard')
+        const redirectPath = session.user.isAdmin ? '/admin' : '/dashboard'
+        router.push(redirectPath)
         router.refresh()
       }
     } catch (error) {
@@ -161,7 +164,7 @@ export default function SignIn() {
                   setIsLoading(true)
                   console.log('Starting Google sign-in process...')
                   
-                  // Try with redirect first
+                  // Try with redirect first - NextAuth will handle the redirect based on our dashboard page logic
                   await signIn('google', { 
                     callbackUrl: '/dashboard',
                     redirect: true

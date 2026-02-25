@@ -32,28 +32,69 @@ export default function SymbolSearch({ selectedSymbol, onSymbolChange }: SymbolS
     queryFn: async () => {
       if (query.length < 1) return []
       
-      // Basic symbol validation and results
+      // Static company names for matching (prices will be fetched live)
       const commonSymbols = [
-        { symbol: 'AAPL', name: 'Apple Inc.', price: 0, change: 0, changePercent: 0, volume: 0 },
-        { symbol: 'MSFT', name: 'Microsoft Corporation', price: 0, change: 0, changePercent: 0, volume: 0 },
-        { symbol: 'GOOGL', name: 'Alphabet Inc.', price: 0, change: 0, changePercent: 0, volume: 0 },
-        { symbol: 'TSLA', name: 'Tesla, Inc.', price: 0, change: 0, changePercent: 0, volume: 0 },
-        { symbol: 'AMZN', name: 'Amazon.com, Inc.', price: 0, change: 0, changePercent: 0, volume: 0 },
-        { symbol: 'NVDA', name: 'NVIDIA Corporation', price: 0, change: 0, changePercent: 0, volume: 0 },
-        { symbol: 'SPY', name: 'SPDR S&P 500 ETF', price: 0, change: 0, changePercent: 0, volume: 0 },
-        { symbol: 'QQQ', name: 'Invesco QQQ Trust', price: 0, change: 0, changePercent: 0, volume: 0 },
-        { symbol: 'PLTR', name: 'Palantir Technologies Inc.', price: 0, change: 0, changePercent: 0, volume: 0 },
-        { symbol: 'ORCL', name: 'Oracle Corporation', price: 0, change: 0, changePercent: 0, volume: 0 },
-        { symbol: 'META', name: 'Meta Platforms Inc.', price: 0, change: 0, changePercent: 0, volume: 0 },
-        { symbol: 'NFLX', name: 'Netflix Inc.', price: 0, change: 0, changePercent: 0, volume: 0 },
-        { symbol: 'AMD', name: 'Advanced Micro Devices Inc.', price: 0, change: 0, changePercent: 0, volume: 0 },
-        { symbol: 'INTC', name: 'Intel Corporation', price: 0, change: 0, changePercent: 0, volume: 0 }
+        { symbol: 'AAPL', name: 'Apple Inc.' },
+        { symbol: 'MSFT', name: 'Microsoft Corporation' },
+        { symbol: 'GOOGL', name: 'Alphabet Inc.' },
+        { symbol: 'TSLA', name: 'Tesla, Inc.' },
+        { symbol: 'AMZN', name: 'Amazon.com, Inc.' },
+        { symbol: 'NVDA', name: 'NVIDIA Corporation' },
+        { symbol: 'SPY', name: 'SPDR S&P 500 ETF' },
+        { symbol: 'QQQ', name: 'Invesco QQQ Trust' },
+        { symbol: 'PLTR', name: 'Palantir Technologies Inc.' },
+        { symbol: 'ORCL', name: 'Oracle Corporation' },
+        { symbol: 'META', name: 'Meta Platforms Inc.' },
+        { symbol: 'NFLX', name: 'Netflix Inc.' },
+        { symbol: 'AMD', name: 'Advanced Micro Devices Inc.' },
+        { symbol: 'INTC', name: 'Intel Corporation' }
       ]
       
       const filteredSymbols = commonSymbols.filter(result => 
         result.symbol.toLowerCase().includes(query.toLowerCase()) ||
         result.name.toLowerCase().includes(query.toLowerCase())
-      ) || []
+      )
+      
+      // Fetch real market data for filtered symbols
+      const symbolsWithPrices: SearchResult[] = await Promise.all(
+        filteredSymbols.map(async (symbolInfo) => {
+          try {
+            const response = await fetch(`/api/options/quote?symbol=${symbolInfo.symbol}`)
+            if (response.ok) {
+              const data = await response.json()
+              if (data.success && data.data) {
+                return {
+                  symbol: symbolInfo.symbol,
+                  name: symbolInfo.name,
+                  price: data.data.price || data.data.regularMarketPrice || 0,
+                  change: data.data.change || data.data.regularMarketChange || 0,
+                  changePercent: data.data.changePercent || data.data.regularMarketChangePercent || 0,
+                  volume: data.data.volume || data.data.regularMarketVolume || 0
+                }
+              }
+            }
+            // Return symbol with zero values if API fails - but don't use fake data
+            return {
+              symbol: symbolInfo.symbol,
+              name: symbolInfo.name + ' (Price unavailable)',
+              price: 0,
+              change: 0,
+              changePercent: 0,
+              volume: 0
+            }
+          } catch (error) {
+            console.error(`Failed to fetch price for ${symbolInfo.symbol}:`, error)
+            return {
+              symbol: symbolInfo.symbol,
+              name: symbolInfo.name + ' (Price unavailable)',
+              price: 0,
+              change: 0,
+              changePercent: 0,
+              volume: 0
+            }
+          }
+        })
+      )
       
       // Add dynamic symbol search for any ticker not in our predefined list
       const upperQuery = query.toUpperCase()
@@ -63,17 +104,56 @@ export default function SymbolSearch({ selectedSymbol, onSymbolChange }: SymbolS
       )
       
       if (isSymbolQuery && !symbolExists && query.trim().length >= 1) {
-        filteredSymbols.unshift({
-          symbol: upperQuery,
-          name: `${upperQuery} (Search for options)`,
-          price: 0,
-          change: 0,
-          changePercent: 0,
-          volume: 0
-        })
+        // Try to fetch real price for unknown symbols
+        try {
+          const response = await fetch(`/api/options/quote?symbol=${upperQuery}`)
+          if (response.ok) {
+            const data = await response.json()
+            if (data.success && data.data) {
+              symbolsWithPrices.unshift({
+                symbol: upperQuery,
+                name: `${upperQuery} (Search for options)`,
+                price: data.data.price || data.data.regularMarketPrice || 0,
+                change: data.data.change || data.data.regularMarketChange || 0,
+                changePercent: data.data.changePercent || data.data.regularMarketChangePercent || 0,
+                volume: data.data.volume || data.data.regularMarketVolume || 0
+              })
+            } else {
+              // Symbol exists but no price data
+              symbolsWithPrices.unshift({
+                symbol: upperQuery,
+                name: `${upperQuery} (No price data available)`,
+                price: 0,
+                change: 0,
+                changePercent: 0,
+                volume: 0
+              })
+            }
+          } else {
+            // API call failed
+            symbolsWithPrices.unshift({
+              symbol: upperQuery,
+              name: `${upperQuery} (Unable to verify)`,
+              price: 0,
+              change: 0,
+              changePercent: 0,
+              volume: 0
+            })
+          }
+        } catch (error) {
+          console.error(`Failed to fetch data for ${upperQuery}:`, error)
+          symbolsWithPrices.unshift({
+            symbol: upperQuery,
+            name: `${upperQuery} (Search failed)`,
+            price: 0,
+            change: 0,
+            changePercent: 0,
+            volume: 0
+          })
+        }
       }
       
-      return filteredSymbols.slice(0, 8)
+      return symbolsWithPrices.slice(0, 8)
     },
     enabled: query.length > 0
   })

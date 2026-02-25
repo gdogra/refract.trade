@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import { createSupabaseAdmin } from '@/lib/supabase'
+import { ReferralManager } from '@/lib/referrals'
 import { z } from 'zod'
 import crypto from 'crypto'
 
@@ -8,12 +9,13 @@ const signupSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
+  referralCode: z.string().optional(),
 })
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, email, password } = signupSchema.parse(body)
+    const { name, email, password, referralCode } = signupSchema.parse(body)
 
     // Check if Supabase is properly configured
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
@@ -92,6 +94,21 @@ export async function POST(request: NextRequest) {
     console.log(`Link: ${verificationUrl}`)
     console.log(`===========================\n`)
 
+    // Process referral code if provided
+    let referralResult = null
+    if (referralCode) {
+      try {
+        referralResult = await ReferralManager.processReferralSignup(referralCode, user.id)
+        if (referralResult.success) {
+          console.log(`Referral processed successfully for user ${user.id}:`, referralResult)
+        } else {
+          console.log(`Referral processing failed for user ${user.id}:`, referralResult.error)
+        }
+      } catch (error) {
+        console.error('Error processing referral:', error)
+      }
+    }
+
     // Remove password and sensitive data from response
     const { password: _, verification_token: __, ...userWithoutPassword } = user
 
@@ -100,7 +117,9 @@ export async function POST(request: NextRequest) {
         message: 'Account created! Please check your email to verify your account before signing in.',
         user: userWithoutPassword,
         requiresVerification: true,
-        verificationUrl: verificationUrl // Include for testing, remove in production
+        verificationUrl: verificationUrl, // Include for testing, remove in production
+        referralProcessed: referralResult?.success || false,
+        trialDaysAwarded: referralResult?.newUserTrialDays || 30
       },
       { status: 201 }
     )

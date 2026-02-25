@@ -74,87 +74,8 @@ export interface MarketDataProvider {
   }
 }
 
-// Mock data for development - replace with real API integration
-const MOCK_MARKET_DATA: Record<string, MarketDataPoint> = {
-  'AAPL': {
-    symbol: 'AAPL',
-    price: 190.50,
-    change: 2.35,
-    changePercent: 1.25,
-    volume: 45234567,
-    timestamp: new Date(),
-    bid: 190.48,
-    ask: 190.52,
-    high: 192.15,
-    low: 188.20,
-    open: 189.10
-  },
-  'TSLA': {
-    symbol: 'TSLA',
-    price: 250.00,
-    change: -5.20,
-    changePercent: -2.04,
-    volume: 28345123,
-    timestamp: new Date(),
-    bid: 249.95,
-    ask: 250.05,
-    high: 255.80,
-    low: 248.50,
-    open: 254.20
-  },
-  'MSFT': {
-    symbol: 'MSFT',
-    price: 380.25,
-    change: 1.85,
-    changePercent: 0.49,
-    volume: 23456789,
-    timestamp: new Date(),
-    bid: 380.20,
-    ask: 380.30,
-    high: 382.50,
-    low: 378.15,
-    open: 379.40
-  },
-  'GOOGL': {
-    symbol: 'GOOGL',
-    price: 140.75,
-    change: 0.95,
-    changePercent: 0.68,
-    volume: 18765432,
-    timestamp: new Date(),
-    bid: 140.70,
-    ask: 140.80,
-    high: 142.20,
-    low: 139.85,
-    open: 140.30
-  },
-  'NVDA': {
-    symbol: 'NVDA',
-    price: 450.00,
-    change: 12.50,
-    changePercent: 2.86,
-    volume: 34567890,
-    timestamp: new Date(),
-    bid: 449.85,
-    ask: 450.15,
-    high: 455.20,
-    low: 442.30,
-    open: 443.80
-  },
-  'SPY': {
-    symbol: 'SPY',
-    price: 485.00,
-    change: 1.20,
-    changePercent: 0.25,
-    volume: 67890123,
-    timestamp: new Date(),
-    bid: 484.98,
-    ask: 485.02,
-    high: 486.50,
-    low: 483.20,
-    open: 484.10
-  }
-}
+// ALL MOCK DATA REMOVED - Real data only
+// Market data comes exclusively from real providers with no fallbacks
 
 class MarketDataService {
   private cache = new Map<string, { data: any; timestamp: number; ttl: number }>()
@@ -295,13 +216,8 @@ class MarketDataService {
         }
       }
 
-      // Fallback to mock data in development or when real data fails
-      const mockData = MOCK_MARKET_DATA[symbol.toUpperCase()]
-      if (mockData) {
-        this.setCache(cacheKey, mockData, this.config.cacheTTL)
-        this.notifySubscribers(`market_${symbol}`, mockData)
-        return mockData
-      }
+      // NO MOCK DATA FALLBACKS - throw error if real data unavailable
+      throw new Error(`Real market data unavailable for ${symbol}. No fallback data provided.`)
 
       // Legacy API call (Polygon.io) as final fallback
       const response = await this.makeAPICall(`/v2/aggs/ticker/${symbol}/prev`, {
@@ -329,13 +245,8 @@ class MarketDataService {
     } catch (error) {
       console.error(`Failed to fetch market data for ${symbol}:`, error)
       
-      // Final fallback to mock data
-      const mockData = MOCK_MARKET_DATA[symbol.toUpperCase()]
-      if (mockData) {
-        return mockData
-      }
-      
-      throw new Error(`Failed to fetch market data for ${symbol}`)
+      // No fallback to mock data - real data only
+      throw new Error(`Failed to fetch real market data for ${symbol}. Real data providers unavailable.`)
     }
   }
 
@@ -354,11 +265,9 @@ class MarketDataService {
       // Get underlying price
       const underlyingData = await this.getMarketData(symbol)
       
-      // Return mock option chain if real data is disabled
+      // Require real data - no mock chains allowed
       if (!this.config.enableRealData || !this.realDataService) {
-        const mockChain = this.generateMockOptionChain(symbol, underlyingData.price, expiry)
-        this.setCache(cacheKey, mockChain, this.config.cacheTTL * 2) // Cache longer for options
-        return mockChain
+        throw new Error(`Real options data is required for ${symbol}. Enable real data providers.`)
       }
 
       // Try to get real options data from providers  
@@ -376,10 +285,8 @@ class MarketDataService {
         }
       }
 
-      // Generate enhanced mock data based on real underlying price
-      const enhancedMockChain = this.generateEnhancedMockOptionChain(symbol, underlyingData.price, expiry)
-      this.setCache(cacheKey, enhancedMockChain, this.config.cacheTTL * 2)
-      return enhancedMockChain
+      // No enhanced mock data - require real options data
+      throw new Error(`Real options data unavailable for ${symbol}. No enhanced mock data provided.`)
 
     } catch (error) {
       console.error(`Failed to fetch option chain for ${symbol}:`, error)

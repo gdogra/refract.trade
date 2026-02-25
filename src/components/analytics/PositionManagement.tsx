@@ -336,7 +336,7 @@ export default function PositionManagement({
               <Card className={cn(
                 "transition-all duration-200 hover:shadow-lg",
                 selectedPosition?.id === position.id ? "ring-2 ring-blue-500" : "",
-                position.managementSignals.some(s => s.strength === 'strong') && "border-orange-300"
+                position.managementSignals?.some(s => s.strength === 'strong') && "border-orange-300"
               )}>
                 <CardContent className="p-6">
                   {/* Position Header */}

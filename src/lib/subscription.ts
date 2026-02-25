@@ -1,361 +1,336 @@
-export type SubscriptionTier = 'trial' | 'premium'
+import { prisma } from '@/lib/prisma'
 
-export interface SubscriptionFeatures {
-  // Data Access
-  realTimeData: boolean
-  delayedData: boolean
-  historicalDepth: string // '1M', '1Y', '5Y', 'unlimited'
-  
-  // Recommendations
-  dailyRecommendations: number
-  scanLimit: number
-  portfolioRecommendations: boolean
-  
-  // Analytics
-  advancedGreeks: boolean
-  volatilitySurface: boolean
-  riskScenarios: boolean
-  probabilityModeling: boolean
-  
-  // Tools
-  strategyBuilder: boolean
-  backtesting: boolean
-  portfolioOptimization: boolean
-  tradeJournaling: boolean
-  
-  // Alerts & Monitoring
-  basicAlerts: boolean
-  advancedAlerts: boolean
-  riskMonitoring: boolean
-  customAlerts: number
-  
-  // API & Integration
-  apiAccess: boolean
-  apiCallsPerMonth: number
-  brokerIntegrations: string[] // ['td_ameritrade', 'schwab', 'ibkr']
-  
-  // Social & Community
-  communityAccess: boolean
-  postCreation: boolean
-  followUsers: boolean
-  leaderboards: boolean
-  
-  // Support
-  supportLevel: 'community' | 'email' | 'priority' | 'dedicated'
-  responseTime: string // '48h', '24h', '4h', '1h'
-}
+export type SubscriptionTier = 'free' | 'trial' | 'basic' | 'pro' | 'elite'
 
-export const SUBSCRIPTION_FEATURES: Record<SubscriptionTier, SubscriptionFeatures> = {
-  trial: {
-    realTimeData: true,
-    delayedData: true,
-    historicalDepth: '1Y',
-    dailyRecommendations: -1, // unlimited during trial
-    scanLimit: -1, // unlimited during trial
-    portfolioRecommendations: true,
-    advancedGreeks: true,
-    volatilitySurface: true,
-    riskScenarios: true,
-    probabilityModeling: true,
-    strategyBuilder: true,
-    backtesting: true,
-    portfolioOptimization: true,
-    tradeJournaling: true,
-    basicAlerts: true,
-    advancedAlerts: true,
-    riskMonitoring: true,
-    customAlerts: -1, // unlimited
-    apiAccess: true,
-    apiCallsPerMonth: 1000,
-    brokerIntegrations: ['td_ameritrade', 'schwab', 'ibkr', 'tastyworks'],
-    communityAccess: true,
-    postCreation: true,
-    followUsers: true,
-    leaderboards: true,
-    supportLevel: 'email',
-    responseTime: '24h'
-  },
-  
-  premium: {
-    realTimeData: true,
-    delayedData: true,
-    historicalDepth: 'unlimited',
-    dailyRecommendations: -1, // unlimited
-    scanLimit: -1, // unlimited
-    portfolioRecommendations: true,
-    advancedGreeks: true,
-    volatilitySurface: true,
-    riskScenarios: true,
-    probabilityModeling: true,
-    strategyBuilder: true,
-    backtesting: true,
-    portfolioOptimization: true,
-    tradeJournaling: true,
-    basicAlerts: true,
-    advancedAlerts: true,
-    riskMonitoring: true,
-    customAlerts: -1, // unlimited
-    apiAccess: true,
-    apiCallsPerMonth: -1, // unlimited
-    brokerIntegrations: ['td_ameritrade', 'schwab', 'ibkr', 'tastyworks', 'custom'],
-    communityAccess: true,
-    postCreation: true,
-    followUsers: true,
-    leaderboards: true,
-    supportLevel: 'priority',
-    responseTime: '4h'
+export interface SubscriptionInfo {
+  tier: SubscriptionTier
+  status: 'active' | 'cancelled' | 'expired'
+  startDate: Date
+  endDate?: Date
+  features: string[]
+  limits: {
+    monthlyRecommendations: number
+    dailyAPIRequests: number
+    portfolioPositions: number
+    riskAnalytics: boolean
+    advancedCharts: boolean
+    aiInsights: boolean
   }
 }
 
-export interface SubscriptionPlan {
-  id: string
-  name: string
-  price: number
-  currency: 'USD'
-  interval: 'month' | 'year'
-  features: SubscriptionFeatures
-  popular?: boolean
-  description: string
-  cta: string
-}
-
-export const SUBSCRIPTION_PLANS: Record<SubscriptionTier, SubscriptionPlan[]> = {
-  trial: [{
-    id: 'trial',
-    name: '30-Day Free Trial',
-    price: 0,
-    currency: 'USD',
-    interval: 'month',
-    features: SUBSCRIPTION_FEATURES.trial,
-    description: 'Full access to all premium features for 30 days',
-    cta: 'Start Free Trial'
-  }],
-  
-  premium: [{
-    id: 'premium',
-    name: 'Premium',
-    price: 39.99,
-    currency: 'USD',
-    interval: 'month',
-    features: SUBSCRIPTION_FEATURES.premium,
-    popular: true,
-    description: 'Professional options trading platform with unlimited features',
-    cta: 'Upgrade to Premium'
-  }]
+export interface UsageStats {
+  monthlyRecommendations: number
+  dailyAPIRequests: number
+  portfolioPositions: number
+  lastReset: Date
 }
 
 export class SubscriptionManager {
-  static canAccess(userTier: SubscriptionTier, feature: keyof SubscriptionFeatures): boolean {
-    return Boolean(SUBSCRIPTION_FEATURES[userTier][feature])
-  }
-  
-  static getUsageLimit(userTier: SubscriptionTier, limit: keyof SubscriptionFeatures): number {
-    const value = SUBSCRIPTION_FEATURES[userTier][limit]
-    if (typeof value === 'number') {
-      return value === -1 ? Infinity : value
+  static async getUserSubscription(userId: string): Promise<SubscriptionInfo | null> {
+    try {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        include: {
+          subscription: true
+        }
+      })
+
+      if (!user) return null
+
+      const tier = (user.subscriptionTier || 'free') as SubscriptionTier
+      
+      return {
+        tier,
+        status: 'active', // Simplified for now
+        startDate: user.createdAt,
+        features: this.getFeaturesForTier(tier),
+        limits: this.getLimitsForTier(tier)
+      }
+    } catch (error) {
+      console.error('Error fetching user subscription:', error)
+      return null
     }
-    return 0
   }
-  
-  static shouldUpgrade(userTier: SubscriptionTier, requestedFeature: keyof SubscriptionFeatures): SubscriptionTier | null {
-    if (this.canAccess(userTier, requestedFeature)) {
-      return null // No upgrade needed
+
+  static getFeaturesForTier(tier: SubscriptionTier): string[] {
+    switch (tier) {
+      case 'free':
+        return ['basic_portfolio', 'limited_recommendations']
+      case 'trial':
+        return ['basic_portfolio', 'recommendations', 'basic_analytics']
+      case 'basic':
+        return ['portfolio', 'recommendations', 'basic_analytics', 'market_data']
+      case 'pro':
+        return ['portfolio', 'recommendations', 'advanced_analytics', 'market_data', 'ai_insights', 'real_time_data']
+      case 'elite':
+        return ['portfolio', 'recommendations', 'advanced_analytics', 'market_data', 'ai_insights', 'real_time_data', 'institutional_features', 'priority_support']
+      default:
+        return []
     }
-    
-    // Only upgrade path is from trial to premium
-    if (userTier === 'trial') {
-      return 'premium'
+  }
+
+  static getLimitsForTier(tier: SubscriptionTier) {
+    switch (tier) {
+      case 'free':
+        return {
+          monthlyRecommendations: 5,
+          dailyAPIRequests: 100,
+          portfolioPositions: 10,
+          riskAnalytics: false,
+          advancedCharts: false,
+          aiInsights: false
+        }
+      case 'trial':
+        return {
+          monthlyRecommendations: 50,
+          dailyAPIRequests: 500,
+          portfolioPositions: 25,
+          riskAnalytics: true,
+          advancedCharts: false,
+          aiInsights: false
+        }
+      case 'basic':
+        return {
+          monthlyRecommendations: 100,
+          dailyAPIRequests: 1000,
+          portfolioPositions: 50,
+          riskAnalytics: true,
+          advancedCharts: true,
+          aiInsights: false
+        }
+      case 'pro':
+        return {
+          monthlyRecommendations: 500,
+          dailyAPIRequests: 5000,
+          portfolioPositions: 200,
+          riskAnalytics: true,
+          advancedCharts: true,
+          aiInsights: true
+        }
+      case 'elite':
+        return {
+          monthlyRecommendations: -1, // Unlimited
+          dailyAPIRequests: -1, // Unlimited
+          portfolioPositions: -1, // Unlimited
+          riskAnalytics: true,
+          advancedCharts: true,
+          aiInsights: true
+        }
+      default:
+        return {
+          monthlyRecommendations: 0,
+          dailyAPIRequests: 0,
+          portfolioPositions: 0,
+          riskAnalytics: false,
+          advancedCharts: false,
+          aiInsights: false
+        }
     }
+  }
+
+  static hasFeature(tier: SubscriptionTier, feature: string): boolean {
+    const features = this.getFeaturesForTier(tier)
+    return features.includes(feature)
+  }
+
+  static canExceedLimit(tier: SubscriptionTier, limitType: string, currentValue: number): boolean {
+    const limits = this.getLimitsForTier(tier)
     
-    return null
+    switch (limitType) {
+      case 'monthlyRecommendations':
+        return limits.monthlyRecommendations === -1 || currentValue < limits.monthlyRecommendations
+      case 'dailyAPIRequests':
+        return limits.dailyAPIRequests === -1 || currentValue < limits.dailyAPIRequests
+      case 'portfolioPositions':
+        return limits.portfolioPositions === -1 || currentValue < limits.portfolioPositions
+      default:
+        return false
+    }
   }
-  
-  static formatPrice(plan: SubscriptionPlan): string {
-    if (plan.price === 0) return 'Free'
-    
-    const monthlyPrice = plan.interval === 'year' ? plan.price / 12 : plan.price
-    return `$${Math.round(monthlyPrice)}/mo`
-  }
-  
-  static getRecommendedTier(monthlyTradeVolume: number, portfolioValue: number): SubscriptionTier {
-    // Everyone starts with trial, then upgrades to premium
-    return 'trial'
-  }
-}
-
-// Usage tracking for subscription limits
-export interface UsageMetrics {
-  userId: string
-  tier: SubscriptionTier
-  period: string // YYYY-MM-DD
-  scansUsed: number
-  recommendationsUsed: number
-  apiCallsUsed: number
-  alertsCreated: number
-}
-
-// Trial and subscription management
-export interface TrialInfo {
-  userId: string
-  startDate: Date
-  endDate: Date
-  isActive: boolean
-  extendedByReferral: boolean
-}
-
-export interface ReferralInfo {
-  userId: string
-  referralCode: string
-  referredUsers: string[]
-  totalRewards: number // months of free service
-  isActive: boolean
-}
-
-export interface SubscriptionInfo {
-  userId: string
-  tier: SubscriptionTier
-  status: 'trial' | 'active' | 'expired' | 'cancelled'
-  trialStartDate?: Date
-  trialEndDate?: Date
-  subscriptionStartDate?: Date
-  nextBillingDate?: Date
-  stripeCustomerId?: string
-  stripeSubscriptionId?: string
-  referralCode?: string
 }
 
 export class UsageTracker {
-  static async checkLimit(
-    userId: string, 
-    tier: SubscriptionTier, 
-    resource: keyof SubscriptionFeatures
-  ): Promise<{ allowed: boolean; remaining: number; upgradeRequired?: SubscriptionTier }> {
-    const limit = SubscriptionManager.getUsageLimit(tier, resource)
-    
-    if (limit === Infinity) {
-      return { allowed: true, remaining: Infinity }
-    }
-    
-    // In production, check actual usage from database
-    const currentUsage = 0 // TODO: Fetch from DB
-    const remaining = Math.max(0, limit - currentUsage)
-    
-    if (remaining > 0) {
-      return { allowed: true, remaining }
-    }
-    
-    const upgradeRequired = SubscriptionManager.shouldUpgrade(tier, resource)
-    return { 
-      allowed: false, 
-      remaining: 0, 
-      upgradeRequired: upgradeRequired || undefined 
+  static async getUserUsage(userId: string): Promise<UsageStats> {
+    try {
+      // For now, return default values - in a real app this would track actual usage
+      return {
+        monthlyRecommendations: 0,
+        dailyAPIRequests: 0,
+        portfolioPositions: 0,
+        lastReset: new Date()
+      }
+    } catch (error) {
+      console.error('Error fetching user usage:', error)
+      return {
+        monthlyRecommendations: 0,
+        dailyAPIRequests: 0,
+        portfolioPositions: 0,
+        lastReset: new Date()
+      }
     }
   }
-  
-  static async incrementUsage(
-    userId: string, 
-    resource: keyof SubscriptionFeatures, 
-    amount: number = 1
-  ): Promise<void> {
-    // TODO: Implement usage tracking in database
-    console.log(`User ${userId} used ${amount} ${resource}`)
-  }
-}
 
-export class TrialManager {
-  static TRIAL_DURATION_DAYS = 30
-  
-  static async startTrial(userId: string): Promise<TrialInfo> {
-    const startDate = new Date()
-    const endDate = new Date(startDate)
-    endDate.setDate(endDate.getDate() + this.TRIAL_DURATION_DAYS)
-    
-    const trialInfo: TrialInfo = {
-      userId,
-      startDate,
-      endDate,
-      isActive: true,
-      extendedByReferral: false
+  static async incrementUsage(userId: string, type: 'recommendations' | 'api_requests' | 'positions'): Promise<boolean> {
+    try {
+      // For now, just return true - in a real app this would increment actual usage counters
+      return true
+    } catch (error) {
+      console.error('Error incrementing usage:', error)
+      return false
     }
-    
-    // TODO: Save to database
-    console.log(`Started trial for user ${userId} until ${endDate.toISOString()}`)
-    
-    return trialInfo
   }
-  
-  static async extendTrialByReferral(userId: string, days: number = 30): Promise<void> {
-    // TODO: Extend trial in database
-    console.log(`Extended trial for user ${userId} by ${days} days`)
-  }
-  
-  static async isTrialActive(userId: string): Promise<boolean> {
-    // TODO: Check database
-    return true // Placeholder
-  }
-  
-  static async getTrialInfo(userId: string): Promise<TrialInfo | null> {
-    // TODO: Fetch from database
-    return null // Placeholder
-  }
-  
-  static getDaysRemaining(trialInfo: TrialInfo): number {
-    const now = new Date()
-    const diffTime = trialInfo.endDate.getTime() - now.getTime()
-    return Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)))
+
+  static async canMakeRequest(userId: string, type: 'recommendations' | 'api_requests' | 'positions'): Promise<boolean> {
+    try {
+      const subscription = await SubscriptionManager.getUserSubscription(userId)
+      const usage = await this.getUserUsage(userId)
+      
+      if (!subscription) return false
+
+      switch (type) {
+        case 'recommendations':
+          return SubscriptionManager.canExceedLimit(subscription.tier, 'monthlyRecommendations', usage.monthlyRecommendations)
+        case 'api_requests':
+          return SubscriptionManager.canExceedLimit(subscription.tier, 'dailyAPIRequests', usage.dailyAPIRequests)
+        case 'positions':
+          return SubscriptionManager.canExceedLimit(subscription.tier, 'portfolioPositions', usage.portfolioPositions)
+        default:
+          return false
+      }
+    } catch (error) {
+      console.error('Error checking request limits:', error)
+      return false
+    }
   }
 }
 
 export class ReferralManager {
   static async generateReferralCode(userId: string): Promise<string> {
-    // Generate a unique referral code
-    const code = `REF${userId.substring(0, 4).toUpperCase()}${Math.random().toString(36).substring(2, 6).toUpperCase()}`
+    const code = Math.random().toString(36).substring(2, 8).toUpperCase()
     
-    const referralInfo: ReferralInfo = {
-      userId,
-      referralCode: code,
-      referredUsers: [],
-      totalRewards: 0,
-      isActive: true
+    try {
+      await prisma.referralCode.create({
+        data: {
+          userId,
+          code,
+          createdAt: new Date(),
+          isActive: true
+        }
+      })
+      
+      return code
+    } catch (error) {
+      console.error('Error generating referral code:', error)
+      throw new Error('Failed to generate referral code')
     }
-    
-    // TODO: Save to database
-    console.log(`Generated referral code ${code} for user ${userId}`)
-    
-    return code
   }
-  
-  static async processReferral(referralCode: string, newUserId: string): Promise<boolean> {
-    // TODO: Validate referral code and apply rewards
-    const referrerId = await this.getUserByReferralCode(referralCode)
-    
-    if (!referrerId) {
-      return false
+
+  static async processReferralSignup(referralCode: string, newUserId: string): Promise<{
+    success: boolean
+    referrerTrialExtension?: number
+    newUserTrialDays?: number
+    error?: string
+  }> {
+    try {
+      const referralCodeRecord = await prisma.referralCode.findFirst({
+        where: {
+          code: referralCode,
+          isActive: true
+        },
+        include: {
+          user: true
+        }
+      })
+
+      if (!referralCodeRecord) {
+        return { success: false, error: 'Invalid referral code' }
+      }
+
+      const referrerId = referralCodeRecord.userId
+
+      // Check if referrer has reached maximum referrals (3 for 90 days total)
+      const existingReferrals = await prisma.referral.count({
+        where: { referrerId }
+      })
+
+      if (existingReferrals >= 3) {
+        return { success: false, error: 'Referrer has reached maximum referrals' }
+      }
+
+      // Create referral record
+      await prisma.referral.create({
+        data: {
+          referrerId,
+          refereeId: newUserId,
+          createdAt: new Date(),
+          rewardGiven: true
+        }
+      })
+
+      // Extend referrer's trial by 30 days
+      const referrer = await prisma.user.findUnique({
+        where: { id: referrerId }
+      })
+
+      if (referrer) {
+        const currentTrialDays = referrer.trialDaysLeft || 0
+        const newTrialDays = Math.min(currentTrialDays + 30, 90) // Max 90 days
+
+        await prisma.user.update({
+          where: { id: referrerId },
+          data: { trialDaysLeft: newTrialDays }
+        })
+
+        // Give new user 30 days trial
+        await prisma.user.update({
+          where: { id: newUserId },
+          data: { trialDaysLeft: 30 }
+        })
+
+        return {
+          success: true,
+          referrerTrialExtension: 30,
+          newUserTrialDays: 30
+        }
+      }
+
+      return { success: false, error: 'Failed to process referral' }
+    } catch (error) {
+      console.error('Error processing referral signup:', error)
+      return { success: false, error: 'Database error' }
     }
-    
-    // Extend referrer's subscription by 1 month
-    await this.addReferralReward(referrerId, 30) // 30 days
-    
-    // Extend new user's trial by 1 month
-    await TrialManager.extendTrialByReferral(newUserId, 30)
-    
-    console.log(`Processed referral: ${referrerId} referred ${newUserId}`)
-    
-    return true
   }
-  
-  static async getUserByReferralCode(code: string): Promise<string | null> {
-    // TODO: Query database
-    return null // Placeholder
-  }
-  
-  static async addReferralReward(userId: string, days: number): Promise<void> {
-    // TODO: Add reward to database
-    console.log(`Added ${days} days reward to user ${userId}`)
-  }
-  
-  static async getReferralStats(userId: string): Promise<{ totalReferrals: number; totalRewards: number }> {
-    // TODO: Query database
-    return { totalReferrals: 0, totalRewards: 0 }
+
+  static async getUserReferralStats(userId: string): Promise<{
+    totalReferrals: number
+    successfulReferrals: number
+    remainingReferrals: number
+    totalTrialDaysEarned: number
+  }> {
+    try {
+      const referrals = await prisma.referral.findMany({
+        where: { referrerId: userId }
+      })
+
+      const totalReferrals = referrals.length
+      const successfulReferrals = referrals.filter(r => r.rewardGiven).length
+      const remainingReferrals = Math.max(0, 3 - totalReferrals)
+      const totalTrialDaysEarned = successfulReferrals * 30
+
+      return {
+        totalReferrals,
+        successfulReferrals,
+        remainingReferrals,
+        totalTrialDaysEarned
+      }
+    } catch (error) {
+      console.error('Error fetching referral stats:', error)
+      return {
+        totalReferrals: 0,
+        successfulReferrals: 0,
+        remainingReferrals: 3,
+        totalTrialDaysEarned: 0
+      }
+    }
   }
 }

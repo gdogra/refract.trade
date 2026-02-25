@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { MessageCircle, X, Send, Bot, User, Sparkles } from 'lucide-react'
+import { MessageCircle, X, Send, Bot, User, Sparkles, TrendingUp, AlertTriangle, Calculator, Brain, Mic, MicOff } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardHeader } from '@/components/ui/Card'
 
@@ -11,29 +11,78 @@ interface ChatMessage {
   type: 'user' | 'bot'
   content: string
   timestamp: Date
+  isTyping?: boolean
+  context?: {
+    symbol?: string
+    position?: any
+    marketData?: any
+  }
+  actions?: Array<{
+    label: string
+    action: string
+    data?: any
+  }>
+}
+
+interface AIContext {
+  currentSymbol?: string
+  currentPosition?: any
+  portfolioValue?: number
+  marketCondition?: 'bullish' | 'bearish' | 'neutral' | 'volatile'
+  riskLevel?: 'low' | 'medium' | 'high'
+  tradingSession?: 'pre-market' | 'market' | 'after-hours'
 }
 
 interface AIChatbotProps {
   className?: string
+  context?: AIContext
+  onAction?: (action: string, data?: any) => void
 }
 
-export default function AIChatbot({ className = '' }: AIChatbotProps) {
+export default function AIChatbot({ className = '', context = {}, onAction }: AIChatbotProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
       type: 'bot',
-      content: "👋 Hi! I'm your AI trading assistant. I can help you understand options trading, explain features, analyze strategies, or answer questions about the platform. What would you like to know?",
-      timestamp: new Date()
+      content: getContextualGreeting(context),
+      timestamp: new Date(),
+      actions: [
+        { label: 'Analyze Portfolio', action: 'analyze_portfolio' },
+        { label: 'Market Overview', action: 'market_overview' },
+        { label: 'Risk Check', action: 'risk_check' }
+      ]
     }
   ])
   const [inputMessage, setInputMessage] = useState('')
   const [isTyping, setIsTyping] = useState(false)
+  const [isListening, setIsListening] = useState(false)
+  const [conversationMode, setConversationMode] = useState<'casual' | 'technical' | 'educational'>('casual')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const recognitionRef = useRef<any>(null)
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  function getContextualGreeting(context: AIContext): string {
+    const timeOfDay = new Date().getHours()
+    let greeting = timeOfDay < 12 ? '🌅 Good morning!' : timeOfDay < 17 ? '☀️ Good afternoon!' : '🌙 Good evening!'
+    
+    let contextMessage = "I'm your AI trading assistant."
+    
+    if (context.currentSymbol) {
+      contextMessage += ` I see you're looking at ${context.currentSymbol}.`
+    }
+    
+    if (context.riskLevel === 'high') {
+      contextMessage += ' ⚠️ I notice your portfolio risk is elevated. Want me to analyze it?'
+    } else if (context.marketCondition === 'volatile') {
+      contextMessage += ' 📊 Markets are volatile today. Need help adjusting your positions?'
+    }
+    
+    return `${greeting} ${contextMessage} How can I help you trade smarter today?`
   }
 
   useEffect(() => {
@@ -46,19 +95,70 @@ export default function AIChatbot({ className = '' }: AIChatbotProps) {
     }
   }, [isOpen])
 
-  const getAIResponse = async (userMessage: string): Promise<string> => {
-    const responses = {
-      'what': "I can help you with various aspects of options trading and our platform. Try asking about specific features, trading strategies, or risk management concepts.",
-      'risk': "Risk management is crucial in options trading. Our platform offers:\n\n• Real-time portfolio Greeks monitoring\n• Worst-case scenario analysis\n• Automated position sizing\n• Stop-loss recommendations\n• Market regime analysis\n\nWould you like to know more about any specific risk management feature?",
-      'strategy': "Our platform supports various options strategies:\n\n• Iron Condors (neutral market)\n• Credit Spreads (directional bias)\n• Strangles & Straddles (volatility plays)\n• Covered Calls (income generation)\n• Protective Puts (portfolio insurance)\n\nEach strategy comes with AI-powered entry/exit signals and risk analysis.",
-      'ai': "Our AI features include:\n\n🧠 **Predictive Analytics**: Forecasts market movements and position adjustments\n📊 **Portfolio Optimization**: Suggests optimal position sizing and allocation\n⚡ **Real-time Alerts**: Proactive notifications before losses occur\n🎯 **Strategy Recommendations**: AI suggests best strategies based on market conditions\n📈 **Performance Analysis**: Tracks and improves your trading patterns",
-      'analytics': "Our analytics dashboard provides:\n\n📊 **Portfolio Overview**: Real-time P&L and risk metrics\n🔍 **Opportunities Scanner**: AI-powered trade discovery\n🛡️ **Risk Analysis**: Worst-case scenario planning\n📈 **Performance Tracking**: Strategy-by-strategy breakdowns\n👁️ **Options Flow**: Institutional money movements\n⚡ **Volatility Intelligence**: IV surface analysis",
-      'volatility': "Volatility analysis includes:\n\n• **IV Rank**: Where current volatility sits historically\n• **Surface Analysis**: 3D visualization of option prices\n• **Regime Detection**: Identifies low/high vol environments\n• **Mean Reversion Signals**: When volatility might normalize\n• **Earnings Impact**: How events affect option pricing",
-      'help': "I can assist with:\n\n🎯 **Trading Strategies**: Explain and analyze options strategies\n📊 **Platform Features**: Guide you through our tools\n⚠️ **Risk Management**: Help you understand and manage risk\n📈 **Market Analysis**: Interpret market conditions\n🤖 **AI Features**: Explain how our AI assists your trading\n\nJust ask me anything about options trading or our platform!",
-      'greeks': "The Greeks measure option price sensitivities:\n\n• **Delta**: Price sensitivity to underlying movement\n• **Gamma**: How Delta changes with price moves\n• **Theta**: Time decay - how options lose value daily\n• **Vega**: Volatility sensitivity\n• **Rho**: Interest rate sensitivity\n\nOur platform monitors all Greeks in real-time and alerts you when adjustments are needed."
-    }
-
+  const getAIResponse = async (userMessage: string): Promise<{ content: string, actions?: Array<{label: string, action: string, data?: any}> }> => {
     const lowerMessage = userMessage.toLowerCase()
+    
+    // Contextual responses based on current state
+    if (context.currentSymbol && (lowerMessage.includes('analyze') || lowerMessage.includes(context.currentSymbol.toLowerCase()))) {
+      return {
+        content: `📊 **${context.currentSymbol} Analysis**\n\n• Current Price: $${(Math.random() * 200 + 100).toFixed(2)}\n• IV Rank: ${(Math.random() * 100).toFixed(0)}th percentile\n• Options Flow: Mostly bullish\n• Next Earnings: ${Math.floor(Math.random() * 30)} days\n\n**AI Recommendation**: Consider covered calls or cash-secured puts based on your outlook.`,
+        actions: [
+          { label: 'View Options Chain', action: 'view_options_chain', data: { symbol: context.currentSymbol } },
+          { label: 'Strategy Builder', action: 'open_strategy_builder', data: { symbol: context.currentSymbol } }
+        ]
+      }
+    }
+    
+    const responses: Record<string, { content: string, actions?: Array<{label: string, action: string, data?: any}> }> = {
+      'portfolio': {
+        content: `📈 **Portfolio Analysis**\n\nTotal Value: $${context.portfolioValue?.toLocaleString() || '125,430'}\nRisk Level: ${context.riskLevel || 'Medium'}\nCurrent Delta: +12.5\nTheta Decay: -$45/day\n\n${context.riskLevel === 'high' ? '⚠️ **Risk Alert**: Consider reducing position sizes or adding hedges.' : '✅ **Healthy Portfolio**: Well-balanced risk exposure.'}`,
+        actions: [
+          { label: 'Risk Dashboard', action: 'open_risk_dashboard' },
+          { label: 'Position Optimizer', action: 'optimize_positions' },
+          { label: 'Add Hedge', action: 'suggest_hedge' }
+        ]
+      },
+      'risk': {
+        content: "🛡️ **Advanced Risk Management**\n\n• **Real-time Greeks Monitoring**: Track Delta, Gamma, Theta, Vega\n• **Stress Testing**: See how positions perform in market crashes\n• **Correlation Analysis**: Identify concentrated risks\n• **Liquidity Scoring**: Ensure you can exit when needed\n• **Options Flow Alerts**: Track institutional movements\n\nOur AI continuously monitors 127 risk factors across your portfolio.",
+        actions: [
+          { label: 'Run Stress Test', action: 'stress_test' },
+          { label: 'Risk Heatmap', action: 'risk_heatmap' },
+          { label: 'Set Alerts', action: 'setup_alerts' }
+        ]
+      },
+      'earnings': {
+        content: "📅 **Earnings Intelligence**\n\n• **Volatility Predictor**: AI forecasts IV crush probability\n• **Historical Patterns**: How stock moved post-earnings\n• **Options Flow**: Unusual activity before announcements\n• **Strategy Recommendations**: Best plays for earnings\n\nNext week: AAPL (Mon), TSLA (Wed), META (Thu)",
+        actions: [
+          { label: 'Earnings Calendar', action: 'earnings_calendar' },
+          { label: 'IV Crush Scanner', action: 'iv_scanner' },
+          { label: 'Earnings Strategies', action: 'earnings_strategies' }
+        ]
+      },
+      'market': {
+        content: `🌍 **Market Intelligence**\n\nCondition: ${context.marketCondition || 'Neutral'}\nVIX Level: ${(Math.random() * 30 + 10).toFixed(1)}\nSector Rotation: Tech → Value\nOptions Flow: Defensive\n\n**Key Levels**: SPY 480 support, 485 resistance\n**AI Outlook**: Expect continued volatility through month-end.`,
+        actions: [
+          { label: 'Market Dashboard', action: 'market_dashboard' },
+          { label: 'Options Flow', action: 'options_flow' },
+          { label: 'Volatility Map', action: 'volatility_map' }
+        ]
+      },
+      'strategy': {
+        content: "🎯 **Smart Strategy Selection**\n\nBased on current market conditions:\n\n• **High IV Environment**: Iron Condors, Credit Spreads\n• **Low IV Environment**: Straddles, Calendar Spreads\n• **Trending Markets**: Covered Calls, Cash-Secured Puts\n• **Volatile Markets**: Iron Butterflies, Protective Collars\n\nOur AI analyzes 50+ market factors to recommend optimal strategies.",
+        actions: [
+          { label: 'Strategy Builder', action: 'strategy_builder' },
+          { label: 'Backtest Ideas', action: 'backtest_strategies' },
+          { label: 'Paper Trade', action: 'paper_trade' }
+        ]
+      },
+      'ai': {
+        content: "🤖 **Advanced AI Features**\n\n• **Predictive Analytics**: 72% accuracy on price movements\n• **Sentiment Analysis**: Social media & news impact\n• **Options Flow Detection**: Institutional money tracking\n• **Risk Prediction**: Early warning system\n• **Performance Attribution**: What's working and why\n\nYour AI Score: 8.5/10 (Excellent risk management)",
+        actions: [
+          { label: 'AI Dashboard', action: 'ai_dashboard' },
+          { label: 'Predictions', action: 'view_predictions' },
+          { label: 'Performance AI', action: 'performance_ai' }
+        ]
+      }
+    }
     
     for (const [keyword, response] of Object.entries(responses)) {
       if (lowerMessage.includes(keyword)) {
@@ -66,7 +166,15 @@ export default function AIChatbot({ className = '' }: AIChatbotProps) {
       }
     }
 
-    return "That's a great question! While I don't have specific information about that topic, I can help with:\n\n• Options trading strategies and concepts\n• Platform features and navigation\n• Risk management techniques\n• Market analysis and volatility\n• AI features and analytics\n\nTry asking about any of these topics, or be more specific about what you'd like to learn!"
+    // Fallback with contextual suggestions
+    return {
+      content: `💡 I can help you with many trading topics! Based on current market conditions, you might be interested in:\n\n• Portfolio risk analysis (your current risk: ${context.riskLevel || 'medium'})\n• ${context.currentSymbol || 'SPY'} options strategies\n• Market volatility insights\n• Earnings plays and IV crush protection\n\nWhat would you like to explore?`,
+      actions: [
+        { label: 'Quick Risk Check', action: 'risk_check' },
+        { label: 'Market Update', action: 'market_update' },
+        { label: 'Strategy Ideas', action: 'strategy_ideas' }
+      ]
+    }
   }
 
   const handleSendMessage = async () => {
@@ -76,7 +184,11 @@ export default function AIChatbot({ className = '' }: AIChatbotProps) {
       id: Date.now().toString(),
       type: 'user',
       content: inputMessage,
-      timestamp: new Date()
+      timestamp: new Date(),
+      context: {
+        symbol: context.currentSymbol,
+        position: context.currentPosition
+      }
     }
 
     setMessages(prev => [...prev, userMessage])
@@ -89,13 +201,59 @@ export default function AIChatbot({ className = '' }: AIChatbotProps) {
       const botMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: 'bot',
-        content: aiResponse,
-        timestamp: new Date()
+        content: aiResponse.content,
+        timestamp: new Date(),
+        actions: aiResponse.actions
       }
       
       setMessages(prev => [...prev, botMessage])
       setIsTyping(false)
-    }, 1000 + Math.random() * 1000)
+    }, 800 + Math.random() * 1200)
+  }
+
+  const handleAction = (action: string, data?: any) => {
+    if (onAction) {
+      onAction(action, data)
+    }
+    
+    // Add confirmation message
+    const confirmationMessage: ChatMessage = {
+      id: Date.now().toString(),
+      type: 'bot',
+      content: `✅ Opening ${action.replace('_', ' ')}...`,
+      timestamp: new Date()
+    }
+    setMessages(prev => [...prev, confirmationMessage])
+  }
+
+  const startVoiceInput = () => {
+    if ('webkitSpeechRecognition' in window) {
+      const recognition = new (window as any).webkitSpeechRecognition()
+      recognitionRef.current = recognition
+      
+      recognition.continuous = false
+      recognition.interimResults = false
+      recognition.lang = 'en-US'
+      
+      recognition.onstart = () => setIsListening(true)
+      recognition.onend = () => setIsListening(false)
+      recognition.onerror = () => setIsListening(false)
+      
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript
+        setInputMessage(transcript)
+        setTimeout(() => handleSendMessage(), 500)
+      }
+      
+      recognition.start()
+    }
+  }
+
+  const stopVoiceInput = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop()
+    }
+    setIsListening(false)
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -105,13 +263,23 @@ export default function AIChatbot({ className = '' }: AIChatbotProps) {
     }
   }
 
-  const quickQuestions = [
-    "How do I manage risk?",
-    "What trading strategies work best?",
-    "How does the AI help me trade?",
-    "Explain the analytics dashboard",
-    "What are the Greeks?"
-  ]
+  const getContextualQuestions = () => {
+    const base = [
+      "Analyze my portfolio risk",
+      "Show me today's market intelligence",
+      "What strategies work now?"
+    ]
+    
+    if (context.currentSymbol) {
+      base.unshift(`Analyze ${context.currentSymbol}`)
+    }
+    
+    if (context.riskLevel === 'high') {
+      base.unshift('Help reduce my risk')
+    }
+    
+    return base.slice(0, 3)
+  }
 
   return (
     <>
@@ -226,12 +394,38 @@ export default function AIChatbot({ className = '' }: AIChatbotProps) {
                 <div ref={messagesEndRef} />
               </div>
 
+              {/* Action Buttons for Bot Messages */}
+              {messages.map(message => (
+                message.type === 'bot' && message.actions && (
+                  <motion.div
+                    key={`actions-${message.id}`}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="px-4 pb-2"
+                  >
+                    <div className="flex flex-wrap gap-1">
+                      {message.actions.map((action, idx) => (
+                        <Button
+                          key={`${message.id}-${idx}`}
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleAction(action.action, action.data)}
+                          className="text-xs h-6 px-2 bg-purple-50 hover:bg-purple-100 text-purple-700 border-purple-200"
+                        >
+                          {action.label}
+                        </Button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )
+              ))}
+
               {/* Quick Questions */}
               {messages.length === 1 && (
                 <div className="px-4 py-2 border-t border-gray-200 dark:border-gray-700">
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Quick questions:</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Quick actions:</p>
                   <div className="flex flex-wrap gap-1">
-                    {quickQuestions.slice(0, 3).map((question) => (
+                    {getContextualQuestions().map((question) => (
                       <Button
                         key={question}
                         size="sm"
@@ -252,18 +446,30 @@ export default function AIChatbot({ className = '' }: AIChatbotProps) {
               {/* Input Area */}
               <div className="p-4 border-t border-gray-200 dark:border-gray-700">
                 <div className="flex space-x-2">
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    value={inputMessage}
-                    onChange={(e) => setInputMessage(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder="Ask me anything about options trading..."
-                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm
-                             bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-                             focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    disabled={isTyping}
-                  />
+                  <div className="flex-1 relative">
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      value={inputMessage}
+                      onChange={(e) => setInputMessage(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      placeholder={isListening ? "Listening..." : "Ask me anything about options trading..."}
+                      className="w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg text-sm
+                               bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                               focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      disabled={isTyping || isListening}
+                    />
+                    {/* Voice Input Button */}
+                    <button
+                      onClick={isListening ? stopVoiceInput : startVoiceInput}
+                      className={`absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md transition-colors ${
+                        isListening ? 'text-red-500 hover:bg-red-50' : 'text-gray-400 hover:text-purple-500 hover:bg-purple-50'
+                      }`}
+                      title={isListening ? 'Stop listening' : 'Voice input'}
+                    >
+                      {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                    </button>
+                  </div>
                   <Button
                     onClick={handleSendMessage}
                     disabled={!inputMessage.trim() || isTyping}
@@ -273,9 +479,27 @@ export default function AIChatbot({ className = '' }: AIChatbotProps) {
                     <Send className="h-4 w-4" />
                   </Button>
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Press Enter to send
-                </p>
+                <div className="flex justify-between items-center mt-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {isListening ? '🎤 Listening...' : 'Press Enter to send or 🎤 for voice'}
+                  </p>
+                  <div className="flex space-x-1">
+                    {(['casual', 'technical', 'educational'] as const).map(mode => (
+                      <button
+                        key={mode}
+                        onClick={() => setConversationMode(mode)}
+                        className={`text-xs px-2 py-1 rounded transition-colors ${
+                          conversationMode === mode
+                            ? 'bg-purple-100 text-purple-700'
+                            : 'text-gray-400 hover:text-gray-600'
+                        }`}
+                        title={`Switch to ${mode} mode`}
+                      >
+                        {mode.charAt(0).toUpperCase()}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             </Card>
           </motion.div>

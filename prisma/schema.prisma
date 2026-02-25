@@ -25,6 +25,11 @@ model User {
   subscriptionTier String @default("basic") // basic, pro, elite
   subscriptionExpiry DateTime?
   
+  // Trial and referral system
+  trialExpiry DateTime?
+  totalTrialDays Int @default(30)
+  referredBy String? // User ID who referred this user
+  
   // Profile data
   profile   UserProfile?
   accounts  Account[]
@@ -39,6 +44,19 @@ model User {
   tradingRules TradingRule[]
   smartNotifications SmartNotification[]
   brokerConnections BrokerConnection[]
+  
+  // Referral relations
+  referralCodes ReferralCode[]
+  referrals Referral[]
+  
+  // Admin and feedback relations
+  isAdmin Boolean @default(false)
+  feedback Feedback[]
+  adminFeedbackResponses Feedback[] @relation("AdminFeedback")
+  adminActions AdminAction[] @relation("AdminActions")
+  targetAdminActions AdminAction[] @relation("AdminTargetActions")
+  userNotes UserNote[] @relation("UserNotes")
+  adminUserNotes UserNote[] @relation("AdminUserNotes")
 
   @@map("users")
 }
@@ -517,4 +535,131 @@ model BrokerConnection {
   
   @@unique([userId, broker, accountId])
   @@index([userId])
+}
+
+// ─── REFERRAL SYSTEM ──────────────────────────────────────────────────────────
+
+model ReferralCode {
+  id                  String   @id @default(cuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  code                String   @unique
+  isActive            Boolean  @default(true)
+  
+  successfulReferrals Referral[]
+  
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([code])
+}
+
+model Referral {
+  id                  String      @id @default(cuid())
+  referrerCodeId      String
+  referralCode        ReferralCode @relation(fields: [referrerCodeId], references: [id], onDelete: Cascade)
+  
+  referredUserId      String
+  referredUser        User        @relation(fields: [referredUserId], references: [id], onDelete: Cascade)
+  
+  status              String      @default("pending") // "pending", "completed", "failed"
+  rewardType          String?     // "trial_extension", "discount", "credit"
+  rewardValue         Int?        // Number of days, percentage, or amount
+  
+  rewardDelivered     Boolean     @default(false)
+  rewardDeliveredAt   DateTime?
+  
+  createdAt           DateTime    @default(now())
+  
+  @@index([referrerCodeId])
+  @@index([referredUserId])
+  @@index([status])
+}
+
+// ─── FEEDBACK & ADMIN SYSTEM ──────────────────────────────────────────────────
+
+model Feedback {
+  id                  String   @id @default(cuid())
+  userId              String?
+  user                User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  // Contact info for anonymous feedback
+  email               String?
+  name                String?
+  
+  category            String   // "bug", "feature", "improvement", "complaint", "praise"
+  subject             String
+  message             String   @db.Text
+  priority            String   @default("medium") // "low", "medium", "high", "critical"
+  
+  // Admin response
+  status              String   @default("open") // "open", "in_progress", "resolved", "closed"
+  adminResponse       String?  @db.Text
+  adminId             String?
+  admin               User?    @relation("AdminFeedback", fields: [adminId], references: [id])
+  respondedAt         DateTime?
+  
+  // Metadata
+  userAgent           String?
+  url                 String?
+  screenshot          String?  // URL to uploaded screenshot
+  systemInfo          Json?    // Browser, OS, etc.
+  
+  // Satisfaction tracking
+  satisfactionRating  Int?     // 1-5 rating after resolution
+  satisfactionComment String?
+  
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([status])
+  @@index([category])
+  @@index([createdAt])
+}
+
+model AdminAction {
+  id                  String   @id @default(cuid())
+  adminId             String
+  admin               User     @relation("AdminActions", fields: [adminId], references: [id])
+  
+  action              String   // "user_created", "user_updated", "user_deleted", "refund_issued", "feedback_responded"
+  targetUserId        String?
+  targetUser          User?    @relation("AdminTargetActions", fields: [targetUserId], references: [id])
+  
+  details             Json?    // Additional action details
+  reason              String?  // Reason for action
+  
+  // Refund specific
+  refundAmount        Decimal?
+  refundReason        String?
+  refundMethod        String?  // "stripe", "manual", etc.
+  refundId            String?  // External refund ID
+  
+  createdAt           DateTime @default(now())
+  
+  @@index([adminId])
+  @@index([targetUserId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model UserNote {
+  id                  String   @id @default(cuid())
+  userId              String
+  user                User     @relation("UserNotes", fields: [userId], references: [id], onDelete: Cascade)
+  adminId             String
+  admin               User     @relation("AdminUserNotes", fields: [adminId], references: [id])
+  
+  note                String   @db.Text
+  isPrivate           Boolean  @default(true) // Only visible to admins
+  category            String?  // "general", "billing", "support", "warning"
+  
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([adminId])
 }

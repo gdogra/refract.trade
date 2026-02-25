@@ -2,8 +2,8 @@ import { NextAuthOptions, User, DefaultSession } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import GoogleProvider from 'next-auth/providers/google'
 import { createSupabaseAdmin } from './supabase'
+import { ReferralManager } from './referrals'
 import bcrypt from 'bcryptjs'
-import { TrialManager, ReferralManager } from './subscription'
 
 // Note: Environment variables are validated at runtime during auth operations
 
@@ -11,6 +11,7 @@ declare module 'next-auth' {
   interface User {
     subscriptionTier?: string
     profile?: any
+    isAdmin?: boolean
   }
   
   interface Session {
@@ -20,6 +21,7 @@ declare module 'next-auth' {
       name?: string
       subscriptionTier?: string
       profile?: any
+      isAdmin?: boolean
     } & DefaultSession['user']
   }
 }
@@ -28,6 +30,7 @@ declare module 'next-auth/jwt' {
   interface JWT {
     subscriptionTier?: string
     profile?: any
+    isAdmin?: boolean
   }
 }
 
@@ -99,7 +102,8 @@ export const authOptions: NextAuthOptions = {
             email: user.email,
             name: user.name,
             subscriptionTier: user.subscription_tier,
-            profile: user.user_profiles?.[0]
+            profile: user.user_profiles?.[0],
+            isAdmin: user.email === 'gdogra@gmail.com' // Admin user hardcoded for now
           }
         } catch (error) {
           console.error('Auth error:', error)
@@ -130,6 +134,8 @@ export const authOptions: NextAuthOptions = {
             .eq('email', user.email)
             .single()
           
+          let userId = existingUser?.id
+          
           if (!existingUser) {
             // Create new user for Google SSO
             const { data: newUser, error } = await supabase
@@ -150,23 +156,11 @@ export const authOptions: NextAuthOptions = {
               return false
             }
             
-            // Start trial and check for referrals
-            if (newUser) {
-              try {
-                await TrialManager.startTrial(newUser.id)
-              } catch (error) {
-                console.error('Failed to start trial:', error)
-                // Don't fail the sign-in process for trial setup issues
-              }
-              
-              // Generate referral code for new user
-              try {
-                await ReferralManager.generateReferralCode(newUser.id)
-              } catch (error) {
-                console.error('Failed to generate referral code:', error)
-                // Don't fail the sign-in process for referral setup issues
-              }
-            }
+            userId = newUser.id
+            console.log('New Google user created successfully:', newUser.id)
+
+            // NOTE: Referral processing for Google OAuth will be handled separately
+            // via the google-signup endpoint and subsequent processing
           }
           
           return true
@@ -186,8 +180,9 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.subscriptionTier = user.subscriptionTier
         token.profile = user.profile
+        token.isAdmin = user.isAdmin
         
-        // For Google users, fetch subscription info from database
+        // For Google users, fetch subscription info and admin status from database
         if (account?.provider === 'google') {
           try {
             // Check if we're in a build environment
@@ -205,6 +200,7 @@ export const authOptions: NextAuthOptions = {
             
             if (userData) {
               token.subscriptionTier = userData.subscription_tier
+              token.isAdmin = user.email === 'gdogra@gmail.com' // Admin user hardcoded for now
             }
           } catch (error) {
             console.error('Error fetching user data for token:', error)
@@ -218,6 +214,7 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.sub!
         session.user.subscriptionTier = token.subscriptionTier
         session.user.profile = token.profile
+        session.user.isAdmin = token.isAdmin
       }
       return session
     }

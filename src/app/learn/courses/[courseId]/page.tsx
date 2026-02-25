@@ -63,16 +63,19 @@ const courses = {
           
           <h3>Example: AAPL Call Option</h3>
           <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-            <p><strong>Current AAPL Price:</strong> $190</p>
-            <p><strong>Call Option:</strong> $195 strike, expires in 30 days</p>
-            <p><strong>Premium:</strong> $3.00 per share ($300 for 1 contract)</p>
+            <p><strong>Current AAPL Price:</strong> [Check real-time price]</p>
+            <p><strong>Call Option:</strong> Strike 5$ above current price, expires in 30 days</p>
+            <p><strong>Premium:</strong> [Based on current market data]</p>
+            <p class="text-sm text-blue-600 dark:text-blue-400 mt-2">
+              💡 <em>Use real market data from your trading platform for accurate examples</em>
+            </p>
           </div>
           
-          <h3>Profit/Loss Scenarios</h3>
+          <h3>Profit/Loss Calculation Formula</h3>
           <ul>
-            <li><strong>AAPL goes to $200:</strong> Profit = ($200 - $195 - $3) × 100 = $200</li>
-            <li><strong>AAPL stays at $190:</strong> Loss = $300 (premium paid)</li>
-            <li><strong>AAPL goes to $197:</strong> Breakeven = $195 + $3 = $198</li>
+            <li><strong>If stock rises above strike:</strong> Profit = (Stock Price - Strike Price - Premium) × 100</li>
+            <li><strong>If stock stays below strike:</strong> Loss = Premium paid × 100</li>
+            <li><strong>Breakeven:</strong> Strike Price + Premium</li>
           </ul>
           
           <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg mt-4">
@@ -99,16 +102,19 @@ const courses = {
           
           <h3>Example: TSLA Put Option</h3>
           <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-            <p><strong>Current TSLA Price:</strong> $250</p>
-            <p><strong>Put Option:</strong> $245 strike, expires in 30 days</p>
-            <p><strong>Premium:</strong> $4.00 per share ($400 for 1 contract)</p>
+            <p><strong>Current TSLA Price:</strong> [Check real-time price]</p>
+            <p><strong>Put Option:</strong> Strike $5 below current price, expires in 30 days</p>
+            <p><strong>Premium:</strong> [Based on current market data]</p>
+            <p class="text-sm text-blue-600 dark:text-blue-400 mt-2">
+              💡 <em>Use real market data from your trading platform for accurate examples</em>
+            </p>
           </div>
           
-          <h3>Profit/Loss Scenarios</h3>
+          <h3>Profit/Loss Calculation Formula</h3>
           <ul>
-            <li><strong>TSLA drops to $230:</strong> Profit = ($245 - $230 - $4) × 100 = $1,100</li>
-            <li><strong>TSLA stays at $250:</strong> Loss = $400 (premium paid)</li>
-            <li><strong>Breakeven:</strong> $245 - $4 = $241</li>
+            <li><strong>If stock drops below strike:</strong> Profit = (Strike Price - Stock Price - Premium) × 100</li>
+            <li><strong>If stock stays above strike:</strong> Loss = Premium paid × 100</li>
+            <li><strong>Breakeven:</strong> Strike Price - Premium</li>
           </ul>
           
           <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg mt-4">

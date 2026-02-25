@@ -23,20 +23,60 @@ export default function MarketOverview() {
   const { data: marketData, isLoading } = useQuery({
     queryKey: ['market-overview'],
     queryFn: async () => {
-      // Mock data for now - will connect to real market data API later
+      // Fetch real market data for major indices
+      const symbols = ['SPY', 'QQQ', 'IWM', 'VIX']
+      const indices = await Promise.all(
+        symbols.map(async (symbol) => {
+          try {
+            // Try main API first
+            const response = await fetch(`/api/options/quote?symbol=${symbol}`)
+            if (response.ok) {
+              const data = await response.json()
+              if (data.success && data.data) {
+                return {
+                  symbol,
+                  price: data.data.price || data.data.regularMarketPrice,
+                  change: data.data.change || data.data.regularMarketChange,
+                  changePercent: data.data.changePercent || data.data.regularMarketChangePercent,
+                  volume: data.data.volume ? `${(data.data.volume / 1000000).toFixed(1)}M` : 'N/A'
+                }
+              }
+            }
+            
+            // Fallback to static data if main API fails
+            console.log(`Main API failed for ${symbol}, using fallback`)
+            const fallbackResponse = await fetch(`/api/market/fallback/?symbol=${symbol}`)
+            if (fallbackResponse.ok) {
+              const fallbackData = await fallbackResponse.json()
+              if (fallbackData.success && fallbackData.data) {
+                return {
+                  symbol,
+                  price: fallbackData.data.price,
+                  change: fallbackData.data.change,
+                  changePercent: fallbackData.data.changePercent,
+                  volume: fallbackData.data.volume ? `${(fallbackData.data.volume / 1000000).toFixed(1)}M` : 'N/A'
+                }
+              }
+            }
+            
+            throw new Error(`No data available for ${symbol}`)
+          } catch (error) {
+            console.error(`Failed to fetch ${symbol}:`, error)
+            return null
+          }
+        })
+      )
+      
+      // Filter out failed fetches
+      const validIndices = indices.filter(index => index !== null)
+      
+      if (validIndices.length === 0) {
+        throw new Error('No real market data available')
+      }
+      
       return {
-        indices: [
-          { symbol: 'SPY', price: 478.32, change: 2.45, changePercent: 0.51, volume: '45.2M' },
-          { symbol: 'QQQ', price: 412.67, change: -1.23, changePercent: -0.30, volume: '32.1M' },
-          { symbol: 'IWM', price: 201.45, change: 0.78, changePercent: 0.39, volume: '18.7M' },
-          { symbol: 'VIX', price: 13.42, change: -0.67, changePercent: -4.76, volume: 'N/A' }
-        ],
-        indicators: [
-          { name: 'Fear & Greed', value: 72, change: 3, changePercent: 4.35 },
-          { name: 'Put/Call Ratio', value: 0.84, change: -0.02, changePercent: -2.33 },
-          { name: 'Options Volume', value: 42.5, change: 5.2, changePercent: 13.93 },
-          { name: 'IV Rank', value: 28, change: -2, changePercent: -6.67 }
-        ]
+        indices: validIndices,
+        indicators: [] // Real indicators would come from specialized APIs
       }
     }
   })

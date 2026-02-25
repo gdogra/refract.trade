@@ -403,15 +403,7 @@ export default function Analytics() {
             </TabsContent>
 
             <TabsContent value="market-intel">
-              <PremiumGate
-                feature="advancedAnalytics"
-                requiredTier="premium"
-                currentTier={currentUserTier}
-                title="Market Intelligence Dashboard"
-                description="Access real-time sentiment analysis, institutional insights, and AI-powered market intelligence to make informed trading decisions."
-              >
-                <MarketIntelligence />
-              </PremiumGate>
+              <MarketIntelligence />
             </TabsContent>
 
             <TabsContent value="performance">
@@ -419,27 +411,11 @@ export default function Analytics() {
             </TabsContent>
 
             <TabsContent value="monitoring">
-              <PremiumGate
-                feature="realTimeData"
-                requiredTier="premium"
-                currentTier={currentUserTier}
-                title="Real-Time Portfolio Monitoring"
-                description="Monitor your portfolio with live data feeds, instant alerts, and automated risk notifications. Never miss a critical market move again."
-              >
-                <RealTimeMonitoring />
-              </PremiumGate>
+              <RealTimeMonitoring />
             </TabsContent>
 
             <TabsContent value="flow">
-              <PremiumGate
-                feature="institutionalFeatures"
-                requiredTier="premium"
-                currentTier={currentUserTier}
-                title="Institutional Options Flow"
-                description="Track smart money movements with institutional-grade options flow analysis, unusual activity alerts, and block trade monitoring."
-              >
-                <OptionsFlowAnalysis />
-              </PremiumGate>
+              <OptionsFlowAnalysis />
             </TabsContent>
 
             <TabsContent value="volatility">
@@ -562,15 +538,7 @@ export default function Analytics() {
             </TabsContent>
 
             <TabsContent value="ai-pilot">
-              <PremiumGate
-                feature="aiInsights"
-                requiredTier="premium"
-                currentTier={currentUserTier}
-                title="AI Portfolio Pilot"
-                description="Let our advanced AI manage your portfolio with machine learning insights, automated rebalancing, and predictive position adjustments."
-              >
-                <AIPortfolioPilot />
-              </PremiumGate>
+              <AIPortfolioPilot />
             </TabsContent>
 
             <TabsContent value="risk-analysis">

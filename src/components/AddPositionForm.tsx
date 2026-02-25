@@ -93,33 +93,36 @@ export default function AddPositionForm({ isOpen, onClose, onSubmit, defaultSymb
     }
   }, [formData.symbol, formData.strike, formData.expiry, formData.type, currentPrice])
   
-  // Mock function to get current price (replace with real API)
+  // Real function to get current price from market data API
   const fetchCurrentPrice = async (symbol: string) => {
     try {
-      // TODO: Replace with real market data API
-      // For now, return a mock price
-      const mockPrices: Record<string, number> = {
-        'AAPL': 190.50,
-        'TSLA': 250.00,
-        'MSFT': 380.25,
-        'GOOGL': 140.75,
-        'NVDA': 450.00,
-        'SPY': 485.00
+      const response = await fetch(`/api/options/quote?symbol=${symbol.toUpperCase()}`)
+      if (!response.ok) {
+        throw new Error(`Failed to fetch price for ${symbol}`)
       }
       
-      const price = mockPrices[symbol.toUpperCase()] || 100.00
-      setCurrentPrice(price)
-      
-      // Auto-suggest strike prices based on current price
-      if (formData.strike === 0) {
-        const suggestedStrike = formData.type === 'call' 
-          ? Math.ceil(price / 5) * 5 // Round up to nearest $5 for calls
-          : Math.floor(price / 5) * 5 // Round down to nearest $5 for puts
+      const data = await response.json()
+      if (data.success && data.data?.price) {
+        const price = data.data.price
+        setCurrentPrice(price)
         
-        setFormData(prev => ({ ...prev, strike: suggestedStrike }))
+        // Auto-suggest strike prices based on real current price
+        if (formData.strike === 0) {
+          const suggestedStrike = formData.type === 'call' 
+            ? Math.ceil(price / 5) * 5 // Round up to nearest $5 for calls
+            : Math.floor(price / 5) * 5 // Round down to nearest $5 for puts
+          
+          setFormData(prev => ({ ...prev, strike: suggestedStrike }))
+        }
+      } else {
+        console.error('No price data available for symbol:', symbol)
+        setCurrentPrice(null)
       }
     } catch (error) {
-      console.error('Failed to fetch price:', error)
+      console.error('Failed to fetch real market price for', symbol, ':', error)
+      setCurrentPrice(null)
+      // Show user-friendly error but don't fall back to fake data
+      toast.error(`Unable to fetch real price for ${symbol}. Please check the symbol.`)
     }
   }
   

@@ -307,7 +307,7 @@ export default function PriceAlertsPanel({
           </div>
 
           {/* Notification Permission */}
-          {'Notification' in window && Notification.permission === 'default' && (
+          {typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default' && (
             <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">

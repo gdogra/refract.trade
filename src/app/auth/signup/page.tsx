@@ -52,6 +52,7 @@ export default function SignUp() {
           name: formData.name,
           email: formData.email,
           password: formData.password,
+          referralCode: referralCode,
         }),
       })
 
@@ -232,10 +233,11 @@ export default function SignUp() {
             <Button
               type="button"
               onClick={() => {
-                const callbackUrl = referralCode 
-                  ? `/dashboard?ref=${referralCode}` 
-                  : '/dashboard'
-                signIn('google', { callbackUrl })
+                if (referralCode) {
+                  window.location.href = `/api/auth/google-signup?ref=${referralCode}`
+                } else {
+                  signIn('google', { callbackUrl: '/dashboard' })
+                }
               }}
               disabled={isLoading}
               className="w-full mt-4 bg-white hover:bg-gray-50 text-gray-900 font-semibold py-3 px-4 border border-gray-300 rounded-lg shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center space-x-2"

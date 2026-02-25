@@ -67,36 +67,61 @@ export default function RealTimeMonitoring({
     }
   }
 
-  const updateMarketData = () => {
+  const updateMarketData = async () => {
     const newData: any = {}
     
-    watchlist.forEach(symbol => {
-      const basePrice = symbol === 'SPY' ? 525.40 : 
-                      symbol === 'QQQ' ? 435.20 :
-                      symbol === 'AAPL' ? 185.50 :
-                      symbol === 'NVDA' ? 875.30 : 150.00
+    try {
+      // Fetch real market data for all watchlist symbols
+      const promises = watchlist.map(async symbol => {
+        try {
+          const response = await fetch(`/api/options/quote?symbol=${symbol}`)
+          if (!response.ok) {
+            throw new Error(`Failed to fetch data for ${symbol}`)
+          }
+          const data = await response.json()
+          
+          if (data.success && data.data) {
+            return {
+              symbol,
+              price: data.data.price || data.data.regularMarketPrice,
+              change: data.data.change || data.data.regularMarketChange,
+              changePercent: data.data.changePercent || data.data.regularMarketChangePercent,
+              volume: data.data.volume || data.data.regularMarketVolume,
+              impliedVolatility: data.data.impliedVolatility || 0.25, // Default if not available
+              delta: 0.5, // Would need options data for real delta
+              theta: -0.05, // Would need options data for real theta
+              vega: 0.15, // Would need options data for real vega
+              bidAskSpread: 0.02, // Would need level 2 data for real spread
+              openInterest: 0, // Would need options data for real OI
+              lastUpdate: new Date()
+            }
+          }
+          return null
+        } catch (error) {
+          console.error(`Failed to fetch real data for ${symbol}:`, error)
+          return null
+        }
+      })
       
-      const change = (Math.random() - 0.5) * 2
-      const volume = Math.floor(Math.random() * 1000000) + 500000
-      const iv = 0.15 + Math.random() * 0.25
+      const results = await Promise.all(promises)
       
-      newData[symbol] = {
-        symbol,
-        price: basePrice + change,
-        change,
-        changePercent: (change / basePrice) * 100,
-        volume,
-        impliedVolatility: iv,
-        delta: Math.random() * 0.5 + 0.25,
-        theta: -(Math.random() * 0.2),
-        vega: Math.random() * 0.3,
-        bidAskSpread: 0.01 + Math.random() * 0.05,
-        openInterest: Math.floor(Math.random() * 50000) + 10000,
-        lastUpdate: new Date()
+      results.forEach(result => {
+        if (result) {
+          newData[result.symbol] = result
+        }
+      })
+      
+      // Only update if we have real data
+      if (Object.keys(newData).length > 0) {
+        setLiveData(newData)
+      } else {
+        console.error('No real market data available')
+        setIsConnected(false)
       }
-    })
-    
-    setLiveData(newData)
+    } catch (error) {
+      console.error('Failed to update market data:', error)
+      setIsConnected(false)
+    }
     
     // Update monitoring stats
     setMonitoringStats({

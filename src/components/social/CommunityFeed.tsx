@@ -14,8 +14,9 @@ interface CommunityPost {
     name: string
     avatar: string
     verified: boolean
-    tier: 'free' | 'pro' | 'elite'
+    tier: 'trial'
     followers: number
+    trialDaysLeft?: number
   }
   timestamp: Date
   content: string
@@ -31,6 +32,8 @@ interface CommunityPost {
     comments: number
     shares: number
     liked: boolean
+    commented: boolean
+    shared: boolean
   }
   performance?: {
     returns: number
@@ -39,192 +42,48 @@ interface CommunityPost {
   tags: string[]
 }
 
-// Generate more realistic and current posts
-const generateMockPosts = (): CommunityPost[] => [
-  {
-    id: '1',
-    user: {
-      name: 'OptionsWizard',
-      avatar: 'OW',
-      verified: true,
-      tier: 'elite',
-      followers: 1247
-    },
-    timestamp: new Date(Date.now() - 1800000), // 30 min ago
-    content: "🚀 NVDA breaking out above $145 resistance with massive volume. Added 0DTE calls at $147 strike. Risk management set at 50% loss. This is not financial advice - sharing my play.",
-    position: {
-      symbol: 'NVDA',
-      type: 'call',
-      action: 'bought',
-      price: 147.00,
-      quantity: 5
-    },
-    engagement: {
-      likes: 87,
-      comments: 23,
-      shares: 12,
-      liked: false
-    },
-    performance: {
-      returns: 28.5,
-      timeframe: '2h'
-    },
-    tags: ['0DTE', 'momentum', 'tech', 'breakout']
-  },
-  {
-    id: '2',
-    user: {
-      name: 'VegaHunter',
-      avatar: 'VH',
-      verified: true,
-      tier: 'pro',
-      followers: 2156
-    },
-    timestamp: new Date(Date.now() - 3600000), // 1hr ago
-    content: "VIX term structure showing backwardation - classic setup for vol crush plays. Selling TSLA iron condors 30 DTE, collecting $3.20 premium with $12 wide strikes. IV rank 85th percentile.",
-    position: {
-      symbol: 'TSLA',
-      type: 'call',
-      action: 'sold',
-      price: 3.20,
-      quantity: 10
-    },
-    engagement: {
-      likes: 156,
-      comments: 34,
-      shares: 28,
-      liked: true
-    },
-    performance: {
-      returns: 15.7,
-      timeframe: '5d'
-    },
-    tags: ['vix', 'volatility', 'iron-condor', 'tesla']
-  },
-  {
-    id: '3',
-    user: {
-      name: 'ThetaGang',
-      avatar: 'TG',
-      verified: false,
-      tier: 'pro',
-      followers: 934
-    },
-    timestamp: new Date(Date.now() - 7200000), // 2hr ago
-    content: "SPY put credit spreads printing money this week 💰 Sold the 480/475 spread for $1.85, now worth $0.40. Taking profits at 75% max gain as planned. Discipline pays!",
-    position: {
-      symbol: 'SPY',
-      type: 'put',
-      action: 'sold',
-      price: 1.85,
-      quantity: 25
-    },
-    engagement: {
-      likes: 203,
-      comments: 45,
-      shares: 31,
-      liked: false
-    },
-    performance: {
-      returns: 78.4,
-      timeframe: '3d'
-    },
-    tags: ['spy', 'credit-spread', 'theta', 'profit-taking']
-  },
-  {
-    id: '4',
-    user: {
-      name: 'MarketSurfer',
-      avatar: 'MS',
-      verified: false,
-      tier: 'free',
-      followers: 287
-    },
-    timestamp: new Date(Date.now() - 10800000), // 3hr ago
-    content: "Learning options the hard way... My AAPL calls expired worthless today 😅 $500 lesson on why I need to understand time decay better. Back to paper trading for a while!",
-    position: {
-      symbol: 'AAPL',
-      type: 'call',
-      action: 'bought',
-      price: 2.45,
-      quantity: 2
-    },
-    engagement: {
-      likes: 67,
-      comments: 28,
-      shares: 5,
-      liked: false
-    },
-    performance: {
-      returns: -100,
-      timeframe: '7d'
-    },
-    tags: ['aapl', 'learning', 'theta-decay', 'paper-trading']
-  },
-  {
-    id: '5',
-    user: {
-      name: 'QuantTrader',
-      avatar: 'QT',
-      verified: true,
-      tier: 'elite',
-      followers: 3421
-    },
-    timestamp: new Date(Date.now() - 14400000), // 4hr ago
-    content: "🔥 High conviction play: QQQ strangle before Fed announcement. Selling puts and calls around current price, expecting big move either direction. Vol is underpriced at 22 IV.",
-    position: {
-      symbol: 'QQQ',
-      type: 'call',
-      action: 'sold',
-      price: 4.80,
-      quantity: 20
-    },
-    engagement: {
-      likes: 312,
-      comments: 89,
-      shares: 67,
-      liked: true
-    },
-    performance: {
-      returns: 45.2,
-      timeframe: '1d'
-    },
-    tags: ['qqq', 'strangle', 'fed', 'volatility', 'high-conviction']
-  },
-  {
-    id: '6',
-    user: {
-      name: 'RetailWarrior',
-      avatar: 'RW',
-      verified: false,
-      tier: 'free',
-      followers: 145
-    },
-    timestamp: new Date(Date.now() - 18000000), // 5hr ago
-    content: "First successful wheel trade! AMD assignment at $135, been selling covered calls for 3 weeks. Just got called away at $140 for nice profit. Time to find the next wheel candidate.",
-    position: {
-      symbol: 'AMD',
-      type: 'call',
-      action: 'sold',
-      price: 140.00,
-      quantity: 1
-    },
-    engagement: {
-      likes: 89,
-      comments: 19,
-      shares: 8,
-      liked: false
-    },
-    performance: {
-      returns: 12.8,
-      timeframe: '21d'
-    },
-    tags: ['amd', 'wheel', 'assignment', 'covered-calls']
+// Real community posts will be fetched from authenticated users only
+// No fake posts or mock trading data allowed
+
+// Fetch real community posts from authenticated users
+const fetchRealCommunityPosts = async (): Promise<CommunityPost[]> => {
+  try {
+    // This would connect to your real user database
+    const response = await fetch('/api/community/posts')
+    if (!response.ok) {
+      throw new Error('Failed to fetch community posts')
+    }
+    const data = await response.json()
+    return data.posts || []
+  } catch (error) {
+    console.error('Failed to fetch real community posts:', error)
+    return []
   }
-]
+}
+
+// No mock posts - return empty array until real implementation
+const generateMockPosts = (): CommunityPost[] => []
 
 export default function CommunityFeed() {
-  const [allPosts] = useState<CommunityPost[]>(generateMockPosts())
+  const [allPosts, setAllPosts] = useState<CommunityPost[]>([])
+  const [loading, setLoading] = useState(true)
+  
+  // Load real posts on component mount
+  useEffect(() => {
+    const loadRealPosts = async () => {
+      try {
+        const realPosts = await fetchRealCommunityPosts()
+        setAllPosts(realPosts)
+      } catch (error) {
+        console.error('Failed to load community posts:', error)
+        setAllPosts([])
+      } finally {
+        setLoading(false)
+      }
+    }
+    
+    loadRealPosts()
+  }, [])
   const [filter, setFilter] = useState<'all' | 'following' | 'trending'>('all')
   const [followedUsers] = useState<Set<string>>(new Set(['OptionsWizard', 'VegaHunter', 'QuantTrader']))
   
@@ -246,6 +105,9 @@ export default function CommunityFeed() {
   }, [filter, allPosts, followedUsers])
 
   const [posts, setPosts] = useState<CommunityPost[]>(filteredPosts)
+  const [showComments, setShowComments] = useState<string | null>(null)
+  const [showShareModal, setShowShareModal] = useState<string | null>(null)
+  const [usedAdditionalPosts, setUsedAdditionalPosts] = useState<number>(0)
   
   // Update posts when filter changes
   React.useEffect(() => {
@@ -267,12 +129,52 @@ export default function CommunityFeed() {
     ))
   }
 
+  const handleComment = (postId: string) => {
+    setPosts(prev => prev.map(post => 
+      post.id === postId 
+        ? {
+            ...post,
+            engagement: {
+              ...post.engagement,
+              commented: true,
+              comments: post.engagement.comments + 1
+            }
+          }
+        : post
+    ))
+    setShowComments(postId === showComments ? null : postId)
+  }
+
+  const handleShare = (postId: string) => {
+    setPosts(prev => prev.map(post => 
+      post.id === postId 
+        ? {
+            ...post,
+            engagement: {
+              ...post.engagement,
+              shared: true,
+              shares: post.engagement.shares + 1
+            }
+          }
+        : post
+    ))
+    setShowShareModal(postId)
+    // Auto-close share modal after animation
+    setTimeout(() => setShowShareModal(null), 2000)
+  }
+
   const getTierColor = (tier: string) => {
     switch (tier) {
-      case 'elite': return 'text-purple-500 border-purple-500'
-      case 'pro': return 'text-blue-500 border-blue-500'
+      case 'trial': return 'text-blue-500 border-blue-500'
       default: return 'text-gray-500 border-gray-500'
     }
+  }
+
+  const getTierLabel = (user: any) => {
+    if (user.tier === 'trial' && user.trialDaysLeft) {
+      return `Trial (${user.trialDaysLeft}d)`
+    }
+    return user.tier
   }
 
   const formatTimeAgo = (date: Date) => {
@@ -359,7 +261,7 @@ export default function CommunityFeed() {
                         </div>
                       )}
                       <Badge variant="outline" className={`text-xs ${getTierColor(post.user.tier)}`}>
-                        {post.user.tier}
+                        {getTierLabel(post.user)}
                       </Badge>
                     </div>
                     <div className="flex items-center space-x-2 text-xs text-gray-500 dark:text-gray-400">
@@ -450,14 +352,36 @@ export default function CommunityFeed() {
                       <span>{post.engagement.likes}</span>
                     </button>
                     
-                    <button className="flex items-center space-x-1 text-sm text-gray-500 hover:text-blue-500 transition-colors">
-                      <MessageCircle className="h-4 w-4" />
+                    <button 
+                      onClick={() => handleComment(post.id)}
+                      className={`flex items-center space-x-1 text-sm transition-colors ${
+                        post.engagement.commented ? 'text-blue-500' : 'text-gray-500 hover:text-blue-500'
+                      }`}
+                      title="Comment on this post"
+                    >
+                      <MessageCircle className={`h-4 w-4 ${post.engagement.commented ? 'fill-current' : ''}`} />
                       <span>{post.engagement.comments}</span>
                     </button>
                     
-                    <button className="flex items-center space-x-1 text-sm text-gray-500 hover:text-green-500 transition-colors">
-                      <Share2 className="h-4 w-4" />
+                    <button 
+                      onClick={() => handleShare(post.id)}
+                      className={`flex items-center space-x-1 text-sm transition-colors relative ${
+                        post.engagement.shared ? 'text-green-500' : 'text-gray-500 hover:text-green-500'
+                      }`}
+                      title="Share this post"
+                    >
+                      <Share2 className={`h-4 w-4 ${post.engagement.shared ? 'fill-current' : ''}`} />
                       <span>{post.engagement.shares}</span>
+                      {showShareModal === post.id && (
+                        <motion.div
+                          initial={{ scale: 0.5, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          exit={{ scale: 0.5, opacity: 0 }}
+                          className="absolute -top-8 left-0 bg-green-500 text-white text-xs px-2 py-1 rounded whitespace-nowrap"
+                        >
+                          Shared! 🚀
+                        </motion.div>
+                      )}
                     </button>
                   </div>
 
@@ -466,6 +390,44 @@ export default function CommunityFeed() {
                     <span>View Details</span>
                   </button>
                 </div>
+
+                {/* Comments Section */}
+                {showComments === post.id && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="border-t border-gray-100 dark:border-gray-800 pt-3 mt-3"
+                  >
+                    <div className="space-y-3">
+                      <div className="flex space-x-2">
+                        <div className="w-6 h-6 bg-gradient-to-br from-green-500 to-blue-600 rounded-full flex items-center justify-center text-white text-xs">
+                          YU
+                        </div>
+                        <div className="flex-1">
+                          <div className="text-sm text-gray-900 dark:text-white">
+                            <span className="font-medium">You:</span> Great analysis! What's your exit strategy if IV drops?
+                          </div>
+                          <div className="text-xs text-gray-500">Just now</div>
+                        </div>
+                      </div>
+                      <div className="flex space-x-2">
+                        <input
+                          type="text"
+                          placeholder="Write a comment..."
+                          className="flex-1 text-sm border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 bg-white dark:bg-gray-800"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                              e.currentTarget.value = ''
+                              // Comment added via handleComment already
+                            }
+                          }}
+                        />
+                        <Button size="sm" variant="outline">Post</Button>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
               </CardContent>
             </Card>
           </motion.div>
@@ -504,31 +466,21 @@ export default function CommunityFeed() {
           <Button 
             variant="outline" 
             className="w-full"
-            onClick={() => {
-              // Simulate loading more posts
-              const morePost = {
-                id: `${Date.now()}`,
-                user: {
-                  name: 'TradeNewbie',
-                  avatar: 'TN',
-                  verified: false,
-                  tier: 'free' as const,
-                  followers: 42
-                },
-                timestamp: new Date(Date.now() - 21600000),
-                content: "Just started learning options trading! Any advice for a beginner? Looking at covered calls on my MSFT shares.",
-                engagement: {
-                  likes: 12,
-                  comments: 8,
-                  shares: 1,
-                  liked: false
-                },
-                tags: ['beginner', 'covered-calls', 'msft']
+            onClick={async () => {
+              // Load more real posts from API
+              try {
+                const morePosts = await fetchRealCommunityPosts()
+                if (morePosts.length > allPosts.length) {
+                  setAllPosts(morePosts)
+                }
+              } catch (error) {
+                console.error('Failed to load more posts:', error)
               }
-              setPosts(prev => [...prev, morePost])
             }}
+            disabled={loading}
+            title="Load more community posts from real users"
           >
-            Load More Posts
+            {loading ? 'Loading...' : 'Load More Posts'}
           </Button>
         </div>
       )}

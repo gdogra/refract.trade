@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import OptionsChain from '@/components/OptionsChain'
 
 interface OptionsChainTableProps {
@@ -17,8 +18,17 @@ export default function OptionsChainTable({
   selectedStrike, 
   onStrikeSelect 
 }: OptionsChainTableProps) {
+  // Use a key to force re-render when symbol changes
+  // This ensures the OptionsChain component completely resets when switching symbols
+  const [key, setKey] = useState(0)
+  
+  useEffect(() => {
+    setKey(prev => prev + 1)
+  }, [symbol])
+  
   return (
     <OptionsChain 
+      key={key}
       initialSymbol={symbol}
       initialExpiration={selectedExpiry}
       className="w-full"
