@@ -6,6 +6,14 @@ const prisma = new PrismaClient()
 
 export async function POST(request: NextRequest) {
   try {
+    // Check database connection
+    if (!process.env.DATABASE_URL) {
+      return NextResponse.json({
+        success: false,
+        error: 'Database configuration required. Please contact support.'
+      }, { status: 503 })
+    }
+
     const session = await getServerSession()
     
     // Parse FormData
@@ -106,6 +114,14 @@ export async function POST(request: NextRequest) {
     
   } catch (error) {
     console.error('Feedback submission error:', error)
+    
+    // Check if it's a database connection error
+    if (error instanceof Error && error.message.includes('database') || error instanceof Error && error.message.includes('connection')) {
+      return NextResponse.json({
+        success: false,
+        error: 'Database temporarily unavailable. Please try again later.'
+      }, { status: 503 })
+    }
     
     return NextResponse.json({
       success: false,

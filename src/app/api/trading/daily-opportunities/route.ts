@@ -99,6 +99,18 @@ function getFallbackPrice(symbol: string): number {
 
 export async function GET(request: NextRequest) {
   try {
+    // Check for required environment variables
+    const alphaVantageKey = process.env.ALPHA_VANTAGE_API_KEY || process.env.NEXT_PUBLIC_ALPHA_VANTAGE_API_KEY
+    if (!alphaVantageKey || alphaVantageKey === 'demo') {
+      return NextResponse.json({
+        success: false,
+        error: 'Market data API configuration required. Please contact support.',
+        data: [],
+        portfolioCount: 0,
+        marketCount: 0
+      }, { status: 503 })
+    }
+
     const session = await getServerSession(authOptions)
     
     if (!session?.user?.id) {
