@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useSearchParams } from 'next/navigation'
+import { useQuery } from '@tanstack/react-query'
 import SymbolSearch from './SymbolSearch'
 import OptionsChainTable from './OptionsChainTable'
 import StrategyBuilder from './StrategyBuilder'
@@ -23,6 +24,23 @@ export default function OptionsChainClient() {
   
   // Get options data for strategy recommendations
   const { data: optionsData } = useOptionsChain(selectedSymbol, selectedExpiry)
+  
+  // Get real-time current price from the same API the MarketDataPanel uses
+  const { data: realTimePrice } = useQuery({
+    queryKey: ['real-time-price', selectedSymbol],
+    queryFn: async () => {
+      const response = await fetch(`/api/options/quote?symbol=${selectedSymbol}`)
+      if (!response.ok) throw new Error('Failed to fetch price')
+      const result = await response.json()
+      return result.success ? result.data.regularMarketPrice : 0
+    },
+    enabled: !!selectedSymbol,
+    refetchInterval: 30000, // Update every 30 seconds
+    staleTime: 15000
+  })
+  
+  // Use real-time price consistently across all components
+  const currentPrice = realTimePrice || optionsData?.underlyingPrice || 0
 
   // Set symbol from URL parameter
   useEffect(() => {
@@ -113,7 +131,7 @@ export default function OptionsChainClient() {
                 <StrategyRecommendations 
                   symbol={selectedSymbol}
                   optionsData={optionsData}
-                  underlyingPrice={optionsData?.underlyingPrice || 0}
+                  underlyingPrice={currentPrice}
                 />
                 <StrategyBuilder 
                   symbol={selectedSymbol}
@@ -154,7 +172,7 @@ export default function OptionsChainClient() {
               <QuickStrategyPanel 
                 symbol={selectedSymbol}
                 optionsData={optionsData}
-                underlyingPrice={optionsData?.underlyingPrice || 0}
+                underlyingPrice={currentPrice}
                 onViewDetailedAnalysis={() => setViewMode('strategy')}
               />
             </motion.div>
@@ -167,7 +185,7 @@ export default function OptionsChainClient() {
             >
               <PriceAlertsPanel 
                 symbol={selectedSymbol}
-                currentPrice={optionsData?.underlyingPrice || 0}
+                currentPrice={currentPrice}
               />
             </motion.div>
           </div>
