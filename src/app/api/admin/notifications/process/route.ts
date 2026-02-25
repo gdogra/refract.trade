@@ -104,7 +104,7 @@ export async function GET(request: NextRequest) {
     }
     
     // Get recent notifications with fallback
-    let recentNotifications = []
+    let recentNotifications: any[] = []
     
     try {
       recentNotifications = await prisma.smartNotification.findMany({
