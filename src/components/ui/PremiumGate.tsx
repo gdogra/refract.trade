@@ -1,119 +1,150 @@
 'use client'
 
 import { ReactNode } from 'react'
-import { motion } from 'framer-motion'
-import { useRouter } from 'next/navigation'
-import { Lock, Crown, Zap, Star, ArrowRight } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
-import { Card, CardContent } from '@/components/ui/Card'
+import { useSession } from 'next-auth/react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { UserTier, canAccessFeature } from '@/lib/tierManager'
+import { Lock, Crown, Star, Zap, TrendingUp } from 'lucide-react'
 
 interface PremiumGateProps {
   children: ReactNode
-  feature: string
-  requiredTier: UserTier
-  currentTier: UserTier
-  title?: string
+  requiredTier?: 'trial' | 'basic' | 'pro' | 'elite'
+  feature?: string
   description?: string
-  className?: string
+  showUpgrade?: boolean
+  fallback?: ReactNode
+  currentTier?: string
+  title?: string
 }
 
-export default function PremiumGate({
-  children,
-  feature,
-  requiredTier,
-  currentTier = 'trial',
-  title,
-  description,
-  className = ''
+export default function PremiumGate({ 
+  children, 
+  requiredTier = 'basic',
+  feature = 'Premium Feature',
+  description = 'Upgrade to access this premium feature',
+  showUpgrade = true,
+  fallback,
+  currentTier,
+  title
 }: PremiumGateProps) {
-  const router = useRouter()
-  const hasAccess = canAccessFeature(currentTier, feature as any)
-
+  const { data: session } = useSession()
+  const userTier = currentTier || (session?.user as any)?.subscriptionTier || 'free'
+  
+  const tierLevels = {
+    free: 0,
+    trial: 1,
+    basic: 2,
+    pro: 3,
+    elite: 4
+  }
+  
+  const userLevel = tierLevels[userTier as keyof typeof tierLevels] || 0
+  const requiredLevel = tierLevels[requiredTier]
+  
+  const hasAccess = userLevel >= requiredLevel
+  
   if (hasAccess) {
     return <>{children}</>
   }
-
-  const getTierIcon = (tier: UserTier) => {
+  
+  if (fallback) {
+    return <>{fallback}</>
+  }
+  
+  const getTierInfo = (tier: string) => {
     switch (tier) {
-      case 'premium': return <Crown className="h-5 w-5 text-purple-500" />
-      default: return <Zap className="h-5 w-5 text-green-500" />
+      case 'trial':
+        return {
+          name: 'Trial',
+          icon: <Star className="h-4 w-4" />,
+          color: 'text-blue-600',
+          bgColor: 'bg-blue-50 border-blue-200',
+          price: 'Free Trial'
+        }
+      case 'basic':
+        return {
+          name: 'Basic',
+          icon: <Zap className="h-4 w-4" />,
+          color: 'text-green-600',
+          bgColor: 'bg-green-50 border-green-200',
+          price: '$29/month'
+        }
+      case 'pro':
+        return {
+          name: 'Pro',
+          icon: <TrendingUp className="h-4 w-4" />,
+          color: 'text-purple-600',
+          bgColor: 'bg-purple-50 border-purple-200',
+          price: '$79/month'
+        }
+      case 'elite':
+        return {
+          name: 'Elite',
+          icon: <Crown className="h-4 w-4" />,
+          color: 'text-yellow-600',
+          bgColor: 'bg-yellow-50 border-yellow-200',
+          price: '$199/month'
+        }
+      default:
+        return {
+          name: 'Premium',
+          icon: <Lock className="h-4 w-4" />,
+          color: 'text-gray-600',
+          bgColor: 'bg-gray-50 border-gray-200',
+          price: 'Upgrade required'
+        }
     }
   }
-
-  const getTierColor = (tier: UserTier) => {
-    switch (tier) {
-      case 'premium': return 'from-purple-500/20 to-purple-600/20 border-purple-200 dark:border-purple-800'
-      default: return 'from-green-500/20 to-green-600/20 border-green-200 dark:border-green-800'
-    }
-  }
-
+  
+  const tierInfo = getTierInfo(requiredTier)
+  
   return (
-    <div className={`relative ${className}`}>
-      {/* Blurred Preview */}
-      <div className="relative">
-        <div className="blur-sm pointer-events-none opacity-30">
-          {children}
+    <Card className={`${tierInfo.bgColor} border-2`}>
+      <CardHeader className="text-center pb-3">
+        <div className="flex justify-center items-center gap-2 mb-2">
+          <Lock className="h-6 w-6 text-gray-400" />
+          {tierInfo.icon}
+        </div>
+        <CardTitle className={`text-lg ${tierInfo.color}`}>
+          {title || feature}
+        </CardTitle>
+        <CardDescription className="text-center">
+          {description}
+        </CardDescription>
+      </CardHeader>
+      
+      <CardContent className="text-center space-y-4">
+        <div className="flex justify-center">
+          <Badge variant="outline" className={`${tierInfo.color} border-current`}>
+            {tierInfo.name} Required
+          </Badge>
         </div>
         
-        {/* Premium Overlay */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="absolute inset-0 flex items-center justify-center"
-        >
-          <Card className={`bg-gradient-to-br ${getTierColor(requiredTier)} border-2 shadow-xl max-w-md mx-4`}>
-            <CardContent className="p-6 text-center">
-              <div className="flex justify-center mb-4">
-                <div className="relative">
-                  <Lock className="h-8 w-8 text-gray-600 dark:text-gray-400" />
-                  <div className="absolute -top-1 -right-1">
-                    {getTierIcon(requiredTier)}
-                  </div>
-                </div>
-              </div>
-
-              <Badge 
-                variant="outline" 
-                className={`mb-3 ${
-                  requiredTier === 'premium' ? 'text-purple-600 border-purple-600' :
-                  'text-green-600 border-green-600'
-                }`}
-              >
-                {requiredTier.toUpperCase()} FEATURE
-              </Badge>
-
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                {title || `Unlock ${feature}`}
-              </h3>
-              
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                {description || `This ${feature} feature is available with ${requiredTier.charAt(0).toUpperCase() + requiredTier.slice(1)} plan and above.`}
-              </p>
-
-              <div className="space-y-3">
-                <Button
-                  onClick={() => router.push('/upgrade')}
-                  className="w-full bg-purple-600 hover:bg-purple-700"
-                >
-                  <ArrowRight className="h-4 w-4 mr-2" />
-                  Upgrade to {requiredTier.charAt(0).toUpperCase() + requiredTier.slice(1)}
-                </Button>
-                
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => router.push('/upgrade')}
-                  className="w-full text-xs"
-                >
-                  View All Plans
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
-    </div>
+        <div className="text-sm text-gray-600">
+          Unlock this feature and many more with {tierInfo.name}
+        </div>
+        
+        {showUpgrade && (
+          <div className="space-y-3">
+            <div className="text-sm text-gray-600">
+              This feature is available to all users.
+            </div>
+            
+            <Button 
+              variant="outline"
+              className="w-full"
+              onClick={() => alert('Feature access is being updated. All features will be available to all users soon!')}
+            >
+              Learn More
+            </Button>
+          </div>
+        )}
+        
+        <div className="text-xs text-gray-500 mt-4">
+          Current plan: <span className="capitalize font-medium">{userTier}</span>
+        </div>
+      </CardContent>
+    </Card>
   )
 }

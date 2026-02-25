@@ -124,33 +124,6 @@ export default function QuickActions() {
         })}
       </div>
 
-      {/* Pro Features Banner */}
-      <motion.div 
-        className="mt-6 p-4 bg-gradient-to-r from-brand-500/10 to-purple-500/10 rounded-lg border border-brand-200 dark:border-brand-800"
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5, delay: 0.8 }}
-      >
-        <div className="flex items-center space-x-2 mb-2">
-          <Zap className="h-4 w-4 text-brand-500" />
-          <span className="text-sm font-medium text-brand-700 dark:text-brand-300">
-            Upgrade to Pro
-          </span>
-        </div>
-        <p className="text-xs text-brand-600 dark:text-brand-400 mb-3">
-          Get advanced AI insights, real-time alerts, and unlimited strategies
-        </p>
-        <motion.button 
-          className="w-full bg-brand-500 hover:bg-brand-600 text-white text-xs font-medium py-2 px-3 rounded-lg transition-colors"
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => {
-            router.push('/upgrade')
-          }}
-        >
-          Upgrade Now
-        </motion.button>
-      </motion.div>
     </motion.div>
 
       {/* Add Position Modal */}

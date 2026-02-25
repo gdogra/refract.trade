@@ -13,6 +13,7 @@ import AIInsights from './AIInsights'
 import AlertsPanel from './AlertsPanel'
 import CommunityFeed from '@/components/social/CommunityFeed'
 import AlphaAssistant from '@/components/ai/AlphaAssistant'
+import DailyTradeOpportunities from '@/components/dashboard/DailyTradeOpportunities'
 import { Tooltip } from '@/components/ui/tooltip'
 import { Crown, Star } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/Card'
@@ -66,42 +67,6 @@ export default function DashboardClient() {
           </div>
         </motion.div>
 
-        {/* Premium Features Banner for Free Users */}
-        {userTier === 'free' && (
-          <motion.div variants={itemVariants}>
-            <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/10 dark:to-purple-900/10 border-blue-200 dark:border-blue-700">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="flex items-center space-x-1">
-                      <Star className="h-5 w-5 text-blue-500" />
-                      <Crown className="h-5 w-5 text-purple-500" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white">
-                        Unlock Premium Analytics
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Get real-time data, AI insights, unlimited positions, and advanced risk tools
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm text-blue-600 dark:text-blue-400 font-medium">
-                      Starting at $29/month
-                    </span>
-                    <Button
-                      onClick={() => window.open('/upgrade', '_blank')}
-                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-2"
-                    >
-                      Upgrade Now
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
 
         {/* Main Dashboard - Public.com style single column mobile-first */}
         <div className="space-y-4">
@@ -118,6 +83,11 @@ export default function DashboardClient() {
           {/* Positions List - Main focus like Public.com */}
           <motion.div variants={itemVariants}>
             <PositionsList />
+          </motion.div>
+
+          {/* Daily Trade Opportunities - Premium feature */}
+          <motion.div variants={itemVariants}>
+            <DailyTradeOpportunities />
           </motion.div>
 
           {/* AI Research Assistant - Public.com Alpha style */}
