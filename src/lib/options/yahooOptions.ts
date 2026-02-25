@@ -251,7 +251,6 @@ export async function getFullQuoteData(symbol: string): Promise<any> {
   const result = await throttleRequest(() => fetchYahooOptions(symbol))
   
   const quote = result.quote
-  console.log(`Yahoo Finance quote for ${symbol}:`, quote) // Debug log
   
   if (!quote || typeof quote.regularMarketPrice !== 'number') {
     throw new Error(`Unable to get quote data for ${symbol}`)

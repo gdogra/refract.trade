@@ -19,8 +19,14 @@ export default async function DashboardPage() {
       redirect('/auth/signin')
     }
 
+    console.log('Dashboard: User session:', { 
+      email: session.user.email, 
+      isAdmin: session.user.isAdmin 
+    })
+
     // Redirect admin users to admin console
     if (session.user.isAdmin) {
+      console.log('Redirecting admin user to /admin')
       redirect('/admin')
     }
 
@@ -28,23 +34,31 @@ export default async function DashboardPage() {
   } catch (error) {
     console.error('Dashboard page error:', error)
     
-    // If there's a configuration error, show a fallback
+    // Show error details for debugging
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="max-w-md w-full mx-auto p-6">
           <div className="bg-white rounded-lg shadow p-8 text-center">
             <h1 className="text-xl font-semibold text-gray-900 mb-4">
-              Configuration Required
+              Dashboard Error
             </h1>
             <p className="text-gray-600 mb-4">
-              The application needs to be configured with environment variables.
+              Error loading dashboard: {error instanceof Error ? error.message : 'Unknown error'}
             </p>
-            <a 
-              href="/auth/signin" 
-              className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
-            >
-              Try Again
-            </a>
+            <div className="space-y-2">
+              <a 
+                href="/auth/signin" 
+                className="block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+              >
+                Sign In Again
+              </a>
+              <a 
+                href="/admin" 
+                className="block bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition-colors"
+              >
+                Try Admin Portal
+              </a>
+            </div>
           </div>
         </div>
       </div>

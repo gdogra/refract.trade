@@ -5,6 +5,7 @@ import { Providers } from './providers'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import Navigation from '@/components/Navigation'
 import AIChatbot from '@/components/ui/AIChatbot'
+import FeedbackButton from '@/components/feedback/FeedbackButton'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -34,6 +35,7 @@ export default function RootLayout({
             <Navigation />
             {children}
             <AIChatbot />
+            <FeedbackButton variant="floating" />
           </Providers>
         </ErrorBoundary>
       </body>
