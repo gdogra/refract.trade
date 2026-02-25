@@ -117,6 +117,7 @@ export default function OptionsChainClient() {
                   onExpiryChange={setSelectedExpiry}
                   selectedStrike={selectedStrike}
                   onStrikeSelect={setSelectedStrike}
+                  currentPrice={currentPrice}
                 />
               </motion.div>
             )}

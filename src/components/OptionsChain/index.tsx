@@ -13,6 +13,7 @@ interface OptionsChainProps {
   className?: string
   showHeader?: boolean
   enableRefresh?: boolean
+  currentPrice?: number
 }
 
 interface OptionRowProps {
@@ -163,7 +164,8 @@ export default function OptionsChain({
   initialExpiration,
   className = "",
   showHeader = true,
-  enableRefresh = true
+  enableRefresh = true,
+  currentPrice
 }: OptionsChainProps) {
   const [symbol, setSymbol] = useState(initialSymbol)
   const [selectedExpiration, setSelectedExpiration] = useState<string | undefined>(initialExpiration)
@@ -190,14 +192,15 @@ export default function OptionsChain({
   }, [data?.puts])
   
   const atmStrike = useMemo(() => {
-    if (!data?.underlyingPrice || !data?.calls.length) return null
+    const price = currentPrice || data?.underlyingPrice
+    if (!price || !data?.calls.length) return null
     
     return data.calls.reduce((closest, contract) => {
-      const currentDiff = Math.abs(contract.strike - data.underlyingPrice)
-      const closestDiff = Math.abs(closest.strike - data.underlyingPrice)
+      const currentDiff = Math.abs(contract.strike - price)
+      const closestDiff = Math.abs(closest.strike - price)
       return currentDiff < closestDiff ? contract : closest
     }).strike
-  }, [data?.underlyingPrice, data?.calls])
+  }, [currentPrice, data?.underlyingPrice, data?.calls])
   
   const handleRefresh = () => {
     refetch()
@@ -298,7 +301,7 @@ export default function OptionsChain({
                   <div className="w-16 h-4 bg-gray-300 dark:bg-gray-600 rounded animate-pulse"></div>
                 ) : (
                   <span className="font-mono text-lg font-bold text-gray-900 dark:text-white">
-                    ${data?.underlyingPrice?.toFixed(2) || '---'}
+                    ${currentPrice?.toFixed(2) || data?.underlyingPrice?.toFixed(2) || '---'}
                   </span>
                 )}
               </div>
@@ -448,7 +451,7 @@ export default function OptionsChain({
                   <div className="flex items-center space-x-4">
                     <span>Calls: {sortedCalls.length}</span>
                     <span>Puts: {sortedPuts.length}</span>
-                    {data?.underlyingPrice && atmStrike && (
+                    {(currentPrice || data?.underlyingPrice) && atmStrike && (
                       <span>ATM: ${atmStrike}</span>
                     )}
                   </div>

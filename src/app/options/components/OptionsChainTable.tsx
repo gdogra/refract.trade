@@ -9,6 +9,7 @@ interface OptionsChainTableProps {
   onExpiryChange: (expiry: string) => void
   selectedStrike: number | null
   onStrikeSelect: (strike: number) => void
+  currentPrice?: number
 }
 
 export default function OptionsChainTable({ 
@@ -16,7 +17,8 @@ export default function OptionsChainTable({
   selectedExpiry, 
   onExpiryChange, 
   selectedStrike, 
-  onStrikeSelect 
+  onStrikeSelect,
+  currentPrice
 }: OptionsChainTableProps) {
   // Use a key to force re-render when symbol changes
   // This ensures the OptionsChain component completely resets when switching symbols
@@ -31,6 +33,7 @@ export default function OptionsChainTable({
       key={key}
       initialSymbol={symbol}
       initialExpiration={selectedExpiry}
+      currentPrice={currentPrice}
       className="w-full"
     />
   )
