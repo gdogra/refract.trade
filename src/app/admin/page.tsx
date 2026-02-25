@@ -31,6 +31,10 @@ interface AdminStats {
   criticalIssues: number
   revenue: number
   refundsIssued: number
+  totalRevenue: number
+  monthlyRevenue: number
+  activeNotifications: number
+  systemStatus: 'healthy' | 'warning' | 'error'
 }
 
 export default function AdminPortal() {
