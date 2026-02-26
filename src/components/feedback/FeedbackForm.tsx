@@ -102,7 +102,7 @@ export default function FeedbackForm({
         submitData.append('screenshot', formData.screenshot)
       }
       
-      const response = await fetch('/api/feedback', {
+      const response = await fetch('/api/feedback-simple', {
         method: 'POST',
         body: submitData
       })
