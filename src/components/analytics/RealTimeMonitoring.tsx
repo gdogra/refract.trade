@@ -288,7 +288,7 @@ export default function RealTimeMonitoring({
                     </div>
                     <div>
                       <span className="text-gray-500">OI:</span>
-                      <span className="font-medium ml-1">{((data?.openInterest || 0) / 1000).toFixed(0)}K</span>
+                      <span className="font-medium ml-1">{(data?.openInterest || 0) / 1000).toFixed(0)}K</span>
                     </div>
                   </div>
                 </motion.div>

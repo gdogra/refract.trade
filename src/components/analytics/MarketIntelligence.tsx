@@ -278,7 +278,7 @@ export default function MarketIntelligence({ symbol = 'SPY' }: MarketIntelligenc
                       <div className="flex justify-between">
                         <span className="text-gray-500">Range</span>
                         <span className="font-medium">
-                          {(((forecast.range[1] - forecast.range[0]) / forecast.target) * 100).toFixed(1)}%
+                          {((forecast.range[1] - forecast.range[0]) / forecast.target) * 100).toFixed(1)}%
                         </span>
                       </div>
                     </div>

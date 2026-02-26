@@ -164,7 +164,7 @@ export default function AddPositionForm({ isOpen, onClose, onSubmit, defaultSymb
     }
     
     setErrors(newErrors)
-    return Object.keys(newErrors)?.length || 0 === 0
+    return (Object.keys(newErrors)?.length || 0) === 0
   }
   
   const handleSubmit = async (e: React.FormEvent) => {

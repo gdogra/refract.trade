@@ -245,7 +245,7 @@ export default function PortfolioOverview() {
 
           <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <div className="text-lg font-semibold text-gray-900 dark:text-white">
-              {((portfolio?.riskUtilization || 0) * 100).toFixed(0)}%
+              {(portfolio?.riskUtilization || 0) * 100).toFixed(0)}%
             </div>
             <div className="text-xs text-gray-500 dark:text-gray-400">Risk Used</div>
             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1 mt-1">

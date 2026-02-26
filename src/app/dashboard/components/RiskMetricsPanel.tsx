@@ -295,7 +295,7 @@ export default function RiskMetricsPanel() {
                     {scenario.scenario}
                   </div>
                   <div className="text-xs text-gray-500 dark:text-gray-400">
-                    {((scenario?.probability || 0) * 100).toFixed(1)}% prob.
+                    {(scenario?.probability || 0) * 100).toFixed(1)}% prob.
                   </div>
                 </div>
                 <div className="text-sm font-semibold text-red-600">

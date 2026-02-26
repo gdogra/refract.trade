@@ -179,7 +179,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
         {/* Results */}
         <div className="max-h-80 overflow-y-auto">
-          {query.trim() && results?.length || 0 === 0 && (
+          {(query.trim() && results??.length || 0) === 0 && (
             <div className="p-8 text-center text-gray-500 dark:text-gray-400">
               <Search className="h-8 w-8 mx-auto mb-3 opacity-50" />
               <p>No results found for "{query}"</p>

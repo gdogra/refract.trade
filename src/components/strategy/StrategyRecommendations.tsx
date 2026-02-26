@@ -92,7 +92,7 @@ export default function StrategyRecommendations({
     const calls = optionsData.calls || []
     const puts = optionsData.puts || []
     
-    if (calls?.length || 0 === 0) return null
+    if ((calls?.length || 0) === 0) return null
     
     const avgIV = calls.reduce((sum, call) => sum + call.impliedVolatility, 0) / calls?.length || 0
     const ivRank = Math.min(100, Math.max(0, (avgIV - 0.15) / 0.4 * 100)) // Normalize to 0-100
@@ -124,7 +124,7 @@ export default function StrategyRecommendations({
     const calls = optionsData.calls || []
     const puts = optionsData.puts || []
     
-    if (calls?.length || 0 === 0) return []
+    if ((calls?.length || 0) === 0) return []
 
     const strategies: StrategyRecommendation[] = []
 
@@ -698,7 +698,7 @@ export default function StrategyRecommendations({
             <Badge variant="outline">{recommendations?.length || 0} strategies</Badge>
           </h2>
 
-          {recommendations?.length || 0 === 0 ? (
+          {(recommendations?.length || 0) === 0 ? (
             <Card>
               <CardContent className="p-8 text-center">
                 <AlertTriangle className="h-12 w-12 text-gray-400 mx-auto mb-4" />

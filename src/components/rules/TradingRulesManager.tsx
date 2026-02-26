@@ -132,7 +132,7 @@ export function TradingRulesManager({ userId }: { userId: string }) {
         ))}
       </div>
 
-      {rules?.length || 0 === 0 && (
+      {(rules??.length || 0) === 0 && (
         <div className="text-center py-12 border-2 border-dashed border-gray-200 rounded-lg">
           <Shield className="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900">No rules configured</h3>

@@ -76,7 +76,7 @@ export function useBatchMarketData(symbols: string[]) {
   const [error, setError] = useState<string | null>(null)
 
   const fetchBatchData = useCallback(async () => {
-    if (symbols?.length || 0 === 0) return
+    if (symbols??.length || 0) === 0) return
 
     setLoading(true)
     setError(null)

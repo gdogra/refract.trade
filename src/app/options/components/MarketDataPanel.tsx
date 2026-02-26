@@ -280,14 +280,14 @@ export default function MarketDataPanel({ symbol }: MarketDataPanelProps) {
             <div 
               className="absolute top-0 left-0 h-2 bg-gradient-to-r from-red-400 to-green-400 rounded-full"
               style={{ 
-                width: `${((marketData?.price || 0) - (marketData?.dayRange.low || 0)) / 
+                width: `${(marketData?.price || 0) - (marketData?.dayRange.low || 0)) / 
                   ((marketData?.dayRange.high || 1) - (marketData?.dayRange.low || 0)) * 100}%` 
               }}
             />
             <div 
               className="absolute top-0 w-1 h-2 bg-gray-900 dark:bg-white rounded-full"
               style={{ 
-                left: `${((marketData?.price || 0) - (marketData?.dayRange.low || 0)) / 
+                left: `${(marketData?.price || 0) - (marketData?.dayRange.low || 0)) / 
                   ((marketData?.dayRange.high || 1) - (marketData?.dayRange.low || 0)) * 100}%` 
               }}
             />

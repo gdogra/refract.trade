@@ -96,7 +96,7 @@ export default function AddPositionForm({ onClose, onSuccess }: AddPositionFormP
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (!formData.symbol || !formData.strategyType || legs?.length || 0 === 0) {
+    if (!formData.symbol || !formData.strategyType || legs??.length || 0) === 0) {
       return
     }
 

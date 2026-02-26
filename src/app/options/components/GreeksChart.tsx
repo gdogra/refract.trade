@@ -81,7 +81,7 @@ export default function GreeksChart({ symbol }: GreeksChartProps) {
               {/* Current price line */}
               <div 
                 className="absolute w-px h-full bg-gray-400 dark:bg-gray-500"
-                style={{ left: `${((currentPrice - 170) / (210 - 170)) * 100}%` }}
+                style={{ left: `${(currentPrice - 170) / (210 - 170)) * 100}%` }}
               >
                 <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
                   Current
@@ -143,7 +143,7 @@ export default function GreeksChart({ symbol }: GreeksChartProps) {
               {/* Current price line */}
               <div 
                 className="absolute w-px h-full bg-gray-400 dark:bg-gray-500"
-                style={{ left: `${((currentPrice - 170) / (210 - 170)) * 100}%` }}
+                style={{ left: `${(currentPrice - 170) / (210 - 170)) * 100}%` }}
               />
               
               {/* Gamma curve */}
@@ -188,7 +188,7 @@ export default function GreeksChart({ symbol }: GreeksChartProps) {
               {/* Current price line */}
               <div 
                 className="absolute w-px h-full bg-gray-400 dark:bg-gray-500"
-                style={{ left: `${((currentPrice - 170) / (210 - 170)) * 100}%` }}
+                style={{ left: `${(currentPrice - 170) / (210 - 170)) * 100}%` }}
               />
               
               {/* Theta curves */}
@@ -228,7 +228,7 @@ export default function GreeksChart({ symbol }: GreeksChartProps) {
               {/* Current price line */}
               <div 
                 className="absolute w-px h-full bg-gray-400 dark:bg-gray-500"
-                style={{ left: `${((currentPrice - 170) / (210 - 170)) * 100}%` }}
+                style={{ left: `${(currentPrice - 170) / (210 - 170)) * 100}%` }}
               />
               
               {/* Vega curve */}

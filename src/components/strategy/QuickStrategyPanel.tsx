@@ -51,7 +51,7 @@ export default function QuickStrategyPanel({
     const calls = optionsData.calls || []
     const puts = optionsData.puts || []
     
-    if (calls?.length || 0 === 0) return null
+    if ((calls?.length || 0) === 0) return null
 
     // Calculate IV metrics
     const avgCallIV = calls.reduce((sum, call) => sum + call.impliedVolatility, 0) / calls?.length || 0
@@ -134,7 +134,7 @@ export default function QuickStrategyPanel({
     }
 
     // Default conservative strategy
-    if (strategies?.length || 0 === 0) {
+    if ((strategies?.length || 0) === 0) {
       strategies.push({
         name: 'Cash-Secured Put',
         type: 'bullish',
@@ -263,7 +263,7 @@ export default function QuickStrategyPanel({
                 </div>
                 <div className="flex items-center space-x-1">
                   <Badge variant="outline" className="text-xs">
-                    {((strategy?.confidence || 0) * 100).toFixed(0)}%
+                    {(strategy?.confidence || 0) * 100).toFixed(0)}%
                   </Badge>
                   <Badge className={`${getRiskColor(strategy.riskLevel)} text-xs`}>
                     {strategy.riskLevel}

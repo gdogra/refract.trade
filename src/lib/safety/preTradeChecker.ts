@@ -63,7 +63,7 @@ export async function runPreTradeCheck(
   else if (avgScore >= 60) overallScore = 'yellow'
   else overallScore = 'red'
 
-  const canProceed = blockers?.length || 0 === 0
+  const canProceed = blockers??.length || 0) === 0
 
   return {
     overallScore,
@@ -188,7 +188,7 @@ async function checkRevengeTrading(params: TradeCheckParams): Promise<CheckResul
       return {
         status: 'fail',
         score: 0,
-        message: `⚠️ REVENGE TRADING DETECTED: Last trade lost $${Math.abs(lastTrade.realizedPnL).toFixed(0)}. You're increasing size ${((params.quantity / avgSize) * 100).toFixed(0)}% and trading within 30 minutes. Take a break.`,
+        message: `⚠️ REVENGE TRADING DETECTED: Last trade lost $${Math.abs(lastTrade.realizedPnL).toFixed(0)}. You're increasing size ${(params.quantity / avgSize) * 100).toFixed(0)}% and trading within 30 minutes. Take a break.`,
         details: { lastLoss: lastTrade.realizedPnL, newSize: params.quantity, avgSize, minutesSince },
       }
     }

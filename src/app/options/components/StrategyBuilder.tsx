@@ -228,7 +228,7 @@ export default function StrategyBuilder({ symbol }: StrategyBuilderProps) {
             Strategy Legs {(legs?.length || 0) > 0 && `(${legs?.length || 0})`}
           </h3>
           
-          {legs?.length || 0 === 0 ? (
+          {(legs?.length || 0) === 0 ? (
             <div className="text-center py-8 text-gray-500 dark:text-gray-400">
               <Calculator className="h-12 w-12 mx-auto mb-3 opacity-50" />
               <p className="mb-2">No legs added yet</p>

@@ -287,7 +287,7 @@ export default function AIPortfolioPilot() {
                     <div className="flex justify-between items-center">
                       <span className="text-slate-300 text-sm">Available Risk Budget</span>
                       <Badge variant="outline" className="text-green-400 border-green-400">
-                        ${((1 - portfolioState.riskUtilization) * portfolioState.totalCapital * portfolioState.maxPortfolioRisk).toLocaleString()}
+                        ${(1 - portfolioState.riskUtilization) * portfolioState.totalCapital * portfolioState.maxPortfolioRisk).toLocaleString()}
                       </Badge>
                     </div>
                   </div>

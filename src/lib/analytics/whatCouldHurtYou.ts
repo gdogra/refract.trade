@@ -506,7 +506,7 @@ export class WorstCaseAnalysisEngine {
         projectedLoss,
         lossPercent: (projectedLoss / Math.abs(position.risk)),
         contributionToTotalLoss: projectedLoss,
-        reason: `${((volMultiplier - 1) * 100).toFixed(0)}% vol spike impacts short vol strategy`
+        reason: `${(volMultiplier - 1) * 100).toFixed(0)}% vol spike impacts short vol strategy`
       }
     })
   }

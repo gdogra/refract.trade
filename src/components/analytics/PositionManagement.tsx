@@ -387,7 +387,7 @@ export default function PositionManagement({
                     
                     <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                       <div className="text-lg font-bold text-gray-900 dark:text-white">
-                        {((position.riskMetrics?.probabilityOfProfit || 0) * 100).toFixed(0)}%
+                        {(position.riskMetrics?.probabilityOfProfit || 0) * 100).toFixed(0)}%
                       </div>
                       <div className="text-xs text-gray-500">Prob of Profit</div>
                     </div>

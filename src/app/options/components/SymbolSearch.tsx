@@ -322,7 +322,7 @@ export default function SymbolSearch({ selectedSymbol, onSymbolChange }: SymbolS
                     </div>
                   )}
 
-                  {query?.length || 0 > 0 && (!searchResults || !Array.isArray(searchResults) || searchResults?.length || 0 === 0) && (
+                  {(query?.length || 0 > 0 && (!searchResults || !Array.isArray(searchResults) || (searchResults?.length || 0) === 0) && (
                     <div className="p-6 text-center">
                       <div className="text-gray-500 dark:text-gray-400">
                         No symbols found for "{query}"

@@ -139,7 +139,7 @@ export function SmartAlertsPanel({ userId }: { userId: string }) {
       </div>
 
       <div className="space-y-3 max-h-96 overflow-y-auto">
-        {alerts?.length || 0 === 0 ? (
+        {(alerts?.length || 0) === 0 ? (
           <div className="text-center py-6 text-gray-500">
             <Bell className="w-8 h-8 mx-auto mb-2 opacity-50" />
             <p>No alerts to display</p>
@@ -178,7 +178,7 @@ export function SmartAlertsPanel({ userId }: { userId: string }) {
                     
                     {alert.actionButtons && alert.actionButtons?.length || 0 > 0 && (
                       <div className="flex gap-2 mt-3">
-                        {alert.actionButtons.map((button, idx) => (
+                        {(alert.actionButtons || []).map((button, idx) => (
                           <button
                             key={idx}
                             className="px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"

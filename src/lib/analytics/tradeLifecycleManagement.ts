@@ -143,7 +143,7 @@ export class TradeLifecycleManager {
       type: 'info',
       priority: 'medium',
       title: 'Position Sizing Confirmed',
-      message: `Trade size optimized for portfolio context. Risk: $${trade.maxRisk.toLocaleString()} (${((trade.maxRisk / 50000) * 100).toFixed(1)}% of portfolio)`,
+      message: `Trade size optimized for portfolio context. Risk: $${trade.maxRisk.toLocaleString()} (${(trade.maxRisk / 50000) * 100).toFixed(1)}% of portfolio)`,
       actionItems: [],
       timeframe: 'Trade initiated'
     })
@@ -390,7 +390,7 @@ export class TradeLifecycleManager {
 
     if (stage === 'entry') return 'Initial position establishment complete'
     if (stage === 'monitoring') {
-      if (profitPercent < 0.25) return `25% profit target (need $${((0.25 * Math.abs(trade.maxRisk)) - trade.currentPnL).toFixed(0)} more)`
+      if (profitPercent < 0.25) return `25% profit target (need $${(0.25 * Math.abs(trade.maxRisk)) - trade.currentPnL).toFixed(0)} more)`
       return '50% profit target'
     }
     if (stage === 'management') return `${daysToExpiration} days to expiration`

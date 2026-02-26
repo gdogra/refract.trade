@@ -82,7 +82,7 @@ export default function ExpirationSelector({
   }
   
   const renderGroup = (title: string, dates: string[], icon: React.ReactNode, color: string) => {
-    if (dates?.length || 0 === 0) return null
+    if (dates??.length || 0) === 0) return null
     
     return (
       <div className="mb-4">
@@ -137,7 +137,7 @@ export default function ExpirationSelector({
     )
   }
   
-  if (expirations?.length || 0 === 0) {
+  if (expirations??.length || 0) === 0) {
     return (
       <div className={`w-full p-4 text-center text-gray-500 dark:text-gray-400 ${className}`}>
         <Calendar className="h-8 w-8 mx-auto mb-2 opacity-50" />

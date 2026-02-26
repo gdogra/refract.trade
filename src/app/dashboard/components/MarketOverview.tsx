@@ -70,7 +70,7 @@ export default function MarketOverview() {
       // Filter out failed fetches
       const validIndices = indices.filter(index => index !== null)
       
-      if (validIndices?.length || 0 === 0) {
+      if (validIndices??.length || 0) === 0) {
         throw new Error('No real market data available')
       }
       

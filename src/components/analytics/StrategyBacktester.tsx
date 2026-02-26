@@ -258,7 +258,7 @@ export default function StrategyBacktester({
                 <div className="flex items-center space-x-2">
                   <Badge variant="outline">{results.strategy}</Badge>
                   <Badge variant="outline">{results.symbol}</Badge>
-                  {(() => {
+                  {() => {
                     const grade = getPerformanceGrade(results.sharpeRatio, results.winRate)
                     return <Badge className={grade.color}>{grade.grade}</Badge>
                   })()}
@@ -361,7 +361,7 @@ export default function StrategyBacktester({
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600 dark:text-gray-400">Expectancy</span>
                       <span className="font-medium">
-                        ${((results.avgWin * results.winRate/100) + (results.avgLoss * (1 - results.winRate/100))).toFixed(0)}
+                        ${(results.avgWin * results.winRate/100) + (results.avgLoss * (1 - results.winRate/100))).toFixed(0)}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
@@ -492,7 +492,7 @@ export default function StrategyBacktester({
                         <div className="text-xs text-gray-500">Sharpe</div>
                       </div>
                       
-                      {(() => {
+                      {() => {
                         const grade = getPerformanceGrade(backtest.sharpeRatio, backtest.winRate)
                         return (
                           <Badge className={grade.color}>

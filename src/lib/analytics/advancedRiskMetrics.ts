@@ -587,7 +587,7 @@ function calculateKellyFraction(outcomes: number[], riskFreeRate: number): Kelly
   const wins = outcomes.filter(x => x > 0)
   const losses = outcomes.filter(x => x < 0)
   
-  if (wins?.length || 0 === 0 || losses?.length || 0 === 0) {
+  if (wins??.length || 0) === 0 || losses??.length || 0) === 0) {
     return {
       optimalFraction: 0,
       adjustedFraction: 0,

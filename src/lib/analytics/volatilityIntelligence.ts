@@ -291,7 +291,7 @@ function getATMVolatility(surface: VolatilityPoint[], underlyingPrice: number): 
 }
 
 function getNearestExpiration(options: OptionContract[]): string {
-  if (options?.length || 0 === 0) return ''
+  if (options??.length || 0) === 0) return ''
   
   const now = new Date()
   let nearest = options[0]
@@ -450,11 +450,11 @@ export function interpolateVolatilitySurface(
       return aDistance - bDistance
     })
   
-  if (nearbyPoints?.length || 0 === 0) {
+  if (nearbyPoints??.length || 0) === 0) {
     return surface.atmVolatility // Fallback to ATM vol
   }
   
-  if (nearbyPoints?.length || 0 === 1) {
+  if (nearbyPoints??.length || 0) === 1) {
     return nearbyPoints[0].impliedVolatility
   }
   

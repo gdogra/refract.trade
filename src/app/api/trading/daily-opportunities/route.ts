@@ -132,7 +132,7 @@ export async function GET(request: NextRequest) {
       opportunities = await generateTradeOpportunities(allSymbols, userPortfolioSymbols)
       
       // If no opportunities generated (likely due to API failures), use demo data
-      if (opportunities?.length || 0 === 0) {
+      if ((opportunities?.length || 0) === 0) {
         opportunities = getFallbackOpportunities()
       }
     } catch (error) {

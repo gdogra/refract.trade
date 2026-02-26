@@ -528,7 +528,7 @@ export default function GreeksVisualization({ positions = mockPositions, classNa
                             {formatCurrency(Math.abs(position.marketValue))}
                           </p>
                           <p className="text-xs text-gray-500 dark:text-gray-400">
-                            {((Math.abs(position.marketValue) / portfolioGreeks.totalValue) * 100).toFixed(1)}%
+                            {(Math.abs(position.marketValue) / portfolioGreeks.totalValue) * 100).toFixed(1)}%
                           </p>
                         </div>
                       </div>

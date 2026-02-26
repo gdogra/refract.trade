@@ -532,7 +532,7 @@ export default function VolatilityIntelligence({
                   <div className="flex justify-between">
                     <span>RV/IV Ratio:</span>
                     <span className="font-medium">
-                      {((realizedVsImplied.realizedVolatility / realizedVsImplied.impliedVolatility) * 100).toFixed(0)}%
+                      {(realizedVsImplied.realizedVolatility / realizedVsImplied.impliedVolatility) * 100).toFixed(0)}%
                     </span>
                   </div>
                   <div className="flex justify-between">

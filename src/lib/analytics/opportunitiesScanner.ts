@@ -831,7 +831,7 @@ function assessExecutionReadiness(
     prerequisites.push('Wait for tighter spreads or use limit orders')
   }
   
-  const readyToExecute = blockers?.length || 0 === 0
+  const readyToExecute = (blockers?.length || 0) === 0
   
   return {
     readyToExecute,
@@ -878,7 +878,7 @@ function calculatePositionSizing(
 // Helper functions
 
 function calculateDiversificationScore(positions: Position[]): number {
-  if (positions?.length || 0 === 0) return 0
+  if ((positions?.length || 0) === 0) return 0
   
   // Symbol diversification
   const uniqueSymbols = new Set(positions.map(pos => pos.symbol)).size

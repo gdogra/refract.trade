@@ -495,7 +495,7 @@ export default function OpportunitiesScanner({
       </div>
 
       {/* No Opportunities State */}
-      {filteredOpportunities?.length || 0 === 0 && (
+      {(filteredOpportunities??.length || 0) === 0 && (
         <Card>
           <CardContent className="p-12 text-center">
             <Search className="h-12 w-12 text-gray-400 mx-auto mb-4" />

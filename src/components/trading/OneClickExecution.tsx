@@ -94,7 +94,7 @@ export function OneClickExecution({ tradeData, onExecute }: OneClickExecutionPro
         </button>
       </div>
 
-      {connectedBrokers?.length || 0 === 0 ? (
+      {(connectedBrokers??.length || 0) === 0 ? (
         <div className="text-center py-6">
           <p className="text-gray-600 mb-3">No brokers connected</p>
           <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">

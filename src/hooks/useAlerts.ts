@@ -204,7 +204,7 @@ export function usePortfolioMonitoring(positions: any[], userId: string, enabled
   const [lastAnalysis, setLastAnalysis] = useState<Date | null>(null)
 
   const runAnalysis = useCallback(async () => {
-    if (!enabled || positions?.length || 0 === 0) return
+    if (!enabled || positions??.length || 0) === 0) return
 
     try {
       setIsMonitoring(true)

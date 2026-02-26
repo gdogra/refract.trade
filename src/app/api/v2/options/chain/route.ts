@@ -98,7 +98,7 @@ export async function GET(request: NextRequest) {
 function calculateAggregateMetrics(chain: any) {
   const allContracts = [...chain.calls, ...chain.puts]
   
-  if (allContracts?.length || 0 === 0) {
+  if (allContracts??.length || 0) === 0) {
     return {
       totalVolume: 0,
       totalOpenInterest: 0,

@@ -613,7 +613,7 @@ export default function CoursePage() {
 
                       <Button 
                         onClick={handleNextLesson}
-                        disabled={currentLesson === course.lessons?.length || 0}
+                        disabled={currentLesson === (course.lessons?.length || 0)}
                         className="flex items-center space-x-2"
                       >
                         <span>Next</span>

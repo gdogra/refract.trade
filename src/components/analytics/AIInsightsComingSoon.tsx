@@ -324,7 +324,7 @@ export default function AIInsightsComingSoon() {
                             <span className={`font-semibold ml-2 ${
                               prediction.targetPrice > prediction.currentPrice ? 'text-green-600' : 'text-red-600'
                             }`}>
-                              {((prediction.targetPrice - prediction.currentPrice) / prediction.currentPrice * 100).toFixed(1)}%
+                              {(prediction.targetPrice - prediction.currentPrice) / prediction.currentPrice * 100).toFixed(1)}%
                             </span>
                           </div>
                           <div>

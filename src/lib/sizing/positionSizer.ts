@@ -105,7 +105,7 @@ export async function calculatePositionSize(
     }
   }
 
-  const explanation = `Based on your portfolio size ($${portfolioValue.toLocaleString()}) and max loss tolerance ($${maxLossPerTrade.toFixed(0)}), we recommend ${recommendedQuantity} contract${recommendedQuantity !== 1 ? 's' : ''}. This risks ${((maxPotentialLoss / portfolioValue) * 100).toFixed(1)}% of your portfolio.`
+  const explanation = `Based on your portfolio size ($${portfolioValue.toLocaleString()}) and max loss tolerance ($${maxLossPerTrade.toFixed(0)}), we recommend ${recommendedQuantity} contract${recommendedQuantity !== 1 ? 's' : ''}. This risks ${(maxPotentialLoss / portfolioValue) * 100).toFixed(1)}% of your portfolio.`
 
   return {
     recommendedQuantity,

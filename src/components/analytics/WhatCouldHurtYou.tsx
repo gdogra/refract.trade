@@ -201,7 +201,7 @@ export default function WhatCouldHurtYou() {
                         {selectedScenario.urgency.toUpperCase()}
                       </Badge>
                       <Badge variant="outline" className="text-orange-400 border-orange-400">
-                        {((selectedScenario.probability || 0) * 100).toFixed(0)}% chance
+                        {(selectedScenario.probability || 0) * 100).toFixed(0)}% chance
                       </Badge>
                     </div>
                   </div>
@@ -240,7 +240,7 @@ export default function WhatCouldHurtYou() {
                         </div>
                         <div className="flex justify-between">
                           <span className="text-slate-400 text-sm">Risk Reduction</span>
-                          <span className="text-green-400 font-bold">{((selectedScenario.mitigation?.riskReduction || 0) * 100).toFixed(0)}%</span>
+                          <span className="text-green-400 font-bold">{(selectedScenario.mitigation?.riskReduction || 0) * 100).toFixed(0)}%</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-slate-400 text-sm">Time to Implement</span>
@@ -343,7 +343,7 @@ export default function WhatCouldHurtYou() {
                         </div>
                         <div className="flex items-center space-x-1">
                           <Activity className="h-4 w-4 text-orange-400" />
-                          <span className="text-orange-400">{((scenario.probability || 0) * 100).toFixed(0)}%</span>
+                          <span className="text-orange-400">{(scenario.probability || 0) * 100).toFixed(0)}%</span>
                         </div>
                         <div className="flex items-center space-x-1">
                           <Clock className="h-4 w-4 text-blue-400" />
@@ -386,7 +386,7 @@ export default function WhatCouldHurtYou() {
                           variant="outline" 
                           className="text-xs"
                         >
-                          {position.symbol} ({position.strategy}) -${((position.lossPercent || 0) * 100).toFixed(0)}%
+                          {position.symbol} ({position.strategy}) -${(position.lossPercent || 0) * 100).toFixed(0)}%
                         </Badge>
                       ))}
                     </div>
@@ -467,13 +467,13 @@ export default function WhatCouldHurtYou() {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-slate-400 text-sm">Risk Reduction</span>
-                        <span className="text-green-400 font-medium">{((selectedScenario.mitigation?.primary?.riskReduction || 0) * 100).toFixed(0)}%</span>
+                        <span className="text-green-400 font-medium">{(selectedScenario.mitigation?.primary?.riskReduction || 0) * 100).toFixed(0)}%</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-slate-400 text-sm">Effectiveness</span>
                         <div className="flex items-center space-x-2">
                           <Progress value={selectedScenario.mitigation.effectiveness * 100} className="w-16 h-2" />
-                          <span className="text-green-400 text-sm">{((selectedScenario.mitigation?.effectiveness || 0) * 100).toFixed(0)}%</span>
+                          <span className="text-green-400 text-sm">{(selectedScenario.mitigation?.effectiveness || 0) * 100).toFixed(0)}%</span>
                         </div>
                       </div>
                     </div>
@@ -482,7 +482,7 @@ export default function WhatCouldHurtYou() {
                   <Button 
                     className="w-full bg-green-600 hover:bg-green-700"
                     onClick={() => {
-                      alert(`Implementing Primary Protection Strategy:\n\n${selectedScenario.mitigation?.primary?.action || 'N/A'}\n\nCost: $${(selectedScenario.mitigation?.primary?.cost || 0).toLocaleString()}\nRisk Reduction: ${((selectedScenario.mitigation?.primary?.riskReduction || 0) * 100).toFixed(0)}%\n\n${selectedScenario.mitigation?.primary?.description || 'N/A'}\n\nThis would connect to your broker to execute the trades.`)
+                      alert(`Implementing Primary Protection Strategy:\n\n${selectedScenario.mitigation?.primary?.action || 'N/A'}\n\nCost: $${(selectedScenario.mitigation?.primary?.cost || 0).toLocaleString()}\nRisk Reduction: ${(selectedScenario.mitigation?.primary?.riskReduction || 0) * 100).toFixed(0)}%\n\n${selectedScenario.mitigation?.primary?.description || 'N/A'}\n\nThis would connect to your broker to execute the trades.`)
                     }}
                   >
                     <Shield className="h-4 w-4 mr-2" />
@@ -505,7 +505,7 @@ export default function WhatCouldHurtYou() {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-slate-400 text-sm">Risk Reduction</span>
-                        <span className="text-blue-400 font-medium">{((selectedScenario.mitigation?.alternative?.riskReduction || 0) * 100).toFixed(0)}%</span>
+                        <span className="text-blue-400 font-medium">{(selectedScenario.mitigation?.alternative?.riskReduction || 0) * 100).toFixed(0)}%</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-slate-400 text-sm">Trade-off</span>
@@ -520,7 +520,7 @@ export default function WhatCouldHurtYou() {
                     variant="outline" 
                     className="w-full border-blue-600 text-blue-300 hover:bg-blue-900/30"
                     onClick={() => {
-                      alert(`Alternative Protection Strategy:\n\n${selectedScenario.mitigation?.alternative?.action || 'N/A'}\n\nCost: $${(selectedScenario.mitigation?.alternative?.cost || 0).toLocaleString()}\nRisk Reduction: ${((selectedScenario.mitigation?.alternative?.riskReduction || 0) * 100).toFixed(0)}%\n\n${selectedScenario.mitigation?.alternative?.description || 'N/A'}`)
+                      alert(`Alternative Protection Strategy:\n\n${selectedScenario.mitigation?.alternative?.action || 'N/A'}\n\nCost: $${(selectedScenario.mitigation?.alternative?.cost || 0).toLocaleString()}\nRisk Reduction: ${(selectedScenario.mitigation?.alternative?.riskReduction || 0) * 100).toFixed(0)}%\n\n${selectedScenario.mitigation?.alternative?.description || 'N/A'}`)
                     }}
                   >
                     <Target className="h-4 w-4 mr-2" />

@@ -614,7 +614,7 @@ export default function PortfolioDashboard({ className }: PortfolioDashboardProp
               </tbody>
             </table>
             
-            {filteredAndSortedPositions?.length || 0 === 0 && (
+            {(filteredAndSortedPositions??.length || 0) === 0 && (
               <div className="text-center py-12">
                 <Target className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-600 dark:text-gray-400 mb-2">
