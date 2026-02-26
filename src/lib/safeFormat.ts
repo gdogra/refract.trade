@@ -7,7 +7,7 @@
  */
 export const safeToFixed = (value: number | undefined | null, precision: number = 2): string => {
   if (value === undefined || value === null || isNaN(value)) {
-    return precision === 0 ? '0' : '0.' + '0'.repeat(precision);
+    return precision === 0 ? '0' : ('0.' + '0'.repeat(precision));
   }
   return value.toFixed(precision);
 };

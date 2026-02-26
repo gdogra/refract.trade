@@ -150,7 +150,7 @@ export const AnalyticsUtils = {
   formatGreek(value: number, type: 'delta' | 'gamma' | 'theta' | 'vega' | 'rho'): string {
     const precision = type === 'gamma' ? 3 : type === 'delta' ? 2 : 1
     if (value === undefined || value === null || isNaN(value)) {
-      return precision === 0 ? '0' : '0.' + '0'.repeat(precision);
+      return '0.' + '0'.repeat(precision);
     }
     return value.toFixed(precision)
   },
