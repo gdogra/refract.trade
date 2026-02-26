@@ -72,7 +72,7 @@ export default function RealTimeMonitoring({
     
     try {
       // Fetch real market data for all watchlist symbols
-      const promises = watchlist.map(async symbol => {
+      const promises = (watchlist || []).map(async symbol => {
         try {
           const response = await fetch(`/api/options/quote?symbol=${symbol}`)
           if (!response.ok) {
@@ -321,7 +321,7 @@ export default function RealTimeMonitoring({
             <CardContent>
               <div className="space-y-3 max-h-64 overflow-y-auto">
                 <AnimatePresence>
-                  {alerts.map((alert, idx) => (
+                  {(alerts || []).map((alert, idx) => (
                     <motion.div
                       key={alert.id}
                       initial={{ opacity: 0, x: -20 }}

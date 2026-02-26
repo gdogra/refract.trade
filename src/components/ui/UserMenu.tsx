@@ -31,12 +31,12 @@ export default function UserMenu() {
     return (
       <div className="flex items-center space-x-2">
         <Link href="/auth/signin">
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white">
             Sign In
           </Button>
         </Link>
         <Link href="/auth/signup">
-          <Button size="sm">
+          <Button size="sm" className="bg-blue-600 text-white hover:bg-blue-700">
             Get Started
           </Button>
         </Link>

@@ -556,7 +556,7 @@ export default function AddPositionForm({ isOpen, onClose, onSubmit, defaultSymb
                 Tags
               </label>
               <div className="flex flex-wrap gap-2 mb-2">
-                {formData.tags.map((tag, index) => (
+                {(formData.tags || []).map((tag, index) => (
                   <span
                     key={index}
                     className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400"

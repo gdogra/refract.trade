@@ -711,7 +711,7 @@ export default function StrategyRecommendations({
               </CardContent>
             </Card>
           ) : (
-            recommendations.map((strategy, index) => (
+            (recommendations || []).map((strategy, index) => (
               <motion.div
                 key={strategy.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -782,7 +782,7 @@ export default function StrategyRecommendations({
                       <div>
                         <h4 className="font-medium text-gray-900 mb-2">Breakeven Points</h4>
                         <div className="flex items-center space-x-4">
-                          {strategy.breakeven.map((point, i) => (
+                          {(strategy.breakeven || []).map((point, i) => (
                             <Badge key={i} variant="outline" className="font-mono">
                               ${point.toFixed(2)}
                             </Badge>
@@ -794,7 +794,7 @@ export default function StrategyRecommendations({
                       <div>
                         <h4 className="font-medium text-gray-900 mb-3">Strategy Legs</h4>
                         <div className="space-y-2">
-                          {strategy.legs.map((leg, i) => (
+                          {(strategy.legs || []).map((leg, i) => (
                             <div key={i} className="flex items-center justify-between p-3 bg-white border rounded-lg">
                               <div className="flex items-center space-x-3">
                                 <Badge variant={leg.action === 'buy' ? 'default' : 'secondary'}>
@@ -820,7 +820,7 @@ export default function StrategyRecommendations({
                       <div>
                         <h4 className="font-medium text-gray-900 mb-3">Outcome Scenarios</h4>
                         <div className="space-y-3">
-                          {strategy.scenarios.map((scenario, i) => (
+                          {(strategy.scenarios || []).map((scenario, i) => (
                             <div key={i} className="p-4 border rounded-lg">
                               <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center space-x-2">
