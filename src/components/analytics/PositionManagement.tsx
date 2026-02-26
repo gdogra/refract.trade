@@ -403,7 +403,7 @@ export default function PositionManagement({
                   </div>
 
                   {/* Management Signals */}
-                  {position.managementSignals.length > 0 && (
+                  {position.managementSignals?.length || 0 > 0 && (
                     <div className="space-y-2 mb-4">
                       <h5 className="font-medium text-gray-900 dark:text-white">Management Signals</h5>
                       {position.managementSignals.map((signal, signalIndex) => (
@@ -709,28 +709,28 @@ export default function PositionManagement({
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg text-center">
               <div className="text-2xl font-bold text-green-600">
-                {positions.filter(p => p.managementSignals.some(s => s.type === 'profit_target')).length}
+                {positions.filter(p => p.managementSignals.some(s => s.type === 'profit_target'))?.length || 0}
               </div>
               <div className="text-sm text-green-700 dark:text-green-300">Ready for Profit Taking</div>
             </div>
 
             <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg text-center">
               <div className="text-2xl font-bold text-red-600">
-                {positions.filter(p => p.managementSignals.some(s => s.type === 'stop_loss')).length}
+                {positions.filter(p => p.managementSignals.some(s => s.type === 'stop_loss'))?.length || 0}
               </div>
               <div className="text-sm text-red-700 dark:text-red-300">Need Loss Management</div>
             </div>
 
             <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg text-center">
               <div className="text-2xl font-bold text-blue-600">
-                {positions.filter(p => p.daysToExpiry <= 21).length}
+                {positions.filter(p => p.daysToExpiry <= 21)?.length || 0}
               </div>
               <div className="text-sm text-blue-700 dark:text-blue-300">Approaching Expiration</div>
             </div>
 
             <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg text-center">
               <div className="text-2xl font-bold text-purple-600">
-                {positions.filter(p => p.tradeQuality === 'AAA' || p.tradeQuality === 'AA').length}
+                {positions.filter(p => p.tradeQuality === 'AAA' || p.tradeQuality === 'AA')?.length || 0}
               </div>
               <div className="text-sm text-purple-700 dark:text-purple-300">High Quality Positions</div>
             </div>

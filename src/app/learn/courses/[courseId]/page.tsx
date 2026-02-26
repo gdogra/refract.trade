@@ -453,7 +453,7 @@ export default function CoursePage() {
   const currentLessonData = course.lessons.find(lesson => lesson.id === currentLesson)
 
   const handleNextLesson = () => {
-    if (currentLesson < course.lessons.length) {
+    if (currentLesson < course.lessons?.length || 0) {
       if (!completedLessons.includes(currentLesson)) {
         setCompletedLessons([...completedLessons, currentLesson])
       }
@@ -502,7 +502,7 @@ export default function CoursePage() {
                   </div>
                   <div className="flex items-center space-x-1">
                     <BookOpen className="h-3 w-3" />
-                    <span>{course.lessons.length} lessons</span>
+                    <span>{course.lessons?.length || 0} lessons</span>
                   </div>
                 </div>
               </CardHeader>
@@ -545,12 +545,12 @@ export default function CoursePage() {
                 <div className="mt-6">
                   <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
                     <span>Progress</span>
-                    <span>{Math.round((completedLessons.length / course.lessons.length) * 100)}%</span>
+                    <span>{Math.round((completedLessons?.length || 0 / course.lessons?.length || 0) * 100)}%</span>
                   </div>
                   <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                     <div 
                       className="bg-brand-500 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${(completedLessons.length / course.lessons.length) * 100}%` }}
+                      style={{ width: `${(completedLessons?.length || 0 / course.lessons?.length || 0) * 100}%` }}
                     />
                   </div>
                 </div>
@@ -608,12 +608,12 @@ export default function CoursePage() {
                       </Button>
 
                       <div className="text-sm text-gray-500 dark:text-gray-400">
-                        Lesson {currentLesson} of {course.lessons.length}
+                        Lesson {currentLesson} of {course.lessons?.length || 0}
                       </div>
 
                       <Button 
                         onClick={handleNextLesson}
-                        disabled={currentLesson === course.lessons.length}
+                        disabled={currentLesson === course.lessons?.length || 0}
                         className="flex items-center space-x-2"
                       >
                         <span>Next</span>

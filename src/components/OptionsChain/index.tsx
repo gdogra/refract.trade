@@ -193,7 +193,7 @@ export default function OptionsChain({
   
   const atmStrike = useMemo(() => {
     const price = currentPrice || data?.underlyingPrice
-    if (!price || !data?.calls.length) return null
+    if (!price || !data?.calls?.length || 0) return null
     
     return data.calls.reduce((closest, contract) => {
       const currentDiff = Math.abs(contract.strike - price)
@@ -449,8 +449,8 @@ export default function OptionsChain({
               <div className={`border-t border-gray-200 dark:border-gray-700 ${compact ? 'p-2' : 'p-3'} bg-gray-50 dark:bg-gray-900/30`}>
                 <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
                   <div className="flex items-center space-x-4">
-                    <span>Calls: {sortedCalls.length}</span>
-                    <span>Puts: {sortedPuts.length}</span>
+                    <span>Calls: {sortedCalls?.length || 0}</span>
+                    <span>Puts: {sortedPuts?.length || 0}</span>
                     {(currentPrice || data?.underlyingPrice) && atmStrike && (
                       <span>ATM: ${atmStrike}</span>
                     )}

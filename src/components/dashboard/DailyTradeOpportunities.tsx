@@ -145,8 +145,8 @@ export function DailyTradeOpportunities() {
     return filtered
   }, [opportunities, filters, sortBy, sortDirection])
 
-  const portfolioCount = filteredAndSortedOpportunities.filter(o => o.inPortfolio).length
-  const marketCount = filteredAndSortedOpportunities.filter(o => !o.inPortfolio).length
+  const portfolioCount = filteredAndSortedOpportunities.filter(o => o.inPortfolio)?.length || 0
+  const marketCount = filteredAndSortedOpportunities.filter(o => !o.inPortfolio)?.length || 0
 
   if (error) {
     return (
@@ -396,7 +396,7 @@ export function DailyTradeOpportunities() {
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-2"></div>
                     <p className="text-gray-600">Analyzing market opportunities...</p>
                   </div>
-                ) : filteredAndSortedOpportunities.length === 0 ? (
+                ) : filteredAndSortedOpportunities?.length || 0 === 0 ? (
                   <div className="p-8 text-center text-gray-500">
                     <Target className="h-12 w-12 mx-auto mb-3 text-gray-300" />
                     <p>No opportunities found matching your criteria.</p>

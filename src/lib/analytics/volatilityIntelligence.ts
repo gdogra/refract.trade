@@ -159,17 +159,17 @@ export function calculateIVRankPercentile(
 ): IVRankPercentile {
   const sorted = historicalIVs.sort((a, b) => a - b)
   const min = sorted[0]
-  const max = sorted[sorted.length - 1]
-  const mean = sorted.reduce((sum, iv) => sum + iv, 0) / sorted.length
-  const variance = sorted.reduce((sum, iv) => sum + Math.pow(iv - mean, 2), 0) / sorted.length
+  const max = sorted[sorted?.length || 0 - 1]
+  const mean = sorted.reduce((sum, iv) => sum + iv, 0) / sorted?.length || 0
+  const variance = sorted.reduce((sum, iv) => sum + Math.pow(iv - mean, 2), 0) / sorted?.length || 0
   const std = Math.sqrt(variance)
   
   // IV Rank: (current - min) / (max - min) * 100
   const ivRank = ((currentIV - min) / (max - min)) * 100
   
   // IV Percentile: percentage of observations below current IV
-  const belowCurrent = sorted.filter(iv => iv < currentIV).length
-  const ivPercentile = (belowCurrent / sorted.length) * 100
+  const belowCurrent = sorted.filter(iv => iv < currentIV)?.length || 0
+  const ivPercentile = (belowCurrent / sorted?.length || 0) * 100
   
   // Interpretation
   let interpretation: IVRankPercentile['interpretation']
@@ -200,12 +200,12 @@ export function calculateRealizedVsImplied(
 ): RealizedVsImplied {
   // Calculate realized volatility from price returns
   const returns = []
-  for (let i = 1; i < historicalPrices.length; i++) {
+  for (let i = 1; i < historicalPrices?.length || 0; i++) {
     returns.push(Math.log(historicalPrices[i] / historicalPrices[i - 1]))
   }
   
-  const meanReturn = returns.reduce((sum, ret) => sum + ret, 0) / returns.length
-  const variance = returns.reduce((sum, ret) => sum + Math.pow(ret - meanReturn, 2), 0) / returns.length
+  const meanReturn = returns.reduce((sum, ret) => sum + ret, 0) / returns?.length || 0
+  const variance = returns.reduce((sum, ret) => sum + Math.pow(ret - meanReturn, 2), 0) / returns?.length || 0
   const realizedVolatility = Math.sqrt(variance * 252) // Annualized
   
   const spread = currentImpliedVol - realizedVolatility
@@ -291,7 +291,7 @@ function getATMVolatility(surface: VolatilityPoint[], underlyingPrice: number): 
 }
 
 function getNearestExpiration(options: OptionContract[]): string {
-  if (options.length === 0) return ''
+  if (options?.length || 0 === 0) return ''
   
   const now = new Date()
   let nearest = options[0]
@@ -334,7 +334,7 @@ function buildVolatilitySmile(
     : 0
   
   // Calculate convexity (simplified)
-  const convexity = points.length > 2 ? 0.01 : 0 // Would require polynomial fitting
+  const convexity = points?.length || 0 > 2 ? 0.01 : 0 // Would require polynomial fitting
   
   return {
     expiration,
@@ -384,7 +384,7 @@ function buildTermStructure(surface: VolatilityPoint[]): TermStructurePoint[] {
   const termStructure: TermStructurePoint[] = []
   
   for (const [expiration, points] of Array.from(expirationMap.entries())) {
-    const atmVol = points.reduce((sum, p) => sum + p.impliedVolatility, 0) / points.length
+    const atmVol = points.reduce((sum, p) => sum + p.impliedVolatility, 0) / points?.length || 0
     const daysToExpiry = points[0]?.daysToExpiry || 0
     
     termStructure.push({
@@ -450,11 +450,11 @@ export function interpolateVolatilitySurface(
       return aDistance - bDistance
     })
   
-  if (nearbyPoints.length === 0) {
+  if (nearbyPoints?.length || 0 === 0) {
     return surface.atmVolatility // Fallback to ATM vol
   }
   
-  if (nearbyPoints.length === 1) {
+  if (nearbyPoints?.length || 0 === 1) {
     return nearbyPoints[0].impliedVolatility
   }
   
@@ -510,7 +510,7 @@ export function detectVolatilityAnomalies(surface: VolatilitySurface): Array<{
   
   // Liquidity gaps
   const lowLiquidityPoints = surface.surface.filter(p => p.volume < 10 && p.openInterest < 100)
-  if (lowLiquidityPoints.length > surface.surface.length * 0.3) {
+  if (lowLiquidityPoints?.length || 0 > surface.surface?.length || 0 * 0.3) {
     anomalies.push({
       type: 'liquidity_gap' as const,
       severity: 'medium' as const,

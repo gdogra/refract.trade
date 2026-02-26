@@ -74,7 +74,7 @@ class NotificationService {
   }
 
   getUnreadCount(): number {
-    return this.notifications.filter(n => !n.read).length
+    return this.notifications.filter(n => !n.read)?.length || 0
   }
 
   markAsRead(notificationId: string): void {

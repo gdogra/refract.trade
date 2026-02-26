@@ -452,8 +452,8 @@ export class ReferralManager {
 
       const allReferrals = referralCodes.flatMap(code => code.successfulReferrals)
       
-      const totalReferrals = allReferrals.length
-      const successfulReferrals = allReferrals.filter(r => r.rewardDelivered).length
+      const totalReferrals = allReferrals?.length || 0
+      const successfulReferrals = allReferrals.filter(r => r.rewardDelivered)?.length || 0
       const remainingReferrals = Math.max(0, 3 - totalReferrals)
       const totalTrialDaysEarned = successfulReferrals * 30
 

@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     if (symbols) {
       const symbolList = symbols.split(',').map(s => s.trim().toUpperCase())
       
-      if (symbolList.length > 10) {
+      if (symbolList?.length || 0 > 10) {
         return NextResponse.json(
           { error: 'Maximum 10 symbols allowed in batch request' },
           { status: 400 }

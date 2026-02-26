@@ -154,7 +154,7 @@ class YahooFinanceProvider implements MarketDataProvider {
         volume: meta.regularMarketVolume || 0,
         high: meta.regularMarketDayHigh || meta.previousClose,
         low: meta.regularMarketDayLow || meta.previousClose,
-        open: quote.open?.[quote.open.length - 1] || meta.previousClose,
+        open: quote.open?.[quote.open?.length || 0 - 1] || meta.previousClose,
         previousClose: meta.previousClose,
         marketCap: meta.marketCap,
         timestamp: Date.now()
@@ -392,7 +392,7 @@ class MarketDataManager {
       }
     })
 
-    if (uncachedSymbols.length === 0) {
+    if (uncachedSymbols?.length || 0 === 0) {
       return results
     }
 

@@ -82,14 +82,14 @@ export default function ExpirationSelector({
   }
   
   const renderGroup = (title: string, dates: string[], icon: React.ReactNode, color: string) => {
-    if (dates.length === 0) return null
+    if (dates?.length || 0 === 0) return null
     
     return (
       <div className="mb-4">
         <div className={`flex items-center space-x-2 mb-2 px-2 py-1 text-xs font-medium ${color}`}>
           {icon}
           <span>{title}</span>
-          <span className="text-gray-400">({dates.length})</span>
+          <span className="text-gray-400">({dates?.length || 0})</span>
         </div>
         <div className="space-y-1">
           {dates.map(dateStr => (
@@ -137,7 +137,7 @@ export default function ExpirationSelector({
     )
   }
   
-  if (expirations.length === 0) {
+  if (expirations?.length || 0 === 0) {
     return (
       <div className={`w-full p-4 text-center text-gray-500 dark:text-gray-400 ${className}`}>
         <Calendar className="h-8 w-8 mx-auto mb-2 opacity-50" />
@@ -155,12 +155,12 @@ export default function ExpirationSelector({
             Expiration Dates
           </h3>
           <span className="text-xs text-gray-500 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
-            {expirations.length} available
+            {expirations?.length || 0} available
           </span>
         </div>
         
         {/* Quick selector for nearest */}
-        {expirations.length > 0 && (
+        {expirations?.length || 0 > 0 && (
           <motion.button
             onClick={() => onExpirationChange(expirations[0])}
             className="w-full mb-3 px-3 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 

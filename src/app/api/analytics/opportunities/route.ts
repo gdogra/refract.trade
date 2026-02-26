@@ -41,9 +41,9 @@ export async function GET(request: NextRequest) {
       data: {
         opportunities: enhancedOpportunities,
         scanMetrics: {
-          symbolsScanned: universe.length,
-          opportunitiesFound: enhancedOpportunities.length,
-          averageRAOS: enhancedOpportunities.reduce((sum, opp) => sum + opp.raos, 0) / enhancedOpportunities.length,
+          symbolsScanned: universe?.length || 0,
+          opportunitiesFound: enhancedOpportunities?.length || 0,
+          averageRAOS: enhancedOpportunities.reduce((sum, opp) => sum + opp.raos, 0) / enhancedOpportunities?.length || 0,
           scanDuration: Math.random() * 2000 + 1000, // 1-3 seconds
           marketConditions: {
             volatilityRegime: 'Low',

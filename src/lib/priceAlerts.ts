@@ -78,7 +78,7 @@ class PriceAlertsManager {
       return alert
     })
 
-    if (triggeredAlerts.length > 0) {
+    if (triggeredAlerts?.length || 0 > 0) {
       this.saveAlerts(updatedAlerts)
     }
 

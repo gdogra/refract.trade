@@ -105,7 +105,7 @@ export default function Navigation() {
       item.type === 'symbol' && item.title.toUpperCase() === upperQuery
     )
 
-    if (isSymbolQuery && !symbolExists && searchQuery.trim().length >= 1) {
+    if (isSymbolQuery && !symbolExists && searchQuery.trim()?.length || 0 >= 1) {
       filteredResults.unshift({
         id: `symbol-${upperQuery}`,
         type: 'symbol',
@@ -159,24 +159,24 @@ export default function Navigation() {
 
   // Search handlers
   const handleSearchKeyDown = (e: React.KeyboardEvent) => {
-    if (!searchResults.length) return
+    if (!searchResults?.length || 0) return
 
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault()
         setSelectedSearchIndex(prev => 
-          prev < searchResults.length - 1 ? prev + 1 : 0
+          prev < searchResults?.length || 0 - 1 ? prev + 1 : 0
         )
         break
       case 'ArrowUp':
         e.preventDefault()
         setSelectedSearchIndex(prev => 
-          prev > 0 ? prev - 1 : searchResults.length - 1
+          prev > 0 ? prev - 1 : searchResults?.length || 0 - 1
         )
         break
       case 'Enter':
         e.preventDefault()
-        if (selectedSearchIndex < searchResults.length) {
+        if (selectedSearchIndex < searchResults?.length || 0) {
           handleSearchSelect(searchResults[selectedSearchIndex])
         }
         break
@@ -280,7 +280,7 @@ export default function Navigation() {
               
               {/* Autocomplete Dropdown */}
               <AnimatePresence>
-                {showSearchResults && searchResults.length > 0 && (
+                {showSearchResults && searchResults?.length || 0 > 0 && (
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}

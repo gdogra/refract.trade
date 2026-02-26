@@ -260,7 +260,7 @@ function calculateStrategyOutcome(
 ): number {
   // Simplified outcome calculation
   // In production, would calculate Greeks evolution and mark-to-market
-  const finalPrice = pricePath[pricePath.length - 1]
+  const finalPrice = pricePath[pricePath?.length || 0 - 1]
   const initialPrice = pricePath[0]
   const priceMove = (finalPrice - initialPrice) / initialPrice
   
@@ -273,15 +273,15 @@ function calculateStrategyOutcome(
  * Calculate Expected Value
  */
 function calculateExpectedValue(outcomes: number[]): number {
-  return outcomes.reduce((sum, outcome) => sum + outcome, 0) / outcomes.length
+  return outcomes.reduce((sum, outcome) => sum + outcome, 0) / outcomes?.length || 0
 }
 
 /**
  * Calculate Probability of Profit
  */
 function calculateProbabilityOfProfit(outcomes: number[]): number {
-  const profitableOutcomes = outcomes.filter(outcome => outcome > 0).length
-  return profitableOutcomes / outcomes.length
+  const profitableOutcomes = outcomes.filter(outcome => outcome > 0)?.length || 0
+  return profitableOutcomes / outcomes?.length || 0
 }
 
 /**
@@ -289,32 +289,32 @@ function calculateProbabilityOfProfit(outcomes: number[]): number {
  */
 function calculateCVaR(outcomes: number[]): CVaRResult {
   const sorted = outcomes.sort((a, b) => a - b)
-  const n = sorted.length
+  const n = sorted?.length || 0
   
   // 95% CVaR
   const var95Index = Math.floor(0.05 * n)
   const var95 = sorted[var95Index]
   const tailLosses95 = sorted.slice(0, var95Index)
-  const cvar95 = tailLosses95.length > 0 
-    ? tailLosses95.reduce((sum, loss) => sum + loss, 0) / tailLosses95.length 
+  const cvar95 = tailLosses95?.length || 0 > 0 
+    ? tailLosses95.reduce((sum, loss) => sum + loss, 0) / tailLosses95?.length || 0 
     : var95
   
   // 99% CVaR
   const var99Index = Math.floor(0.01 * n)
   const var99 = sorted[var99Index]
   const tailLosses99 = sorted.slice(0, var99Index)
-  const cvar99 = tailLosses99.length > 0
-    ? tailLosses99.reduce((sum, loss) => sum + loss, 0) / tailLosses99.length
+  const cvar99 = tailLosses99?.length || 0 > 0
+    ? tailLosses99.reduce((sum, loss) => sum + loss, 0) / tailLosses99?.length || 0
     : var99
   
   // Expected shortfall (average of worst 5%)
   const worstOutcomes = sorted.slice(0, Math.floor(0.05 * n))
-  const expectedShortfall95 = worstOutcomes.reduce((sum, loss) => sum + loss, 0) / worstOutcomes.length
+  const expectedShortfall95 = worstOutcomes.reduce((sum, loss) => sum + loss, 0) / worstOutcomes?.length || 0
   
   const veryWorstOutcomes = sorted.slice(0, Math.floor(0.01 * n))
-  const expectedShortfall99 = veryWorstOutcomes.reduce((sum, loss) => sum + loss, 0) / veryWorstOutcomes.length
+  const expectedShortfall99 = veryWorstOutcomes.reduce((sum, loss) => sum + loss, 0) / veryWorstOutcomes?.length || 0
   
-  const tailLoss = worstOutcomes.reduce((sum, loss) => sum + loss, 0) / worstOutcomes.length
+  const tailLoss = worstOutcomes.reduce((sum, loss) => sum + loss, 0) / worstOutcomes?.length || 0
   
   return {
     cvar95,
@@ -331,7 +331,7 @@ function calculateCVaR(outcomes: number[]): CVaRResult {
  */
 function calculateEnhancedVaR(outcomes: number[], historicalData: HistoricalDataInput): VaRResult {
   const sorted = outcomes.sort((a, b) => a - b)
-  const n = sorted.length
+  const n = sorted?.length || 0
   
   // Historical VaR (empirical quantiles)
   const var95 = sorted[Math.floor(0.05 * n)]
@@ -359,7 +359,7 @@ function calculateEnhancedVaR(outcomes: number[], historicalData: HistoricalData
  * Analyze return distribution characteristics
  */
 function analyzeDistribution(outcomes: number[]): DistributionAnalysis {
-  const n = outcomes.length
+  const n = outcomes?.length || 0
   const mean = outcomes.reduce((sum, x) => sum + x, 0) / n
   
   // Calculate moments
@@ -386,9 +386,9 @@ function analyzeDistribution(outcomes: number[]): DistributionAnalysis {
   for (let i = 0; i < 100; i++) {
     const binStart = sorted[0] + i * binSize
     const binEnd = binStart + binSize
-    const count = sorted.filter(x => x >= binStart && x < binEnd).length
+    const count = sorted.filter(x => x >= binStart && x < binEnd)?.length || 0
     const probability = count / n
-    const cumulativeProbability = sorted.filter(x => x < binEnd).length / n
+    const cumulativeProbability = sorted.filter(x => x < binEnd)?.length || 0 / n
     
     probabilityDensityFunction.push({
       value: binStart + binSize / 2,
@@ -502,7 +502,7 @@ function performStressTesting(
   
   const averageLoss = scenarios
     .filter(s => s.portfolioImpact.totalPnL < 0)
-    .reduce((sum, s) => sum + s.portfolioImpact.totalPnL, 0) / scenarios.length
+    .reduce((sum, s) => sum + s.portfolioImpact.totalPnL, 0) / scenarios?.length || 0
   
   return {
     scenarios,
@@ -544,30 +544,30 @@ function calculateScenarioImpact(
  */
 function analyzeTailExposure(outcomes: number[]): TailExposureAnalysis {
   const sorted = outcomes.sort((a, b) => a - b)
-  const n = sorted.length
+  const n = sorted?.length || 0
   const mean = outcomes.reduce((sum, x) => sum + x, 0) / n
   const std = Math.sqrt(outcomes.reduce((sum, x) => sum + Math.pow(x - mean, 2), 0) / n)
   
   // Left tail (downside) - worst 5%
   const leftTailIndex = Math.floor(0.05 * n)
   const leftTailOutcomes = sorted.slice(0, leftTailIndex)
-  const leftTailExposure = leftTailOutcomes.reduce((sum, x) => sum + Math.abs(x), 0) / leftTailOutcomes.length
+  const leftTailExposure = leftTailOutcomes.reduce((sum, x) => sum + Math.abs(x), 0) / leftTailOutcomes?.length || 0
   
   // Right tail (upside) - best 5%
   const rightTailIndex = Math.floor(0.95 * n)
   const rightTailOutcomes = sorted.slice(rightTailIndex)
-  const rightTailExposure = rightTailOutcomes.reduce((sum, x) => sum + x, 0) / rightTailOutcomes.length
+  const rightTailExposure = rightTailOutcomes.reduce((sum, x) => sum + x, 0) / rightTailOutcomes?.length || 0
   
   const tailRatio = rightTailExposure / Math.max(leftTailExposure, 1)
   
   // Extreme events (3+ sigma)
   const extremeThreshold = 3 * std
-  const extremeEvents = outcomes.filter(x => Math.abs(x - mean) > extremeThreshold).length
+  const extremeEvents = outcomes.filter(x => Math.abs(x - mean) > extremeThreshold)?.length || 0
   const extremeEventProbability = extremeEvents / n
   
   // Black swan exposure (6+ sigma)
   const blackSwanThreshold = 6 * std
-  const blackSwanEvents = outcomes.filter(x => Math.abs(x - mean) > blackSwanThreshold).length
+  const blackSwanEvents = outcomes.filter(x => Math.abs(x - mean) > blackSwanThreshold)?.length || 0
   const blackSwanExposure = blackSwanEvents / n
   
   return {
@@ -587,7 +587,7 @@ function calculateKellyFraction(outcomes: number[], riskFreeRate: number): Kelly
   const wins = outcomes.filter(x => x > 0)
   const losses = outcomes.filter(x => x < 0)
   
-  if (wins.length === 0 || losses.length === 0) {
+  if (wins?.length || 0 === 0 || losses?.length || 0 === 0) {
     return {
       optimalFraction: 0,
       adjustedFraction: 0,
@@ -597,9 +597,9 @@ function calculateKellyFraction(outcomes: number[], riskFreeRate: number): Kelly
     }
   }
   
-  const winProbability = wins.length / outcomes.length
-  const averageWin = wins.reduce((sum, x) => sum + x, 0) / wins.length
-  const averageLoss = Math.abs(losses.reduce((sum, x) => sum + x, 0) / losses.length)
+  const winProbability = wins?.length || 0 / outcomes?.length || 0
+  const averageWin = wins.reduce((sum, x) => sum + x, 0) / wins?.length || 0
+  const averageLoss = Math.abs(losses.reduce((sum, x) => sum + x, 0) / losses?.length || 0)
   
   // Kelly formula: f = (p * b - q) / b
   // where p = win probability, q = loss probability, b = win/loss ratio
@@ -634,8 +634,8 @@ function calculateKellyFraction(outcomes: number[], riskFreeRate: number): Kelly
  * Calculate Sharpe ratio for options strategies
  */
 function calculateOptionsSharpe(outcomes: number[], riskFreeRate: number): number {
-  const mean = outcomes.reduce((sum, x) => sum + x, 0) / outcomes.length
-  const std = Math.sqrt(outcomes.reduce((sum, x) => sum + Math.pow(x - mean, 2), 0) / outcomes.length)
+  const mean = outcomes.reduce((sum, x) => sum + x, 0) / outcomes?.length || 0
+  const std = Math.sqrt(outcomes.reduce((sum, x) => sum + Math.pow(x - mean, 2), 0) / outcomes?.length || 0)
   
   // Annualized Sharpe-like ratio
   const annualizedReturn = mean * 252 // Daily to annual
@@ -670,7 +670,7 @@ export function aggregatePortfolioRiskMetrics(
   positionMetrics: AdvancedRiskMetrics[],
   correlationMatrix?: number[][]
 ): AdvancedRiskMetrics {
-  const n = positionMetrics.length
+  const n = positionMetrics?.length || 0
   
   if (n === 0) {
     throw new Error('No position metrics provided')

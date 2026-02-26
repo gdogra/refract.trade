@@ -178,12 +178,12 @@ export class ReferralManager {
     ])
 
     const successfulReferrals = referrals.filter(r => r.status === 'completed')
-    const remainingReferrals = Math.max(0, 3 - successfulReferrals.length)
+    const remainingReferrals = Math.max(0, 3 - successfulReferrals?.length || 0)
 
     return {
       referralCode,
-      totalReferrals: referrals.length,
-      successfulReferrals: successfulReferrals.length,
+      totalReferrals: referrals?.length || 0,
+      successfulReferrals: successfulReferrals?.length || 0,
       remainingReferrals,
       totalTrialDaysEarned: totalEarned._sum.rewardValue || 0,
       maxTrialDaysFromReferrals: 90, // 3 referrals × 30 days

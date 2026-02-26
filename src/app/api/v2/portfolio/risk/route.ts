@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
     // Get user's positions (mock data for now - integrate with your position management system)
     const positions = await getUserPositions(session.user.id)
     
-    if (positions.length === 0) {
+    if (positions?.length || 0 === 0) {
       return NextResponse.json({
         success: true,
         data: {
@@ -74,13 +74,13 @@ export async function GET(request: NextRequest) {
       success: true,
       data: {
         riskMetrics,
-        positionCount: positions.length,
+        positionCount: positions?.length || 0,
         summary: {
           riskScore: riskMetrics.riskScore,
           totalValue: riskMetrics.totalValue,
           unrealizedPnL: riskMetrics.unrealizedPnL,
-          criticalAlerts: riskMetrics.alerts.filter(a => a.severity === 'critical').length,
-          nextExpiration: riskMetrics.expirationRisk.length > 0 
+          criticalAlerts: riskMetrics.alerts.filter(a => a.severity === 'critical')?.length || 0,
+          nextExpiration: riskMetrics.expirationRisk?.length || 0 > 0 
             ? riskMetrics.expirationRisk[0].expiry 
             : null
         }
@@ -138,7 +138,7 @@ export async function POST(request: NextRequest) {
         riskMetrics,
         scenarioResults,
         analysis: 'hypothetical',
-        positionCount: positions.length
+        positionCount: positions?.length || 0
       },
       timestamp: new Date().toISOString()
     })

@@ -420,7 +420,7 @@ export class PortfolioAwareEngine {
    * Assess if portfolio needs diversification
    */
   private assessDiversificationNeeds(context: PortfolioContext): boolean {
-    const sectorCount = Object.keys(context.sectorExposures).length
+    const sectorCount = Object.keys(context.sectorExposures)?.length || 0
     const maxSectorExposure = Math.max(...Object.values(context.sectorExposures))
     
     return sectorCount < 3 || maxSectorExposure > 0.6
@@ -454,8 +454,8 @@ export class PortfolioAwareEngine {
     let maxCorrelation = 0
     let correlatedPairs: string[] = []
     
-    for (let i = 0; i < symbols.length; i++) {
-      for (let j = i + 1; j < symbols.length; j++) {
+    for (let i = 0; i < symbols?.length || 0; i++) {
+      for (let j = i + 1; j < symbols?.length || 0; j++) {
         const correlation = correlationMatrix[symbols[i]]?.[symbols[j]] || 0
         if (Math.abs(correlation) > 0.7) {
           maxCorrelation = Math.max(maxCorrelation, Math.abs(correlation))

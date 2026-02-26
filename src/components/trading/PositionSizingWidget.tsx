@@ -143,7 +143,7 @@ export function PositionSizingWidget({
               <p className="text-sm text-blue-800">{result.explanation}</p>
             </div>
 
-            {result.warnings.length > 0 && (
+            {result.warnings?.length || 0 > 0 && (
               <div className="space-y-2">
                 {result.warnings.map((warning, idx) => (
                   <div key={idx} className="flex items-start gap-2 p-2 bg-yellow-50 rounded border-l-4 border-yellow-500">

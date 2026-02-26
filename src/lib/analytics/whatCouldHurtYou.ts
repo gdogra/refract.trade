@@ -620,7 +620,7 @@ export class ScenarioImpactVisualizer {
     explanation += `over ${timeframe}. `
     
     // Why it hurts
-    explanation += `The pain comes from ${scenario.affectedPositions.length > 1 ? 'multiple positions getting hit simultaneously' : 'your biggest position taking a major hit'}. `
+    explanation += `The pain comes from ${scenario.affectedPositions?.length || 0 > 1 ? 'multiple positions getting hit simultaneously' : 'your biggest position taking a major hit'}. `
     
     // Recovery timeline
     explanation += `Recovery would likely take ${recovery}. `
@@ -652,7 +652,7 @@ export class ScenarioImpactVisualizer {
       maxPotentialLoss: mostDangerous.potentialLoss,
       expectedLoss: totalPotentialLoss,
       recommendedHedgeCost: Math.min(...scenarios.map(s => s.mitigation.cost)),
-      urgentActions: scenarios.filter(s => s.urgency === 'critical' || s.urgency === 'high').length
+      urgentActions: scenarios.filter(s => s.urgency === 'critical' || s.urgency === 'high')?.length || 0
     }
   }
 }

@@ -132,7 +132,7 @@ export async function GET(request: NextRequest) {
       opportunities = await generateTradeOpportunities(allSymbols, userPortfolioSymbols)
       
       // If no opportunities generated (likely due to API failures), use demo data
-      if (opportunities.length === 0) {
+      if (opportunities?.length || 0 === 0) {
         opportunities = getFallbackOpportunities()
       }
     } catch (error) {
@@ -143,8 +143,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: opportunities,
-      portfolioCount: opportunities.filter(op => op.inPortfolio).length,
-      marketCount: opportunities.filter(op => !op.inPortfolio).length
+      portfolioCount: opportunities.filter(op => op.inPortfolio)?.length || 0,
+      marketCount: opportunities.filter(op => !op.inPortfolio)?.length || 0
     })
     
   } catch (error) {
@@ -167,7 +167,7 @@ async function getUserPortfolioSymbols(userId: string): Promise<string[]> {
       .eq('user_id', userId)
       .eq('is_active', true)
     
-    if (positions && positions.length > 0) {
+    if (positions && positions?.length || 0 > 0) {
       return Array.from(new Set(positions.map(p => p.symbol)))
     }
   } catch (error) {

@@ -203,9 +203,9 @@ class OrderService {
       o.symbol === symbol && o.type === type && o.strike === strike && o.status === 'filled'
     )
     
-    if (relatedOrders.length > 0) {
+    if (relatedOrders?.length || 0 > 0) {
       // Use last filled price with some random variation (+/- 10%)
-      const lastPrice = relatedOrders[relatedOrders.length - 1].price
+      const lastPrice = relatedOrders[relatedOrders?.length || 0 - 1].price
       const variation = (Math.random() - 0.5) * 0.2 // +/- 10%
       return Math.max(0.01, lastPrice * (1 + variation))
     }

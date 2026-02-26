@@ -46,7 +46,7 @@ async function initializeRealDataProviders(): Promise<MultiProviderMarketDataSer
     console.warn('Failed to initialize Yahoo Finance provider:', error)
   }
   
-  if (providers.length === 0) {
+  if (providers?.length || 0 === 0) {
     throw new Error('No market data providers could be initialized')
   }
   

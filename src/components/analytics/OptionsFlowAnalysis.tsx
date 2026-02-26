@@ -128,13 +128,13 @@ export default function OptionsFlowAnalysis({
     const bearishFlow = mockFlows.filter(f => f.sentiment === 'bearish').reduce((sum, f) => sum + f.notionalValue, 0)
     
     setSummary({
-      totalFlows: mockFlows.length,
+      totalFlows: mockFlows?.length || 0,
       totalNotional,
       bullishNotional: bullishFlow,
       bearishNotional: bearishFlow,
       bullishPercentage: (bullishFlow / totalNotional) * 100,
-      institutionalPercentage: (mockFlows.filter(f => f.institutionalProbability > 0.8).length / mockFlows.length) * 100,
-      averageSize: totalNotional / mockFlows.length,
+      institutionalPercentage: (mockFlows.filter(f => f.institutionalProbability > 0.8)?.length || 0 / mockFlows?.length || 0) * 100,
+      averageSize: totalNotional / mockFlows?.length || 0,
       putCallRatio: bearishFlow / bullishFlow
     })
     
@@ -447,13 +447,13 @@ export default function OptionsFlowAnalysis({
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600 dark:text-gray-400">Sweep Activity</span>
                     <span className="font-medium text-yellow-600">
-                      {flowData.filter(f => f.flowType === 'sweep').length} flows
+                      {flowData.filter(f => f.flowType === 'sweep')?.length || 0} flows
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600 dark:text-gray-400">Block Trades</span>
                     <span className="font-medium text-blue-600">
-                      {flowData.filter(f => f.flowType === 'block').length} flows
+                      {flowData.filter(f => f.flowType === 'block')?.length || 0} flows
                     </span>
                   </div>
                 </div>

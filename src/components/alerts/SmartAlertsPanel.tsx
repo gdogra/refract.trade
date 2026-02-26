@@ -91,8 +91,8 @@ export function SmartAlertsPanel({ userId }: { userId: string }) {
     }
   }
 
-  const unreadCount = alerts.filter(a => !a.read).length
-  const urgentCount = alerts.filter(a => a.priority === 'urgent').length
+  const unreadCount = alerts.filter(a => !a.read)?.length || 0
+  const urgentCount = alerts.filter(a => a.priority === 'urgent')?.length || 0
 
   if (loading) {
     return (
@@ -139,7 +139,7 @@ export function SmartAlertsPanel({ userId }: { userId: string }) {
       </div>
 
       <div className="space-y-3 max-h-96 overflow-y-auto">
-        {alerts.length === 0 ? (
+        {alerts?.length || 0 === 0 ? (
           <div className="text-center py-6 text-gray-500">
             <Bell className="w-8 h-8 mx-auto mb-2 opacity-50" />
             <p>No alerts to display</p>
@@ -176,7 +176,7 @@ export function SmartAlertsPanel({ userId }: { userId: string }) {
                       </details>
                     )}
                     
-                    {alert.actionButtons && alert.actionButtons.length > 0 && (
+                    {alert.actionButtons && alert.actionButtons?.length || 0 > 0 && (
                       <div className="flex gap-2 mt-3">
                         {alert.actionButtons.map((button, idx) => (
                           <button

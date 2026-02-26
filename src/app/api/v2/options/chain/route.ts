@@ -65,8 +65,8 @@ export async function GET(request: NextRequest) {
         responseTime,
         timestamp: new Date().toISOString(),
         metadata: {
-          totalCalls: optionsChain.calls.length,
-          totalPuts: optionsChain.puts.length,
+          totalCalls: optionsChain.calls?.length || 0,
+          totalPuts: optionsChain.puts?.length || 0,
           dataSource: optionsChain.source,
           riskFreeRate: optionsChain.greeksMetadata.riskFreeRate
         }
@@ -98,7 +98,7 @@ export async function GET(request: NextRequest) {
 function calculateAggregateMetrics(chain: any) {
   const allContracts = [...chain.calls, ...chain.puts]
   
-  if (allContracts.length === 0) {
+  if (allContracts?.length || 0 === 0) {
     return {
       totalVolume: 0,
       totalOpenInterest: 0,
@@ -113,7 +113,7 @@ function calculateAggregateMetrics(chain: any) {
 
   const totalVolume = allContracts.reduce((sum: number, c: any) => sum + c.volume, 0)
   const totalOpenInterest = allContracts.reduce((sum: number, c: any) => sum + c.openInterest, 0)
-  const avgImpliedVolatility = allContracts.reduce((sum, c) => sum + c.impliedVolatility, 0) / allContracts.length
+  const avgImpliedVolatility = allContracts.reduce((sum, c) => sum + c.impliedVolatility, 0) / allContracts?.length || 0
 
   // Calculate put/call metrics
   const putVolume = chain.puts.reduce((sum: number, p: any) => sum + p.volume, 0)

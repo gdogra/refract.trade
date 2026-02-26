@@ -294,7 +294,7 @@ export class FinnhubProvider implements MarketDataProvider {
 
       const historicalData: HistoricalData[] = []
       
-      for (let i = 0; i < data.t.length; i++) {
+      for (let i = 0; i < data.t?.length || 0; i++) {
         historicalData.push({
           date: new Date(data.t[i] * 1000),
           open: data.o[i],
@@ -358,7 +358,7 @@ export class YahooFinanceProvider implements MarketDataProvider {
         throw new Error('Incomplete data from Yahoo Finance')
       }
 
-      const lastIndex = quote.close.length - 1
+      const lastIndex = quote.close?.length || 0 - 1
       const currentPrice = quote.close[lastIndex]
       const previousClose = meta.previousClose
       
@@ -447,7 +447,7 @@ export class YahooFinanceProvider implements MarketDataProvider {
       const quote = result.indicators?.quote?.[0] || {}
       const historicalData: HistoricalData[] = []
       
-      for (let i = 0; i < timestamps.length; i++) {
+      for (let i = 0; i < timestamps?.length || 0; i++) {
         if (quote.close[i] !== null) {
           historicalData.push({
             date: new Date(timestamps[i] * 1000),
@@ -559,7 +559,7 @@ export class MultiProviderMarketDataService {
       }
     }
     
-    if (uncachedSymbols.length === 0) {
+    if (uncachedSymbols?.length || 0 === 0) {
       return quotes
     }
 

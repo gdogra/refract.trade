@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
         const pnlPercent = entryValue > 0 ? (unrealizedPnl / entryValue) * 100 : 0
 
         // Calculate days to expiry for strategy
-        const daysToExpiry = position.legs.length > 0 
+        const daysToExpiry = position.legs?.length || 0 > 0 
           ? Math.min(...position.legs.map(leg => {
               const expiry = new Date(leg.expiry)
               const now = new Date()
@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
           : 0
 
         let greeksData = null
-        if (includeGreeks && position.legs.length > 0) {
+        if (includeGreeks && position.legs?.length || 0 > 0) {
           try {
             // Calculate Greeks for each leg and aggregate
             const legGreeks = await Promise.all(
@@ -197,12 +197,12 @@ export async function GET(request: NextRequest) {
 
     // Calculate portfolio summary
     const portfolioSummary = {
-      totalPositions: processedPositions.length,
+      totalPositions: processedPositions?.length || 0,
       totalValue: processedPositions.reduce((sum, pos) => sum + (pos.currentPrice * pos.quantity * 100), 0),
       totalPnl: processedPositions.reduce((sum, pos) => sum + pos.unrealizedPnl, 0),
       totalPnlPercent: 0, // Will calculate after getting total invested
-      activePositions: processedPositions.filter(pos => pos.daysToExpiry > 0).length,
-      expiringThisWeek: processedPositions.filter(pos => pos.daysToExpiry <= 7 && pos.daysToExpiry > 0).length
+      activePositions: processedPositions.filter(pos => pos.daysToExpiry > 0)?.length || 0,
+      expiringThisWeek: processedPositions.filter(pos => pos.daysToExpiry <= 7 && pos.daysToExpiry > 0)?.length || 0
     }
 
     const totalInvested = processedPositions.reduce((sum, pos) => sum + (pos.entryPrice * pos.quantity * 100), 0)

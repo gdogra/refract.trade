@@ -285,7 +285,7 @@ export default function MarketIntelligenceDashboard() {
                   </SmartTooltip>
                 </CardTitle>
                 <Badge variant="outline">
-                  Live • {optionsFlow.filter(f => f.unusual).length} alerts
+                  Live • {optionsFlow.filter(f => f.unusual)?.length || 0} alerts
                 </Badge>
               </div>
             </CardHeader>
@@ -469,7 +469,7 @@ export default function MarketIntelligenceDashboard() {
                   <AlertTriangle className="h-8 w-8 text-yellow-500" />
                   <div>
                     <div className="text-2xl font-bold">
-                      {optionsFlow.filter(f => f.unusual).length}
+                      {optionsFlow.filter(f => f.unusual)?.length || 0}
                     </div>
                     <div className="text-sm text-gray-600">Unusual Activity</div>
                   </div>
@@ -483,7 +483,7 @@ export default function MarketIntelligenceDashboard() {
                   <PieChart className="h-8 w-8 text-green-500" />
                   <div>
                     <div className="text-2xl font-bold">
-                      {putCallData.reduce((sum, d) => sum + d.putCallRatio, 0) / putCallData.length}
+                      {putCallData.reduce((sum, d) => sum + d.putCallRatio, 0) / putCallData?.length || 0}
                     </div>
                     <div className="text-sm text-gray-600">Avg P/C Ratio</div>
                   </div>
@@ -497,7 +497,7 @@ export default function MarketIntelligenceDashboard() {
                   <Activity className="h-8 w-8 text-purple-500" />
                   <div>
                     <div className="text-2xl font-bold">
-                      {Math.round(gammaData.reduce((sum, g) => sum + g.totalGamma, 0) / gammaData.length)}
+                      {Math.round(gammaData.reduce((sum, g) => sum + g.totalGamma, 0) / gammaData?.length || 0)}
                     </div>
                     <div className="text-sm text-gray-600">Avg Gamma</div>
                   </div>

@@ -181,9 +181,9 @@ export default function PortfolioHealthDashboard({
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Risk Factors</p>
-                <p className="text-2xl font-bold">{healthData.riskFactors.length}</p>
+                <p className="text-2xl font-bold">{healthData.riskFactors?.length || 0}</p>
                 <p className="text-sm mt-1 text-gray-500">
-                  {healthData.riskFactors.filter(rf => rf.severity === 'critical' || rf.severity === 'high').length} high/critical
+                  {healthData.riskFactors.filter(rf => rf.severity === 'critical' || rf.severity === 'high')?.length || 0} high/critical
                 </p>
               </div>
               <AlertTriangle className="h-8 w-8 text-orange-600" />
@@ -401,7 +401,7 @@ export default function PortfolioHealthDashboard({
       </Card>
 
       {/* Actionable Guidance */}
-      {displayedGuidance.length > 0 && (
+      {displayedGuidance?.length || 0 > 0 && (
         <Card>
           <CardHeader>
             <div className="flex justify-between items-center">
@@ -411,16 +411,16 @@ export default function PortfolioHealthDashboard({
                   <span>Immediate Actions Required</span>
                 </CardTitle>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  {criticalGuidance.length} critical actions • Updated {healthData.lastUpdated.toLocaleTimeString()}
+                  {criticalGuidance?.length || 0} critical actions • Updated {healthData.lastUpdated.toLocaleTimeString()}
                 </p>
               </div>
-              {actionableGuidance.length > displayedGuidance.length && (
+              {actionableGuidance?.length || 0 > displayedGuidance?.length || 0 && (
                 <Button 
                   variant="ghost" 
                   size="sm"
                   onClick={() => setShowAllGuidance(!showAllGuidance)}
                 >
-                  {showAllGuidance ? 'Show Less' : `Show All (${actionableGuidance.length})`}
+                  {showAllGuidance ? 'Show Less' : `Show All (${actionableGuidance?.length || 0})`}
                 </Button>
               )}
             </div>
@@ -482,7 +482,7 @@ export default function PortfolioHealthDashboard({
       )}
 
       {/* Risk Factors Detail */}
-      {healthData.riskFactors.length > 0 && (
+      {healthData.riskFactors?.length || 0 > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>Risk Factors Breakdown</CardTitle>
@@ -562,7 +562,7 @@ export default function PortfolioHealthDashboard({
             </div>
             <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Risk Management</h3>
             <p className="text-3xl font-bold text-blue-600 mb-2">
-              {healthData.riskFactors.filter(rf => rf.severity === 'critical' || rf.severity === 'high').length}
+              {healthData.riskFactors.filter(rf => rf.severity === 'critical' || rf.severity === 'high')?.length || 0}
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               High-priority risk factors requiring attention

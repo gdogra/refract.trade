@@ -274,7 +274,7 @@ function parseYahooResponse(result: any, selectedExpiration?: string): OptionsCh
     return date.toISOString().split('T')[0]
   })
   
-  if (expirationDates.length === 0) {
+  if (expirationDates?.length || 0 === 0) {
     throw new Error('No expiration dates found')
   }
   

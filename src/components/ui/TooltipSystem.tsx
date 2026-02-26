@@ -197,7 +197,7 @@ export function AdvancedTooltip({ children, config, className = '' }: AdvancedTo
               </div>
               
               {/* Examples */}
-              {config.examples && config.examples.length > 0 && (
+              {config.examples && config.examples?.length || 0 > 0 && (
                 <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
                   <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
                     Examples:
@@ -214,7 +214,7 @@ export function AdvancedTooltip({ children, config, className = '' }: AdvancedTo
               )}
               
               {/* Related Features */}
-              {config.relatedFeatures && config.relatedFeatures.length > 0 && (
+              {config.relatedFeatures && config.relatedFeatures?.length || 0 > 0 && (
                 <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
                   <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
                     Related:
@@ -316,7 +316,7 @@ export function ContextualHelp({ isOpen, onClose, helpPoints }: ContextualHelpPr
     }
   }, [isOpen, helpPoints])
   
-  if (!isOpen || helpPoints.length === 0) return null
+  if (!isOpen || helpPoints?.length || 0 === 0) return null
   
   const currentPoint = helpPoints[currentStep]
   const position = elementPositions[currentPoint.id]
@@ -374,7 +374,7 @@ export function ContextualHelp({ isOpen, onClose, helpPoints }: ContextualHelpPr
             
             <div className="flex items-center justify-between">
               <span className="text-xs text-gray-500">
-                {currentStep + 1} of {helpPoints.length}
+                {currentStep + 1} of {helpPoints?.length || 0}
               </span>
               
               <div className="flex space-x-2">
@@ -387,7 +387,7 @@ export function ContextualHelp({ isOpen, onClose, helpPoints }: ContextualHelpPr
                   </button>
                 )}
                 
-                {currentStep < helpPoints.length - 1 ? (
+                {currentStep < helpPoints?.length || 0 - 1 ? (
                   <button
                     onClick={() => setCurrentStep(currentStep + 1)}
                     className="px-3 py-1 text-xs text-white rounded"

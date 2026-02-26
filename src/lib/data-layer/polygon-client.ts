@@ -77,7 +77,7 @@ class PolygonClient {
     try {
       const data = await this.rateLimitedFetch(url)
       
-      if (!data.results || data.results.length === 0) {
+      if (!data.results || data.results?.length || 0 === 0) {
         throw new Error(`No data found for symbol ${symbol}`)
       }
 
@@ -119,7 +119,7 @@ class PolygonClient {
         quotes.push(quote)
         
         // Rate limiting for Starter plan
-        if (symbols.length > 1) {
+        if (symbols?.length || 0 > 1) {
           await new Promise(resolve => setTimeout(resolve, this.rateLimitDelay))
         }
       } catch (error) {

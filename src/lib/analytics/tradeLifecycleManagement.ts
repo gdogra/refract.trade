@@ -593,7 +593,7 @@ export class ExitIntelligenceEngine {
       risks.push('Upcoming events could cause sudden moves')
     }
 
-    return risks.length > 0 ? risks.join('. ') + '.' : 'Minimal risks to holding current position.'
+    return risks?.length || 0 > 0 ? risks.join('. ') + '.' : 'Minimal risks to holding current position.'
   }
 
   /**

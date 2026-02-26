@@ -164,7 +164,7 @@ export default function AddPositionForm({ isOpen, onClose, onSubmit, defaultSymb
     }
     
     setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
+    return Object.keys(newErrors)?.length || 0 === 0
   }
   
   const handleSubmit = async (e: React.FormEvent) => {
@@ -198,7 +198,7 @@ export default function AddPositionForm({ isOpen, onClose, onSubmit, defaultSymb
     const symbol = e.target.value.toUpperCase()
     setFormData(prev => ({ ...prev, symbol }))
     
-    if (symbol.length >= 1) {
+    if (symbol?.length || 0 >= 1) {
       fetchCurrentPrice(symbol)
     }
   }

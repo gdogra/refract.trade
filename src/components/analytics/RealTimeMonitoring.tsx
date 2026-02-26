@@ -112,7 +112,7 @@ export default function RealTimeMonitoring({
       })
       
       // Only update if we have real data
-      if (Object.keys(newData).length > 0) {
+      if (Object.keys(newData)?.length || 0 > 0) {
         setLiveData(newData)
       } else {
         console.error('No real market data available')
@@ -125,7 +125,7 @@ export default function RealTimeMonitoring({
     
     // Update monitoring stats
     setMonitoringStats({
-      dataPoints: Object.keys(newData).length,
+      dataPoints: Object.keys(newData)?.length || 0,
       lastUpdate: new Date(),
       updateFrequency: 5000,
       latency: Math.floor(Math.random() * 50) + 20,
@@ -168,7 +168,7 @@ export default function RealTimeMonitoring({
     })
     
     // Limit alerts to prevent spam
-    if (newAlerts.length > 0) {
+    if (newAlerts?.length || 0 > 0) {
       setAlerts(prev => [...prev, ...newAlerts].slice(-10))
     }
   }
@@ -209,7 +209,7 @@ export default function RealTimeMonitoring({
           <div className="flex items-center space-x-2">
             <Radio className="h-4 w-4 text-blue-500" />
             <span className="text-sm text-gray-600 dark:text-gray-400">
-              Monitoring {watchlist.length} symbols
+              Monitoring {watchlist?.length || 0} symbols
             </span>
           </div>
         </div>
@@ -299,7 +299,7 @@ export default function RealTimeMonitoring({
       </motion.div>
 
       {/* Real-Time Alerts */}
-      {enableAlerts && alerts.length > 0 && (
+      {enableAlerts && alerts?.length || 0 > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -311,7 +311,7 @@ export default function RealTimeMonitoring({
                 <div className="flex items-center space-x-2">
                   <Bell className="h-5 w-5 text-yellow-500" />
                   <span>Live Alerts</span>
-                  <Badge variant="secondary">{alerts.length}</Badge>
+                  <Badge variant="secondary">{alerts?.length || 0}</Badge>
                 </div>
                 <Button onClick={clearAllAlerts} variant="outline" size="sm">
                   Clear All
@@ -408,7 +408,7 @@ export default function RealTimeMonitoring({
                 
                 <div className="text-center">
                   <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                    {alerts.length}
+                    {alerts?.length || 0}
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">Active Alerts</div>
                 </div>

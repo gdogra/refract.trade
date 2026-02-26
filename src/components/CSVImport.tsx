@@ -150,7 +150,7 @@ export default function CSVImport({ isOpen, onClose, onImportComplete, className
     setIsDragging(false)
 
     const files = Array.from(e.dataTransfer.files)
-    if (files.length > 0) {
+    if (files?.length || 0 > 0) {
       handleFileSelect(files[0])
     }
   }, [handleFileSelect])
@@ -166,7 +166,7 @@ export default function CSVImport({ isOpen, onClose, onImportComplete, className
       setImportResult(result)
       setStep('results')
       
-      if (result.success && result.positions.length > 0) {
+      if (result.success && result.positions?.length || 0 > 0) {
         toast.success(formatImportResults(result))
       } else {
         toast.error('Import failed - please check errors below')
@@ -207,7 +207,7 @@ export default function CSVImport({ isOpen, onClose, onImportComplete, className
 
   // Parse CSV preview data
   const previewData = csvText ? csvImportService.parseCSV(csvText, true).slice(0, 5) : []
-  const previewHeaders = previewData.length > 0 ? Object.keys(previewData[0]) : []
+  const previewHeaders = previewData?.length || 0 > 0 ? Object.keys(previewData[0]) : []
 
   if (!isOpen) return null
 
@@ -398,7 +398,7 @@ export default function CSVImport({ isOpen, onClose, onImportComplete, className
                           <p className="text-sm text-gray-600 dark:text-gray-400">
                             {(csvFile?.size || 0) < 1024 ? `${csvFile?.size} bytes` :
                              (csvFile?.size || 0) < 1024 * 1024 ? `${Math.round((csvFile?.size || 0) / 1024)} KB` :
-                             `${Math.round((csvFile?.size || 0) / (1024 * 1024))} MB`} • {previewData.length} rows
+                             `${Math.round((csvFile?.size || 0) / (1024 * 1024))} MB`} • {previewData?.length || 0} rows
                           </p>
                         </div>
                       </div>
@@ -417,7 +417,7 @@ export default function CSVImport({ isOpen, onClose, onImportComplete, className
                 </Card>
 
                 {/* Data Preview */}
-                {showPreview && previewData.length > 0 && (
+                {showPreview && previewData?.length || 0 > 0 && (
                   <Card>
                     <CardHeader>
                       <CardTitle>Data Preview (First 5 rows)</CardTitle>
@@ -440,7 +440,7 @@ export default function CSVImport({ isOpen, onClose, onImportComplete, className
                                 {previewHeaders.map((header, cellIndex) => (
                                   <td key={cellIndex} className="py-2 px-3 text-gray-900 dark:text-white">
                                     {String(row[header]).slice(0, 50)}
-                                    {String(row[header]).length > 50 && '...'}
+                                    {String(row[header])?.length || 0 > 50 && '...'}
                                   </td>
                                 ))}
                               </tr>
@@ -549,7 +549,7 @@ export default function CSVImport({ isOpen, onClose, onImportComplete, className
                               
                               <div>
                                 <p className="text-2xl font-bold text-red-600">
-                                  {importResult.errors.filter(e => e.severity === 'error').length}
+                                  {importResult.errors.filter(e => e.severity === 'error')?.length || 0}
                                 </p>
                                 <p className="text-xs text-gray-600 dark:text-gray-400">
                                   Errors
@@ -558,7 +558,7 @@ export default function CSVImport({ isOpen, onClose, onImportComplete, className
                               
                               <div>
                                 <p className="text-2xl font-bold text-yellow-600">
-                                  {importResult.warnings.length}
+                                  {importResult.warnings?.length || 0}
                                 </p>
                                 <p className="text-xs text-gray-600 dark:text-gray-400">
                                   Warnings
@@ -582,7 +582,7 @@ export default function CSVImport({ isOpen, onClose, onImportComplete, className
                     </Card>
 
                     {/* Errors and Warnings */}
-                    {(importResult.errors.length > 0 || importResult.warnings.length > 0) && (
+                    {(importResult.errors?.length || 0 > 0 || importResult.warnings?.length || 0 > 0) && (
                       <Card>
                         <CardHeader>
                           <div className="flex items-center justify-between">
@@ -701,7 +701,7 @@ export default function CSVImport({ isOpen, onClose, onImportComplete, className
                   >
                     Close
                   </Button>
-                  {importResult?.success && importResult.positions.length > 0 && (
+                  {importResult?.success && importResult.positions?.length || 0 > 0 && (
                     <Button onClick={handleComplete}>
                       Add to Portfolio
                     </Button>

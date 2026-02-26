@@ -51,11 +51,11 @@ export default function QuickStrategyPanel({
     const calls = optionsData.calls || []
     const puts = optionsData.puts || []
     
-    if (calls.length === 0) return null
+    if (calls?.length || 0 === 0) return null
 
     // Calculate IV metrics
-    const avgCallIV = calls.reduce((sum, call) => sum + call.impliedVolatility, 0) / calls.length
-    const avgPutIV = puts.length > 0 ? puts.reduce((sum, put) => sum + put.impliedVolatility, 0) / puts.length : avgCallIV
+    const avgCallIV = calls.reduce((sum, call) => sum + call.impliedVolatility, 0) / calls?.length || 0
+    const avgPutIV = puts?.length || 0 > 0 ? puts.reduce((sum, put) => sum + put.impliedVolatility, 0) / puts?.length || 0 : avgCallIV
     const ivRank = Math.min(100, Math.max(0, (avgCallIV - 0.15) / 0.4 * 100))
     const skew = avgPutIV - avgCallIV
 
@@ -134,7 +134,7 @@ export default function QuickStrategyPanel({
     }
 
     // Default conservative strategy
-    if (strategies.length === 0) {
+    if (strategies?.length || 0 === 0) {
       strategies.push({
         name: 'Cash-Secured Put',
         type: 'bullish',
@@ -235,7 +235,7 @@ export default function QuickStrategyPanel({
               <span>Top Strategies</span>
             </div>
             <Badge variant="secondary" className="text-xs">
-              {analysis?.strategies?.length || 0} found
+              {analysis?.strategies??.length || 0 || 0} found
             </Badge>
           </CardTitle>
         </CardHeader>
@@ -327,7 +327,7 @@ export default function QuickStrategyPanel({
             </div>
           )}
 
-          {(analysis?.strategies?.length || 0) === 0 && (
+          {(analysis?.strategies??.length || 0 || 0) === 0 && (
             <div className="p-2 bg-gray-50 border border-gray-200 rounded text-xs text-gray-600 text-center">
               No clear opportunities identified
             </div>

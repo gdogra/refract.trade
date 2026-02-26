@@ -258,7 +258,7 @@ async function notifyAdminsOfNewFeedback(feedback: any) {
     subject: feedback.subject,
     priority: feedback.priority,
     from: feedback.email,
-    adminCount: adminUsers.length
+    adminCount: adminUsers?.length || 0
   })
   
   // TODO: Implement email notifications to admins

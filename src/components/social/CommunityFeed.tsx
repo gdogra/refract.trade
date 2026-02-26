@@ -323,7 +323,7 @@ export default function CommunityFeed() {
                 )}
 
                 {/* Tags */}
-                {post.tags.length > 0 && (
+                {post.tags?.length || 0 > 0 && (
                   <div className="mb-3">
                     <div className="flex flex-wrap gap-1">
                       {post.tags.map(tag => (
@@ -435,7 +435,7 @@ export default function CommunityFeed() {
       </div>
 
       {/* Empty State */}
-      {posts.length === 0 && (
+      {posts?.length || 0 === 0 && (
         <div className="text-center py-12">
           <div className="text-gray-400 mb-4">
             {filter === 'following' ? '👥' : filter === 'trending' ? '📈' : '📱'}
@@ -461,7 +461,7 @@ export default function CommunityFeed() {
       )}
 
       {/* Load More */}
-      {posts.length > 0 && (
+      {posts?.length || 0 > 0 && (
         <div className="text-center py-4">
           <Button 
             variant="outline" 
@@ -470,7 +470,7 @@ export default function CommunityFeed() {
               // Load more real posts from API
               try {
                 const morePosts = await fetchRealCommunityPosts()
-                if (morePosts.length > allPosts.length) {
+                if (morePosts?.length || 0 > allPosts?.length || 0) {
                   setAllPosts(morePosts)
                 }
               } catch (error) {

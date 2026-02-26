@@ -126,7 +126,7 @@ export default function PortfolioDashboard({ className }: PortfolioDashboardProp
 
   // Portfolio summary calculations
   const portfolioSummary = useMemo(() => {
-    const totalPositions = positions.length
+    const totalPositions = positions?.length || 0
     const totalPnL = positions.reduce((sum, pos) => sum + pos.unrealizedPnl, 0)
     const totalValue = positions.reduce((sum, pos) => sum + Math.abs(pos.totalValue), 0)
     const totalDelta = positions.reduce((sum, pos) => sum + (pos.greeks.delta * pos.quantity * 100), 0)
@@ -134,7 +134,7 @@ export default function PortfolioDashboard({ className }: PortfolioDashboardProp
     const totalTheta = positions.reduce((sum, pos) => sum + (pos.greeks.theta * pos.quantity), 0)
     const totalVega = positions.reduce((sum, pos) => sum + (pos.greeks.vega * pos.quantity), 0)
     
-    const expiringCount = positions.filter(pos => pos.daysToExpiry <= 7).length
+    const expiringCount = positions.filter(pos => pos.daysToExpiry <= 7)?.length || 0
 
     return {
       totalPositions,
@@ -517,7 +517,7 @@ export default function PortfolioDashboard({ className }: PortfolioDashboardProp
                             {moneyness}
                           </span>
                         </div>
-                        {position.tags.length > 0 && (
+                        {position.tags?.length || 0 > 0 && (
                           <div className="flex flex-wrap gap-1 mt-1">
                             {position.tags.slice(0, 2).map(tag => (
                               <span
@@ -527,9 +527,9 @@ export default function PortfolioDashboard({ className }: PortfolioDashboardProp
                                 {tag}
                               </span>
                             ))}
-                            {position.tags.length > 2 && (
+                            {position.tags?.length || 0 > 2 && (
                               <span className="text-xs text-gray-500 dark:text-gray-400">
-                                +{position.tags.length - 2}
+                                +{position.tags?.length || 0 - 2}
                               </span>
                             )}
                           </div>
@@ -614,7 +614,7 @@ export default function PortfolioDashboard({ className }: PortfolioDashboardProp
               </tbody>
             </table>
             
-            {filteredAndSortedPositions.length === 0 && (
+            {filteredAndSortedPositions?.length || 0 === 0 && (
               <div className="text-center py-12">
                 <Target className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-600 dark:text-gray-400 mb-2">

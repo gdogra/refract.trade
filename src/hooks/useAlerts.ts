@@ -79,10 +79,10 @@ export function useAlerts(userId: string) {
 
   // Alert counts
   const counts = {
-    total: alerts.length,
-    unread: alerts.filter(a => !a.isRead).length,
-    critical: alerts.filter(a => a.severity === AlertSeverity.CRITICAL && !a.isResolved).length,
-    actionRequired: alerts.filter(a => a.actionRequired && !a.isResolved).length
+    total: alerts?.length || 0,
+    unread: alerts.filter(a => !a.isRead)?.length || 0,
+    critical: alerts.filter(a => a.severity === AlertSeverity.CRITICAL && !a.isResolved)?.length || 0,
+    actionRequired: alerts.filter(a => a.actionRequired && !a.isResolved)?.length || 0
   }
 
   return {
@@ -204,7 +204,7 @@ export function usePortfolioMonitoring(positions: any[], userId: string, enabled
   const [lastAnalysis, setLastAnalysis] = useState<Date | null>(null)
 
   const runAnalysis = useCallback(async () => {
-    if (!enabled || positions.length === 0) return
+    if (!enabled || positions?.length || 0 === 0) return
 
     try {
       setIsMonitoring(true)
@@ -212,7 +212,7 @@ export function usePortfolioMonitoring(positions: any[], userId: string, enabled
       setLastAnalysis(new Date())
       
       // Return number of new alerts generated
-      return alerts.length
+      return alerts?.length || 0
     } catch (error) {
       console.error('Portfolio analysis failed:', error)
       return 0
@@ -223,7 +223,7 @@ export function usePortfolioMonitoring(positions: any[], userId: string, enabled
 
   // Run analysis when positions change
   useEffect(() => {
-    if (enabled && positions.length > 0) {
+    if (enabled && positions?.length || 0 > 0) {
       // Debounce analysis to avoid too frequent calls
       const timer = setTimeout(runAnalysis, 1000)
       return () => clearTimeout(timer)
@@ -351,20 +351,20 @@ export function useAlertAnalytics(userId: string, days: number = 30) {
 
       // Calculate average response time for resolved alerts
       const resolvedAlerts = recentAlerts.filter(a => a.isResolved)
-      const avgResponseTime = resolvedAlerts.length > 0
+      const avgResponseTime = resolvedAlerts?.length || 0 > 0
         ? resolvedAlerts.reduce((sum, alert) => {
             // Assume resolved alerts have a resolution timestamp (would need to add this)
             return sum + (2 * 60 * 60 * 1000) // Mock 2 hours average
-          }, 0) / resolvedAlerts.length
+          }, 0) / resolvedAlerts?.length || 0
         : 0
 
       setAnalytics({
-        totalAlerts: recentAlerts.length,
+        totalAlerts: recentAlerts?.length || 0,
         alertsByType,
         alertsBySeverity,
         responseTime: avgResponseTime / (1000 * 60 * 60), // Convert to hours
         falsePositiveRate: 0.12, // Mock 12% false positive rate
-        actionableSaved: recentAlerts.filter(a => a.actionRequired).length * 150 // Mock $150 saved per actionable alert
+        actionableSaved: recentAlerts.filter(a => a.actionRequired)?.length || 0 * 150 // Mock $150 saved per actionable alert
       })
     }
 

@@ -164,7 +164,7 @@ export default function WhatCouldHurtYou() {
               <div className="bg-slate-700/50 p-4 rounded-lg text-center">
                 <Activity className="h-5 w-5 text-orange-400 mx-auto mb-2" />
                 <div className="text-xl font-bold text-orange-400">
-                  {scenarios.length > 0 && scenarios.some(s => s.probability != null) 
+                  {scenarios?.length || 0 > 0 && scenarios.some(s => s.probability != null) 
                     ? (Math.max(...scenarios.map(s => s.probability || 0)) * 100).toFixed(0)
                     : '0'
                   }%
@@ -183,7 +183,7 @@ export default function WhatCouldHurtYou() {
               <div className="bg-slate-700/50 p-4 rounded-lg text-center">
                 <Clock className="h-5 w-5 text-purple-400 mx-auto mb-2" />
                 <div className="text-xl font-bold text-purple-400">
-                  {scenarios.filter(s => s.urgency === 'critical' || s.urgency === 'high').length}
+                  {scenarios.filter(s => s.urgency === 'critical' || s.urgency === 'high')?.length || 0}
                 </div>
                 <p className="text-slate-400 text-sm">Urgent Threats</p>
               </div>

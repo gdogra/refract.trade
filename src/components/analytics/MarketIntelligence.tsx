@@ -127,7 +127,7 @@ export default function MarketIntelligence({ symbol = 'SPY' }: MarketIntelligenc
                     </div>
                   ))}
                   
-                  {sentiment.contraryIndicators?.length > 0 && (
+                  {sentiment.contraryIndicators??.length || 0 > 0 && (
                     <>
                       <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mt-3">Risks:</div>
                       {sentiment.contraryIndicators.map((risk: string, idx: number) => (

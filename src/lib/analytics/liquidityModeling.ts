@@ -317,7 +317,7 @@ function analyzeVolumeProfile(options: OptionContract[]): VolumeProfileAnalysis 
     })
     .sort((a, b) => a.strike - b.strike)
   
-  const averageDailyVolume = volumeByStrike.reduce((sum, point) => sum + point.totalVolume, 0) / volumeByStrike.length
+  const averageDailyVolume = volumeByStrike.reduce((sum, point) => sum + point.totalVolume, 0) / volumeByStrike?.length || 0
   
   // Calculate volume concentration
   const totalVolume = volumeByStrike.reduce((sum, point) => sum + point.totalVolume, 0)
@@ -369,7 +369,7 @@ function analyzeBidAskSpreads(options: OptionContract[]): BidAskAnalysis {
     return acc
   }, [] as SpreadByStrike[])
   
-  const averageSpread = spreadByStrike.reduce((sum, point) => sum + point.effectiveSpread, 0) / spreadByStrike.length
+  const averageSpread = spreadByStrike.reduce((sum, point) => sum + point.effectiveSpread, 0) / spreadByStrike?.length || 0
   
   // Market depth (simplified - would require Level II data)
   const marketDepth: MarketDepthLevel[] = [
@@ -433,8 +433,8 @@ function calculateSlippageEstimates(options: OptionContract[]): SlippageEstimate
   }
   
   // Calculate slippage by order size
-  const averageSpread = options.reduce((sum, opt) => sum + (opt.ask - opt.bid), 0) / options.length
-  const averagePrice = options.reduce((sum, opt) => sum + opt.midpoint, 0) / options.length
+  const averageSpread = options.reduce((sum, opt) => sum + (opt.ask - opt.bid), 0) / options?.length || 0
+  const averagePrice = options.reduce((sum, opt) => sum + opt.midpoint, 0) / options?.length || 0
   
   const smallOrder: SlippageBySize = {
     contracts: 5,
@@ -488,7 +488,7 @@ function calculateScalingLimits(
   const constraints: LiquidityConstraint[] = []
   
   // Open interest constraint (don't trade more than 10% of OI)
-  const avgOpenInterest = oiAnalysis.openInterestByStrike.reduce((sum, s) => sum + s.totalOpenInterest, 0) / oiAnalysis.openInterestByStrike.length
+  const avgOpenInterest = oiAnalysis.openInterestByStrike.reduce((sum, s) => sum + s.totalOpenInterest, 0) / oiAnalysis.openInterestByStrike?.length || 0
   const oiConstraint = Math.floor(avgOpenInterest * 0.1)
   constraints.push({
     constraintType: 'open_interest',
@@ -507,7 +507,7 @@ function calculateScalingLimits(
   })
   
   // Spread constraint
-  const tightSpreads = options.filter(opt => (opt.ask - opt.bid) / opt.midpoint < 0.1).length
+  const tightSpreads = options.filter(opt => (opt.ask - opt.bid) / opt.midpoint < 0.1)?.length || 0
   const spreadConstraint = tightSpreads * 2 // Can trade 2 contracts per tight spread
   constraints.push({
     constraintType: 'spread',
@@ -588,8 +588,8 @@ function assessExecutionRisk(
   }
   
   // Liquidity gap risk
-  const illiquidStrikes = options.filter(opt => opt.volume < 10 && opt.openInterest < 100).length
-  if (illiquidStrikes > options.length * 0.5) {
+  const illiquidStrikes = options.filter(opt => opt.volume < 10 && opt.openInterest < 100)?.length || 0
+  if (illiquidStrikes > options?.length || 0 * 0.5) {
     risks.push({
       type: 'liquidity_gap',
       severity: 8,
@@ -773,7 +773,7 @@ export function generateLiquidityRecommendations(profile: LiquidityProfile): Arr
   // Alternative strikes
   const liquidStrikes = profile.openInterestAnalysis.openInterestByStrike
     .filter(s => s.liquidityTier === 'tier1' || s.liquidityTier === 'tier2')
-    .length
+    ?.length || 0
     
   if (liquidStrikes < 5) {
     recommendations.push({

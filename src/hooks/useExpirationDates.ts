@@ -91,7 +91,7 @@ export function useExpirationDates(symbol?: string): UseExpirationDatesReturn {
   }, [fetchExpirationDates])
   
   // Process dates for different categories
-  const nearest = state.dates.length > 0 ? state.dates[0] : null
+  const nearest = state.dates?.length || 0 > 0 ? state.dates[0] : null
   
   const monthly = state.dates.filter(dateStr => {
     const date = new Date(dateStr)

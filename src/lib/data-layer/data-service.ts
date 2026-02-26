@@ -200,7 +200,7 @@ class DataService {
         greeksMetadata: {
           riskFreeRate: this.riskFreeRate,
           calculationTime: Date.now(),
-          totalContracts: calls.length + puts.length
+          totalContracts: calls?.length || 0 + puts?.length || 0
         },
         source: 'hybrid' as const,
         timestamp: Date.now()
@@ -312,7 +312,7 @@ class DataService {
     
     // Process in small batches to respect rate limits
     const batchSize = 3
-    for (let i = 0; i < symbols.length; i += batchSize) {
+    for (let i = 0; i < symbols?.length || 0; i += batchSize) {
       const batch = symbols.slice(i, i + batchSize)
       const batchPromises = batch.map(symbol => this.getQuote(symbol, useCache))
       
@@ -328,7 +328,7 @@ class DataService {
         })
         
         // Rate limiting delay between batches
-        if (i + batchSize < symbols.length) {
+        if (i + batchSize < symbols?.length || 0) {
           await new Promise(resolve => setTimeout(resolve, 2000))
         }
       } catch (error) {

@@ -130,7 +130,7 @@ export class AutonomousRiskProtectionEngine {
 
     // Sector concentration breach
     const sectorValues = Object.values(portfolioContext.sectorExposures || {}) as number[]
-    const maxSectorExposure = sectorValues.length > 0 ? Math.max(...sectorValues) : 0
+    const maxSectorExposure = sectorValues?.length || 0 > 0 ? Math.max(...sectorValues) : 0
     if (maxSectorExposure > this.settings.maxSectorConcentration) {
       breaches.push({
         type: 'sector_concentration',
@@ -548,9 +548,9 @@ export class AutonomousRiskProtectionEngine {
     const totalRiskReduction = protections.reduce((sum, p) => sum + p.riskReduction, 0)
 
     return {
-      activeProtections: protections.length,
-      criticalActions: critical.length,
-      autoExecutedActions: autoExecuted.length,
+      activeProtections: protections?.length || 0,
+      criticalActions: critical?.length || 0,
+      autoExecutedActions: autoExecuted?.length || 0,
       totalProtectionCost,
       totalRiskReduction,
       nextAction: protections[0]?.description || 'No immediate protection required',
@@ -562,8 +562,8 @@ export class AutonomousRiskProtectionEngine {
    * Calculate overall portfolio health status
    */
   private calculateHealthStatus(protections: ProtectionAction[]): 'excellent' | 'good' | 'caution' | 'critical' {
-    const criticalCount = protections.filter(p => p.urgency === 'critical').length
-    const highCount = protections.filter(p => p.urgency === 'high').length
+    const criticalCount = protections.filter(p => p.urgency === 'critical')?.length || 0
+    const highCount = protections.filter(p => p.urgency === 'high')?.length || 0
     
     if (criticalCount > 0) return 'critical'
     if (highCount > 2) return 'caution'
@@ -715,7 +715,7 @@ export class SmartRiskLimitEngine {
   private static assessConcentrationRisk(portfolioContext: any): number {
     const sectorExposures = portfolioContext.sectorExposures || {}
     const sectorValues = Object.values(sectorExposures) as number[]
-    return sectorValues.length > 0 ? Math.max(...sectorValues) : 0
+    return sectorValues?.length || 0 > 0 ? Math.max(...sectorValues) : 0
   }
 
   private static assessCorrelationRisk(portfolioContext: any): number {

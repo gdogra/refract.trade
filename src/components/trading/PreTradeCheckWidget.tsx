@@ -102,7 +102,7 @@ export function PreTradeCheckWidget({ onCheck, tradeParams }: PreTradeCheckProps
             ))}
           </div>
 
-          {lastResult.allBlockers.length > 0 && (
+          {lastResult.allBlockers?.length || 0 > 0 && (
             <div className="p-3 border-l-4 border-red-500 bg-red-50 rounded">
               <h4 className="font-medium text-red-800 mb-2">Blockers:</h4>
               <ul className="space-y-1">
@@ -113,7 +113,7 @@ export function PreTradeCheckWidget({ onCheck, tradeParams }: PreTradeCheckProps
             </div>
           )}
 
-          {lastResult.allWarnings.length > 0 && (
+          {lastResult.allWarnings?.length || 0 > 0 && (
             <div className="p-3 border-l-4 border-yellow-500 bg-yellow-50 rounded">
               <h4 className="font-medium text-yellow-800 mb-2">Warnings:</h4>
               <ul className="space-y-1">

@@ -295,7 +295,7 @@ function generateMarketWarningAlert(data: any) {
     category: 'action_required' as const,
     title: `🌪️ Market Alert: ${warning.title}`,
     body: warning.description,
-    explanation: `Market conditions have changed significantly. ${warning.reasoning} This affects ${affectedPositions.length} of your positions. Consider: ${warning.recommendedActions.join(', ')}. During similar market conditions in the past, portfolios that took defensive action outperformed by an average of 12%.`,
+    explanation: `Market conditions have changed significantly. ${warning.reasoning} This affects ${affectedPositions?.length || 0} of your positions. Consider: ${warning.recommendedActions.join(', ')}. During similar market conditions in the past, portfolios that took defensive action outperformed by an average of 12%.`,
     actionRequired: true,
     actionButtons: [
       {

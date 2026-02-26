@@ -215,7 +215,7 @@ function calculateConvictionScore(
   }
   
   // Structural edge (spreads vs single legs)
-  if (strategy.legs.length > 1 && strategy.riskProfile.riskType === 'limited') {
+  if (strategy.legs?.length || 0 > 1 && strategy.riskProfile.riskType === 'limited') {
     conviction += 10 // Defined risk structures
   }
   
@@ -456,12 +456,12 @@ function assessInstitutionalGrade(
   }
   
   // Concentration risk
-  if (strategy.legs.length === 1) {
+  if (strategy.legs?.length || 0 === 1) {
     disqualifyingFactors.push('Single-leg strategy lacks diversification')
     institutionalScore -= 10
   }
   
-  const eligible = disqualifyingFactors.length === 0 && institutionalScore >= 60
+  const eligible = disqualifyingFactors?.length || 0 === 0 && institutionalScore >= 60
   
   return {
     eligible,
@@ -492,7 +492,7 @@ export function rankOpportunities(
     ranking: {
       ...opportunity.ranking,
       overallRank: index + 1,
-      percentileRank: Math.round(((sorted.length - index) / sorted.length) * 100)
+      percentileRank: Math.round(((sorted?.length || 0 - index) / sorted?.length || 0) * 100)
     }
   }))
 }
@@ -546,20 +546,20 @@ export function generateOpportunitySummary(
 ): OpportunitySummary {
   const topOpportunities = rankedOpportunities.slice(0, count)
   
-  const avgRAOS = topOpportunities.reduce((sum, opp) => sum + opp.raos, 0) / topOpportunities.length
+  const avgRAOS = topOpportunities.reduce((sum, opp) => sum + opp.raos, 0) / topOpportunities?.length || 0
   const totalExpectedValue = topOpportunities.reduce((sum, opp) => sum + opp.strategy.metrics.expectedValue, 0)
-  const avgProbabilityOfProfit = topOpportunities.reduce((sum, opp) => sum + opp.strategy.metrics.probabilityOfProfit, 0) / topOpportunities.length
+  const avgProbabilityOfProfit = topOpportunities.reduce((sum, opp) => sum + opp.strategy.metrics.probabilityOfProfit, 0) / topOpportunities?.length || 0
   
   const strategyTypeDistribution = topOpportunities.reduce((acc, opp) => {
     acc[opp.strategy.type] = (acc[opp.strategy.type] || 0) + 1
     return acc
   }, {} as Record<StrategyType, number>)
   
-  const institutionalEligible = topOpportunities.filter(opp => opp.institutionalGrade.eligible).length
+  const institutionalEligible = topOpportunities.filter(opp => opp.institutionalGrade.eligible)?.length || 0
   
   return {
-    totalOpportunities: rankedOpportunities.length,
-    topOpportunities: topOpportunities.length,
+    totalOpportunities: rankedOpportunities?.length || 0,
+    topOpportunities: topOpportunities?.length || 0,
     averageRAOS: avgRAOS,
     totalExpectedValue,
     averageProbabilityOfProfit: avgProbabilityOfProfit,
@@ -585,11 +585,11 @@ export interface OpportunitySummary {
 function generateKeyInsights(opportunities: RankedOpportunity[]): string[] {
   const insights: string[] = []
   
-  if (opportunities.length === 0) {
+  if (opportunities?.length || 0 === 0) {
     return ['No high-quality opportunities identified under current market conditions']
   }
   
-  const avgScore = opportunities.reduce((sum, opp) => sum + opp.raos, 0) / opportunities.length
+  const avgScore = opportunities.reduce((sum, opp) => sum + opp.raos, 0) / opportunities?.length || 0
   insights.push(`Average RAOS of top opportunities: ${avgScore.toFixed(1)}`)
   
   const mostCommonStrategy = Object.entries(
@@ -603,12 +603,12 @@ function generateKeyInsights(opportunities: RankedOpportunity[]): string[] {
     insights.push(`Most favorable strategy type: ${mostCommonStrategy[0].replace(/_/g, ' ')}`)
   }
   
-  const highProbStrategies = opportunities.filter(opp => opp.strategy.metrics.probabilityOfProfit > 0.7).length
+  const highProbStrategies = opportunities.filter(opp => opp.strategy.metrics.probabilityOfProfit > 0.7)?.length || 0
   if (highProbStrategies > 0) {
     insights.push(`${highProbStrategies} high-probability opportunities (>70% PoP)`)
   }
   
-  const institutionalGrade = opportunities.filter(opp => opp.institutionalGrade.eligible).length
+  const institutionalGrade = opportunities.filter(opp => opp.institutionalGrade.eligible)?.length || 0
   if (institutionalGrade > 0) {
     insights.push(`${institutionalGrade} opportunities meet institutional standards`)
   }

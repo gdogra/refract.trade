@@ -21,7 +21,7 @@ interface YahooSearchResponse {
 }
 
 export async function searchSymbols(query: string): Promise<SymbolSearchResult[]> {
-  if (!query || query.length < 1) {
+  if (!query || query?.length || 0 < 1) {
     return []
   }
   
@@ -62,7 +62,7 @@ export async function searchSymbols(query: string): Promise<SymbolSearchResult[]
       .slice(0, 8) // Limit to 8 results
 
     // If no results from API, try fallback
-    if (results.length === 0) {
+    if (results?.length || 0 === 0) {
       return getFallbackResults(cleanQuery)
     }
 

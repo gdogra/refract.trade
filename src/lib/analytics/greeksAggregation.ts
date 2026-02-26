@@ -304,8 +304,8 @@ function buildGammaProfile(
     .map(point => point.strike)
   
   // Determine concavity
-  const positiveGamma = gammaByStrike.filter(p => p.gamma > 0).length
-  const negativeGamma = gammaByStrike.filter(p => p.gamma < 0).length
+  const positiveGamma = gammaByStrike.filter(p => p.gamma > 0)?.length || 0
+  const negativeGamma = gammaByStrike.filter(p => p.gamma < 0)?.length || 0
   let gammaConcavity: GammaProfile['gammaConcavity']
   if (positiveGamma > negativeGamma * 2) gammaConcavity = 'positive'
   else if (negativeGamma > positiveGamma * 2) gammaConcavity = 'negative'

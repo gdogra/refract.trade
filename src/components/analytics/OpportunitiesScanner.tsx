@@ -268,7 +268,7 @@ export default function OpportunitiesScanner({
             </div>
             
             <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
-              <span>Found: {filteredOpportunities.length} opportunities</span>
+              <span>Found: {filteredOpportunities?.length || 0} opportunities</span>
               <span>•</span>
               <span>Last scan: {scanStatus.lastScanTime.toLocaleTimeString()}</span>
               {scanStatus.isScanning && (
@@ -284,21 +284,21 @@ export default function OpportunitiesScanner({
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-lg">
               <div className="text-2xl font-bold text-purple-600">
-                {opportunities.filter(opp => opp.tier === 'S').length}
+                {opportunities.filter(opp => opp.tier === 'S')?.length || 0}
               </div>
               <div className="text-sm text-purple-700 dark:text-purple-300">S-Grade (Exceptional)</div>
             </div>
             
             <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
               <div className="text-2xl font-bold text-green-600">
-                {opportunities.filter(opp => opp.tier === 'A').length}
+                {opportunities.filter(opp => opp.tier === 'A')?.length || 0}
               </div>
               <div className="text-sm text-green-700 dark:text-green-300">A-Grade (Strong)</div>
             </div>
             
             <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
               <div className="text-2xl font-bold text-blue-600">
-                {opportunities.filter(opp => opp.executionReadiness).length}
+                {opportunities.filter(opp => opp.executionReadiness)?.length || 0}
               </div>
               <div className="text-sm text-blue-700 dark:text-blue-300">Ready to Execute</div>
             </div>
@@ -495,7 +495,7 @@ export default function OpportunitiesScanner({
       </div>
 
       {/* No Opportunities State */}
-      {filteredOpportunities.length === 0 && (
+      {filteredOpportunities?.length || 0 === 0 && (
         <Card>
           <CardContent className="p-12 text-center">
             <Search className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -644,7 +644,7 @@ export default function OpportunitiesScanner({
               <div>
                 <p className="text-green-100">Avg Success Rate</p>
                 <p className="text-3xl font-bold">
-                  {(opportunities.reduce((sum, opp) => sum + opp.probabilityOfProfit, 0) / opportunities.length * 100).toFixed(0)}%
+                  {(opportunities.reduce((sum, opp) => sum + opp.probabilityOfProfit, 0) / opportunities?.length || 0 * 100).toFixed(0)}%
                 </p>
               </div>
               <TrendingUp className="h-8 w-8 text-green-200" />
@@ -658,7 +658,7 @@ export default function OpportunitiesScanner({
               <div>
                 <p className="text-blue-100">Avg Liquidity</p>
                 <p className="text-3xl font-bold">
-                  {(opportunities.reduce((sum, opp) => sum + opp.liquidityScore, 0) / opportunities.length).toFixed(0)}
+                  {(opportunities.reduce((sum, opp) => sum + opp.liquidityScore, 0) / opportunities?.length || 0).toFixed(0)}
                 </p>
               </div>
               <Zap className="h-8 w-8 text-blue-200" />
@@ -672,7 +672,7 @@ export default function OpportunitiesScanner({
               <div>
                 <p className="text-purple-100">Avg Time Frame</p>
                 <p className="text-3xl font-bold">
-                  {Math.round(opportunities.reduce((sum, opp) => sum + opp.timeToExpiry, 0) / opportunities.length)}d
+                  {Math.round(opportunities.reduce((sum, opp) => sum + opp.timeToExpiry, 0) / opportunities?.length || 0)}d
                 </p>
               </div>
               <Clock className="h-8 w-8 text-purple-200" />
@@ -709,10 +709,10 @@ export default function OpportunitiesScanner({
               </span>
             </div>
             
-            {scanStatus.errors.length > 0 && (
+            {scanStatus.errors?.length || 0 > 0 && (
               <div className="flex items-center space-x-2 text-red-600">
                 <AlertCircle className="h-4 w-4" />
-                <span className="text-sm">{scanStatus.errors.length} errors</span>
+                <span className="text-sm">{scanStatus.errors?.length || 0} errors</span>
               </div>
             )}
           </div>

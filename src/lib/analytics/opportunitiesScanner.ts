@@ -628,10 +628,10 @@ function calculatePortfolioHealth(
     })
   }
   
-  if (opportunities.length > 5) {
+  if (opportunities?.length || 0 > 5) {
     recommendations.push({
       priority: 'medium',
-      action: `Consider ${opportunities.slice(0, 3).length} new high-RAOS opportunities`,
+      action: `Consider ${opportunities.slice(0, 3)?.length || 0} new high-RAOS opportunities`,
       reasoning: 'Multiple attractive opportunities identified',
       expectedImprovement: 'Potential 15-25% portfolio improvement',
       timeframe: 'Next few trading days'
@@ -740,13 +740,13 @@ function generateOpportunityAlerts(
   
   // High-quality opportunity alerts
   const sGradeOpportunities = opportunities.filter(opp => opp.tier === 'S')
-  if (sGradeOpportunities.length > 0) {
+  if (sGradeOpportunities?.length || 0 > 0) {
     alerts.push({
       id: `s_grade_${Date.now()}`,
       type: 'high_quality_opportunity',
       severity: 'high',
-      title: `${sGradeOpportunities.length} S-Grade Opportunities Available`,
-      message: `Found ${sGradeOpportunities.length} exceptional opportunities with RAOS > 85`,
+      title: `${sGradeOpportunities?.length || 0} S-Grade Opportunities Available`,
+      message: `Found ${sGradeOpportunities?.length || 0} exceptional opportunities with RAOS > 85`,
       actionRequired: 'Review and consider entry',
       opportunities: sGradeOpportunities.slice(0, 3),
       timeGenerated: new Date(),
@@ -779,7 +779,7 @@ function generateOpportunityAlerts(
       type: 'risk_exposure',
       severity: 'critical',
       title: 'Critical Risk Exposure Detected',
-      message: `${criticalRisks.length} critical risk factors identified`,
+      message: `${criticalRisks?.length || 0} critical risk factors identified`,
       actionRequired: 'Implement risk mitigation immediately',
       opportunities: [],
       timeGenerated: new Date(),
@@ -831,7 +831,7 @@ function assessExecutionReadiness(
     prerequisites.push('Wait for tighter spreads or use limit orders')
   }
   
-  const readyToExecute = blockers.length === 0
+  const readyToExecute = blockers?.length || 0 === 0
   
   return {
     readyToExecute,
@@ -878,21 +878,21 @@ function calculatePositionSizing(
 // Helper functions
 
 function calculateDiversificationScore(positions: Position[]): number {
-  if (positions.length === 0) return 0
+  if (positions?.length || 0 === 0) return 0
   
   // Symbol diversification
   const uniqueSymbols = new Set(positions.map(pos => pos.symbol)).size
-  const symbolScore = Math.min(100, (uniqueSymbols / Math.max(positions.length, 1)) * 100)
+  const symbolScore = Math.min(100, (uniqueSymbols / Math.max(positions?.length || 0, 1)) * 100)
   
   // Strategy diversification
   const uniqueStrategies = new Set(positions.map(pos => pos.strategyType)).size
-  const strategyScore = Math.min(100, (uniqueStrategies / Math.max(positions.length, 1)) * 100)
+  const strategyScore = Math.min(100, (uniqueStrategies / Math.max(positions?.length || 0, 1)) * 100)
   
   // Expiration diversification
   const uniqueExpirations = new Set(
     positions.flatMap(pos => pos.legs.map(leg => leg.expiry.toISOString().split('T')[0]))
   ).size
-  const expirationScore = Math.min(100, (uniqueExpirations / Math.max(positions.length, 1)) * 100)
+  const expirationScore = Math.min(100, (uniqueExpirations / Math.max(positions?.length || 0, 1)) * 100)
   
   return (symbolScore + strategyScore + expirationScore) / 3
 }

@@ -170,7 +170,7 @@ export function calculateVaR(
   confidence: number = 0.95
 ): number {
   const sortedReturns = returns.sort((a, b) => a - b)
-  const index = Math.floor((1 - confidence) * returns.length)
+  const index = Math.floor((1 - confidence) * returns?.length || 0)
   return sortedReturns[index] || 0
 }
 
@@ -198,8 +198,8 @@ export function calculateSharpeRatio(
   returns: number[], 
   riskFreeRate: number = 0.02
 ): number {
-  const avgReturn = returns.reduce((sum, ret) => sum + ret, 0) / returns.length
-  const variance = returns.reduce((sum, ret) => sum + Math.pow(ret - avgReturn, 2), 0) / returns.length
+  const avgReturn = returns.reduce((sum, ret) => sum + ret, 0) / returns?.length || 0
+  const variance = returns.reduce((sum, ret) => sum + Math.pow(ret - avgReturn, 2), 0) / returns?.length || 0
   const stdDev = Math.sqrt(variance)
   
   return (avgReturn - riskFreeRate) / stdDev
@@ -268,5 +268,5 @@ export function calculateProbabilityOfProfit(
     probProfit += Math.max(probability, 0)
   }
   
-  return Math.min(probProfit / strategy.breakeven.length, 1)
+  return Math.min(probProfit / strategy.breakeven?.length || 0, 1)
 }

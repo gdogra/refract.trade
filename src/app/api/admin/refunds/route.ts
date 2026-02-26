@@ -85,8 +85,8 @@ export async function GET(request: NextRequest) {
         stats: {
           totalRefunded,
           monthlyTotal,
-          totalCount: refunds.length,
-          monthlyCount: monthlyRefunds.length
+          totalCount: refunds?.length || 0,
+          monthlyCount: monthlyRefunds?.length || 0
         }
       }
     })

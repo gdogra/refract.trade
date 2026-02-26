@@ -96,7 +96,7 @@ export default function AddPositionForm({ onClose, onSuccess }: AddPositionFormP
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (!formData.symbol || !formData.strategyType || legs.length === 0) {
+    if (!formData.symbol || !formData.strategyType || legs?.length || 0 === 0) {
       return
     }
 
@@ -237,7 +237,7 @@ export default function AddPositionForm({ onClose, onSuccess }: AddPositionFormP
                     <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300">
                       Leg {index + 1}
                     </h5>
-                    {legs.length > 1 && (
+                    {legs?.length || 0 > 1 && (
                       <button
                         type="button"
                         onClick={() => removeLeg(index)}

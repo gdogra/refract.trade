@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
         data: quotes,
         cached: quotes.some(q => q.cached),
         timestamp: new Date().toISOString(),
-        count: quotes.length
+        count: quotes?.length || 0
       })
     } else {
       // Single quote request

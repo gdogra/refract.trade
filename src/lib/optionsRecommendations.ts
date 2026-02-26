@@ -263,7 +263,7 @@ export class OptionsRecommendationEngine {
       recommendation.fundamentalAnalysis.earnings.lastBeat === (recommendation.optionType === 'call'),
       recommendation.volume > 1000,
       recommendation.impliedVolatility < 0.6
-    ].filter(Boolean).length
+    ].filter(Boolean)?.length || 0
     
     const convictionScore = (confirmations / 5) * 100
     
@@ -440,7 +440,7 @@ export class OptionsRecommendationEngine {
     // Fetch real market data for all symbols
     const marketData = await this.fetchMarketData(callCandidates.slice(0, 8))
 
-    for (let i = 0; i < callCandidates.slice(0, 8).length; i++) {
+    for (let i = 0; i < callCandidates.slice(0, 8)?.length || 0; i++) {
       const symbol = callCandidates[i]
       const symbolMarketData = marketData[i]
       const newsData = await this.fetchNewsData(symbol)
@@ -555,7 +555,7 @@ export class OptionsRecommendationEngine {
     // Fetch real market data for all symbols
     const marketData = await this.fetchMarketData(putCandidates.slice(0, 8))
 
-    for (let i = 0; i < putCandidates.slice(0, 8).length; i++) {
+    for (let i = 0; i < putCandidates.slice(0, 8)?.length || 0; i++) {
       const symbol = putCandidates[i]
       const symbolMarketData = marketData[i]
       const newsData = await this.fetchNewsData(symbol)

@@ -98,7 +98,7 @@ export const BROKER_MAPPINGS: Record<string, BrokerMapping> = {
         if (typeof value === 'string') {
           // Handle formats like "20240315" or "240315"
           if (/^\d{6,8}$/.test(value)) {
-            const year = value.length === 8 ? value.slice(0, 4) : '20' + value.slice(0, 2)
+            const year = value?.length || 0 === 8 ? value.slice(0, 4) : '20' + value.slice(0, 2)
             const month = value.slice(-4, -2)
             const day = value.slice(-2)
             return new Date(`${year}-${month}-${day}`)
@@ -190,16 +190,16 @@ class CSVImportService {
    */
   parseCSV(csvText: string, hasHeaders: boolean = true): any[] {
     const lines = csvText.trim().split('\n')
-    if (lines.length === 0) return []
+    if (lines?.length || 0 === 0) return []
 
     const headers = hasHeaders ? this.parseCSVLine(lines[0]) : []
     const startRow = hasHeaders ? 1 : 0
 
     const data: any[] = []
     
-    for (let i = startRow; i < lines.length; i++) {
+    for (let i = startRow; i < lines?.length || 0; i++) {
       const values = this.parseCSVLine(lines[i])
-      if (values.length === 0) continue // Skip empty lines
+      if (values?.length || 0 === 0) continue // Skip empty lines
 
       if (hasHeaders) {
         const row: any = {}
@@ -223,7 +223,7 @@ class CSVImportService {
     let current = ''
     let inQuotes = false
     
-    for (let i = 0; i < line.length; i++) {
+    for (let i = 0; i < line?.length || 0; i++) {
       const char = line[i]
       
       if (char === '"') {
@@ -298,7 +298,7 @@ class CSVImportService {
     try {
       // Parse CSV
       const rawData = this.parseCSV(csvText, true)
-      if (rawData.length === 0) {
+      if (rawData?.length || 0 === 0) {
         return {
           success: false,
           totalRows: 0,
@@ -325,7 +325,7 @@ class CSVImportService {
       }
 
       // Process each row
-      for (let i = 0; i < rawData.length; i++) {
+      for (let i = 0; i < rawData?.length || 0; i++) {
         const row = rawData[i]
         const rowNum = i + 2 // +2 because of header and 0-based index
         
@@ -348,9 +348,9 @@ class CSVImportService {
       const summary = this.generateSummary(positions)
       
       return {
-        success: errors.filter(e => e.severity === 'error').length === 0,
-        totalRows: rawData.length,
-        importedRows: positions.length,
+        success: errors.filter(e => e.severity === 'error')?.length || 0 === 0,
+        totalRows: rawData?.length || 0,
+        importedRows: positions?.length || 0,
         errors,
         warnings,
         positions,
@@ -688,13 +688,13 @@ class CSVImportService {
     try {
       const data = this.parseCSV(csvText, true)
       
-      if (data.length === 0) {
+      if (data?.length || 0 === 0) {
         errors.push('CSV file appears to be empty')
         return { isValid: false, errors, suggestions }
       }
 
       const headers = Object.keys(data[0])
-      if (headers.length === 0) {
+      if (headers?.length || 0 === 0) {
         errors.push('No headers detected in CSV')
         return { isValid: false, errors, suggestions }
       }
@@ -720,25 +720,25 @@ class CSVImportService {
         }
       }
 
-      if (missingFields.length > 0) {
+      if (missingFields?.length || 0 > 0) {
         errors.push(`Missing required fields: ${missingFields.join(', ')}`)
         suggestions.push('Ensure your CSV contains columns for symbol, option type, strike price, expiry date, and quantity')
       }
 
       // Check data quality
-      const sampleSize = Math.min(5, data.length)
+      const sampleSize = Math.min(5, data?.length || 0)
       for (let i = 0; i < sampleSize; i++) {
         const row = data[i]
         
         // Check for mostly empty rows
-        const nonEmptyValues = Object.values(row).filter(v => v && String(v).trim() !== '').length
-        if (nonEmptyValues < headers.length * 0.3) {
+        const nonEmptyValues = Object.values(row).filter(v => v && String(v).trim() !== '')?.length || 0
+        if (nonEmptyValues < headers?.length || 0 * 0.3) {
           suggestions.push(`Row ${i + 2} appears to have mostly empty values`)
         }
       }
 
       return {
-        isValid: errors.length === 0,
+        isValid: errors?.length || 0 === 0,
         errors,
         suggestions,
         detectedBroker
@@ -761,11 +761,11 @@ export function formatImportResults(result: CSVImportResult): string {
   if (result.success) {
     parts.push(`✅ Successfully imported ${result.importedRows} of ${result.totalRows} positions`)
   } else {
-    parts.push(`❌ Import failed: ${result.errors.filter(e => e.severity === 'error').length} errors found`)
+    parts.push(`❌ Import failed: ${result.errors.filter(e => e.severity === 'error')?.length || 0} errors found`)
   }
   
-  if (result.warnings.length > 0) {
-    parts.push(`⚠️  ${result.warnings.length} warnings`)
+  if (result.warnings?.length || 0 > 0) {
+    parts.push(`⚠️  ${result.warnings?.length || 0} warnings`)
   }
   
   if (result.summary.totalValue > 0) {

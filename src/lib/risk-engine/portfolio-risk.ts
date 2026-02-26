@@ -119,7 +119,7 @@ class PortfolioRiskEngine {
   async calculateRisk(positions: Position[]): Promise<PortfolioRiskMetrics> {
     const startTime = Date.now()
     
-    if (positions.length === 0) {
+    if (positions?.length || 0 === 0) {
       return this.getEmptyRiskMetrics(startTime)
     }
 
@@ -166,7 +166,7 @@ class PortfolioRiskEngine {
       
       // Metadata
       lastUpdated: new Date(),
-      positionCount: positions.length,
+      positionCount: positions?.length || 0,
       calculationTime: Date.now() - startTime
     }
   }
@@ -211,7 +211,7 @@ class PortfolioRiskEngine {
   private calculatePortfolioGreeks(positions: Array<Position & { greeks?: Greeks; impliedVol?: number }>): any {
     const optionsPositions = positions.filter(p => p.type !== 'stock' && p.greeks)
     
-    if (optionsPositions.length === 0) {
+    if (optionsPositions?.length || 0 === 0) {
       return {
         netDelta: 0,
         netGamma: 0,
@@ -354,7 +354,7 @@ class PortfolioRiskEngine {
       return {
         expiry,
         daysToExpiry,
-        positionCount: positions.length,
+        positionCount: positions?.length || 0,
         netDelta: Number(netDelta.toFixed(2)),
         netGamma: Number(netGamma.toFixed(4)),
         netTheta: Number(netTheta.toFixed(2)),
@@ -424,7 +424,7 @@ class PortfolioRiskEngine {
   private calculateVegaRisk(positions: any[], portfolioGreeks: any): VegaRisk {
     const vega = portfolioGreeks.netVega
     const avgIV = positions.filter(p => p.impliedVol).reduce((sum, p) => sum + p.impliedVol, 0) / 
-                  positions.filter(p => p.impliedVol).length || 0.25
+                  positions.filter(p => p.impliedVol)?.length || 0 || 0.25
 
     return {
       totalVega: vega,

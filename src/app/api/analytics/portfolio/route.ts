@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
     
     const portfolioAnalytics = {
       summary: {
-        totalPositions: mockPositions.length,
+        totalPositions: mockPositions?.length || 0,
         totalValue,
         totalPnL,
         totalRisk,

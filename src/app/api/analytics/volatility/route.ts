@@ -198,7 +198,7 @@ export async function POST(request: NextRequest) {
       data: {
         results,
         analysisType,
-        batchSize: symbols.length
+        batchSize: symbols?.length || 0
       },
       timestamp: new Date().toISOString()
     })

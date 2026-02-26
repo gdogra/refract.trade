@@ -116,7 +116,7 @@ class RedisCache {
     try {
       if (this.isRedisAvailable) {
         const keys = await this.redis.keys(pattern)
-        if (keys.length > 0) {
+        if (keys?.length || 0 > 0) {
           await this.redis.del(...keys)
         }
       }

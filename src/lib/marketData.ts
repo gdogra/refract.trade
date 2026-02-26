@@ -166,9 +166,9 @@ class MarketDataService {
         console.warn('Failed to add Yahoo Finance provider:', error)
       }
 
-      if (providers.length > 0) {
+      if (providers?.length || 0 > 0) {
         this.realDataService = new MultiProviderMarketDataService(providers)
-        console.log(`Initialized ${providers.length} market data providers`)
+        console.log(`Initialized ${providers?.length || 0} market data providers`)
       } else {
         console.warn('No market data providers could be initialized')
       }
@@ -274,7 +274,7 @@ class MarketDataService {
       if (this.realDataService && 'getOptionChain' in this.realDataService) {
         try {
           const optionsData = await (this.realDataService as any).getOptionChain(symbol, expiry)
-          if (optionsData && optionsData.length > 0) {
+          if (optionsData && optionsData?.length || 0 > 0) {
             // Convert to our OptionChain format
             const optionChain = this.convertProviderOptionsToChain(symbol, underlyingData.price, optionsData, expiry)
             this.setCache(cacheKey, optionChain, this.config.cacheTTL * 2)
@@ -458,7 +458,7 @@ class MarketDataService {
       enableRealData: this.config.enableRealData,
       provider: this.config.provider,
       hasRealDataService: !!this.realDataService,
-      providerCount: this.realDataService ? this.realDataService.getProviderStatus().length : 0,
+      providerCount: this.realDataService ? this.realDataService.getProviderStatus()?.length || 0 : 0,
       cacheSize: this.cache.size,
       subscriberCount: this.subscribers.size,
       // Enhanced debugging information

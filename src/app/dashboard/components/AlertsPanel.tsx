@@ -120,7 +120,7 @@ export default function AlertsPanel() {
     return colors[priority as keyof typeof colors] || colors.low
   }
 
-  const unreadCount = alerts?.filter(alert => !alert.isRead).length || 0
+  const unreadCount = alerts?.filter(alert => !alert.isRead)?.length || 0 || 0
 
   return (
     <motion.div 

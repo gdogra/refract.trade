@@ -421,7 +421,7 @@ export default function AIChatbot({ className = '', context = {}, onAction }: AI
               ))}
 
               {/* Quick Questions */}
-              {messages.length === 1 && (
+              {messages?.length || 0 === 1 && (
                 <div className="px-4 py-2 border-t border-gray-200 dark:border-gray-700">
                   <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Quick actions:</p>
                   <div className="flex flex-wrap gap-1">

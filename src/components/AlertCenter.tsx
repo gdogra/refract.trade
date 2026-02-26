@@ -167,10 +167,10 @@ export default function AlertCenter({ isOpen, onClose, className }: AlertCenterP
   // Alert counts
   const alertCounts = useMemo(() => {
     return {
-      total: alerts.length,
-      unread: alerts.filter(a => !a.isRead).length,
-      critical: alerts.filter(a => a.severity === AlertSeverity.CRITICAL && !a.isResolved).length,
-      actionRequired: alerts.filter(a => a.actionRequired && !a.isResolved).length
+      total: alerts?.length || 0,
+      unread: alerts.filter(a => !a.isRead)?.length || 0,
+      critical: alerts.filter(a => a.severity === AlertSeverity.CRITICAL && !a.isResolved)?.length || 0,
+      actionRequired: alerts.filter(a => a.actionRequired && !a.isResolved)?.length || 0
     }
   }, [alerts])
 
@@ -477,7 +477,7 @@ export default function AlertCenter({ isOpen, onClose, className }: AlertCenterP
             ))}
           </AnimatePresence>
 
-          {filteredAlerts.length === 0 && (
+          {filteredAlerts?.length || 0 === 0 && (
             <div className="text-center py-12">
               <Bell className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-600 dark:text-gray-400">
@@ -499,7 +499,7 @@ export default function AlertCenter({ isOpen, onClose, className }: AlertCenterP
         {/* Footer */}
         <div className="border-t border-gray-200 dark:border-gray-700 p-4">
           <div className="flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
-            <span>{filteredAlerts.length} alert{filteredAlerts.length !== 1 ? 's' : ''} shown</span>
+            <span>{filteredAlerts?.length || 0} alert{filteredAlerts?.length || 0 !== 1 ? 's' : ''} shown</span>
             <div className="flex space-x-4">
               <span>Last updated: {new Date().toLocaleTimeString()}</span>
               <Button variant="ghost" size="sm">
@@ -561,7 +561,7 @@ export default function AlertCenter({ isOpen, onClose, className }: AlertCenterP
                 {selectedAlert.details.affectedPositions && (
                   <div className="flex justify-between">
                     <span>Affected Positions:</span>
-                    <span className="font-semibold">{selectedAlert.details.affectedPositions.length}</span>
+                    <span className="font-semibold">{selectedAlert.details.affectedPositions?.length || 0}</span>
                   </div>
                 )}
               </div>

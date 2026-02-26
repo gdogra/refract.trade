@@ -134,7 +134,7 @@ export default function Watchlist() {
 
         {/* Watchlist Items */}
         <div className="space-y-4">
-          {watchlist.length === 0 ? (
+          {watchlist?.length || 0 === 0 ? (
             <motion.div
               className="text-center py-12"
               initial={{ opacity: 0, y: 20 }}
@@ -241,7 +241,7 @@ export default function Watchlist() {
         </div>
 
         {/* Quick Stats */}
-        {watchlist.length > 0 && (
+        {watchlist?.length || 0 > 0 && (
           <motion.div
             className="mt-8"
             initial={{ opacity: 0, y: 20 }}
@@ -256,7 +256,7 @@ export default function Watchlist() {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-blue-600">
-                      {watchlist.length}
+                      {watchlist?.length || 0}
                     </div>
                     <div className="text-sm text-gray-600 dark:text-gray-400">
                       Total Symbols
@@ -264,7 +264,7 @@ export default function Watchlist() {
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-green-600">
-                      {watchlist.filter(item => (item.change || 0) > 0).length}
+                      {watchlist.filter(item => (item.change || 0) > 0)?.length || 0}
                     </div>
                     <div className="text-sm text-gray-600 dark:text-gray-400">
                       Gaining
@@ -272,7 +272,7 @@ export default function Watchlist() {
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-red-600">
-                      {watchlist.filter(item => (item.change || 0) < 0).length}
+                      {watchlist.filter(item => (item.change || 0) < 0)?.length || 0}
                     </div>
                     <div className="text-sm text-gray-600 dark:text-gray-400">
                       Losing
@@ -280,7 +280,7 @@ export default function Watchlist() {
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-purple-600">
-                      {((watchlist.reduce((sum, item) => sum + (item.changePercent || 0), 0) / watchlist.length) || 0).toFixed(2)}%
+                      {((watchlist.reduce((sum, item) => sum + (item.changePercent || 0), 0) / watchlist?.length || 0) || 0).toFixed(2)}%
                     </div>
                     <div className="text-sm text-gray-600 dark:text-gray-400">
                       Avg Change

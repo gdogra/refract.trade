@@ -43,7 +43,7 @@ export default function PriceAlertsPanel({
   useEffect(() => {
     if (symbol && currentPrice > 0) {
       const triggered = priceAlertsManager.checkAlerts(symbol, currentPrice)
-      if (triggered.length > 0) {
+      if (triggered?.length || 0 > 0) {
         setTriggeredAlerts(prev => [...prev, ...triggered])
         loadAlerts() // Refresh to show updated triggered status
         
@@ -121,7 +121,7 @@ export default function PriceAlertsPanel({
     <div className={className}>
       {/* Triggered Alerts Banner */}
       <AnimatePresence>
-        {triggeredAlerts.length > 0 && (
+        {triggeredAlerts?.length || 0 > 0 && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -134,7 +134,7 @@ export default function PriceAlertsPanel({
                   <div className="flex items-center space-x-2">
                     <BellRing className="h-5 w-5 text-green-600" />
                     <span className="font-medium text-green-800">
-                      {triggeredAlerts.length} Price Alert{triggeredAlerts.length > 1 ? 's' : ''} Triggered
+                      {triggeredAlerts?.length || 0} Price Alert{triggeredAlerts?.length || 0 > 1 ? 's' : ''} Triggered
                     </span>
                   </div>
                   <Button
@@ -174,9 +174,9 @@ export default function PriceAlertsPanel({
             </div>
             
             <div className="flex items-center space-x-2">
-              {alerts.length > 0 && (
+              {alerts?.length || 0 > 0 && (
                 <Badge variant="secondary" className="text-xs">
-                  {alerts.length} active
+                  {alerts?.length || 0} active
                 </Badge>
               )}
               <Button
@@ -248,7 +248,7 @@ export default function PriceAlertsPanel({
 
           {/* Active Alerts List */}
           <div className="space-y-2">
-            {alerts.length === 0 ? (
+            {alerts?.length || 0 === 0 ? (
               <div className="text-center py-6 text-gray-500">
                 <Bell className="h-8 w-8 mx-auto mb-2 opacity-50" />
                 <p className="text-sm">No active price alerts</p>

@@ -74,20 +74,20 @@ async function runTradeSimulation(params: {
   const profits = results.filter(r => r > 0)
   const losses = results.filter(r => r < 0)
   
-  const winRate = profits.length / results.length
-  const avgProfit = profits.length > 0 ? profits.reduce((a, b) => a + b, 0) / profits.length : 0
-  const avgLoss = losses.length > 0 ? losses.reduce((a, b) => a + b, 0) / losses.length : 0
+  const winRate = profits?.length || 0 / results?.length || 0
+  const avgProfit = profits?.length || 0 > 0 ? profits.reduce((a, b) => a + b, 0) / profits?.length || 0 : 0
+  const avgLoss = losses?.length || 0 > 0 ? losses.reduce((a, b) => a + b, 0) / losses?.length || 0 : 0
   const maxProfit = Math.max(...results)
   const maxLoss = Math.min(...results)
-  const expectedValue = results.reduce((a, b) => a + b, 0) / results.length
+  const expectedValue = results.reduce((a, b) => a + b, 0) / results?.length || 0
   
   const distribution = {
     profit_ranges: [
-      { range: '> +$500', count: results.filter(r => r > 500).length },
-      { range: '+$100 to +$500', count: results.filter(r => r > 100 && r <= 500).length },
-      { range: '-$100 to +$100', count: results.filter(r => r >= -100 && r <= 100).length },
-      { range: '-$500 to -$100', count: results.filter(r => r >= -500 && r < -100).length },
-      { range: '< -$500', count: results.filter(r => r < -500).length }
+      { range: '> +$500', count: results.filter(r => r > 500)?.length || 0 },
+      { range: '+$100 to +$500', count: results.filter(r => r > 100 && r <= 500)?.length || 0 },
+      { range: '-$100 to +$100', count: results.filter(r => r >= -100 && r <= 100)?.length || 0 },
+      { range: '-$500 to -$100', count: results.filter(r => r >= -500 && r < -100)?.length || 0 },
+      { range: '< -$500', count: results.filter(r => r < -500)?.length || 0 }
     ]
   }
 

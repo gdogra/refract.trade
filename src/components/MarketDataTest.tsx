@@ -178,7 +178,7 @@ export default function MarketDataTest() {
       </Card>
 
       {/* Provider Status */}
-      {providers.length > 0 && (
+      {providers?.length || 0 > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>Data Providers</CardTitle>

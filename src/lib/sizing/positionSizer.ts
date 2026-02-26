@@ -186,7 +186,7 @@ export async function getOptimalPositionSize(
   // Get historical performance for this strategy/symbol combination
   const historicalData = await getStrategyPerformance(symbol, strategy)
   
-  if (!historicalData || historicalData.trades.length < 10) {
+  if (!historicalData || historicalData.trades?.length || 0 < 10) {
     // Not enough data - use conservative sizing
     return {
       kellySize: 1,
@@ -211,7 +211,7 @@ export async function getOptimalPositionSize(
     kellySize: kelly.recommendedQuantity,
     conservativeSize: Math.max(1, Math.floor(kelly.recommendedQuantity * 0.5)),
     aggressiveSize: Math.min(kelly.recommendedQuantity * 2, Math.floor(userBankroll * 0.1 / Math.abs(avgLoss))),
-    recommendation: `Based on ${historicalData.trades.length} historical trades: ${(winRate * 100).toFixed(0)}% win rate, Kelly suggests ${kelly.recommendedQuantity} contracts.`
+    recommendation: `Based on ${historicalData.trades?.length || 0} historical trades: ${(winRate * 100).toFixed(0)}% win rate, Kelly suggests ${kelly.recommendedQuantity} contracts.`
   }
 }
 
@@ -227,9 +227,9 @@ async function getStrategyPerformance(symbol: string, strategy: string) {
   
   return {
     trades: mockTrades,
-    winRate: wins.length / mockTrades.length,
-    avgWin: wins.reduce((sum, w) => sum + w.profit, 0) / wins.length || 0,
-    avgLoss: losses.reduce((sum, l) => sum + l.profit, 0) / losses.length || 0,
-    avgDuration: mockTrades.reduce((sum, t) => sum + t.duration, 0) / mockTrades.length
+    winRate: wins?.length || 0 / mockTrades?.length || 0,
+    avgWin: wins.reduce((sum, w) => sum + w.profit, 0) / wins?.length || 0 || 0,
+    avgLoss: losses.reduce((sum, l) => sum + l.profit, 0) / losses?.length || 0 || 0,
+    avgDuration: mockTrades.reduce((sum, t) => sum + t.duration, 0) / mockTrades?.length || 0
   }
 }

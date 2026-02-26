@@ -245,7 +245,7 @@ export function ReferralDashboard() {
       </Card>
 
       {/* Referral History */}
-      {stats.referrals.length > 0 && (
+      {stats.referrals?.length || 0 > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>Referral History</CardTitle>

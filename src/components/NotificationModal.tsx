@@ -145,7 +145,7 @@ export default function NotificationModal({ isOpen, onClose }: NotificationModal
                   : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
               }`}
             >
-              All ({notifications.length})
+              All ({notifications?.length || 0})
             </button>
             <button
               onClick={() => setSelectedTab('unread')}
@@ -160,7 +160,7 @@ export default function NotificationModal({ isOpen, onClose }: NotificationModal
           </div>
 
           {/* Actions */}
-          {notifications.length > 0 && (
+          {notifications?.length || 0 > 0 && (
             <div className="flex space-x-2">
               <Button
                 variant="ghost"
@@ -186,7 +186,7 @@ export default function NotificationModal({ isOpen, onClose }: NotificationModal
 
         {/* Notifications List */}
         <div className="max-h-96 overflow-y-auto">
-          {filteredNotifications.length === 0 ? (
+          {filteredNotifications?.length || 0 === 0 ? (
             <div className="p-8 text-center text-gray-500 dark:text-gray-400">
               <Bell className="h-12 w-12 mx-auto mb-3 opacity-50" />
               <p className="text-sm">

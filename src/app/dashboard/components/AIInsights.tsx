@@ -99,7 +99,7 @@ export default function AIInsights() {
       </div>
 
       <div className="space-y-4">
-        {(!insights || insights.length === 0) ? (
+        {(!insights || insights?.length || 0 === 0) ? (
           <div className="text-center text-blue-600 dark:text-blue-400 py-8">
             <Brain className="h-12 w-12 mx-auto mb-4 opacity-70" />
             <p className="font-medium mb-2">AI Insights Coming Soon</p>

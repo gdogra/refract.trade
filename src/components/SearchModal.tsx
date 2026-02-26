@@ -70,7 +70,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
       item.type === 'symbol' && item.title.toUpperCase() === upperQuery
     )
 
-    if (isSymbolQuery && !symbolExists && query.trim().length >= 1) {
+    if (isSymbolQuery && !symbolExists && query.trim()?.length || 0 >= 1) {
       // Add dynamic symbol result
       filteredResults.unshift({
         id: `symbol-${upperQuery}`,
@@ -92,16 +92,16 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   }, [isOpen])
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!results.length) return
+    if (!results?.length || 0) return
 
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault()
-        setSelectedIndex((prev) => (prev + 1) % results.length)
+        setSelectedIndex((prev) => (prev + 1) % results?.length || 0)
         break
       case 'ArrowUp':
         e.preventDefault()
-        setSelectedIndex((prev) => (prev - 1 + results.length) % results.length)
+        setSelectedIndex((prev) => (prev - 1 + results?.length || 0) % results?.length || 0)
         break
       case 'Enter':
         e.preventDefault()
@@ -179,7 +179,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
         {/* Results */}
         <div className="max-h-80 overflow-y-auto">
-          {query.trim() && results.length === 0 && (
+          {query.trim() && results?.length || 0 === 0 && (
             <div className="p-8 text-center text-gray-500 dark:text-gray-400">
               <Search className="h-8 w-8 mx-auto mb-3 opacity-50" />
               <p>No results found for "{query}"</p>
@@ -266,11 +266,11 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
         </div>
 
         {/* Footer */}
-        {results.length > 0 && (
+        {results?.length || 0 > 0 && (
           <div className="border-t border-gray-200 dark:border-gray-700 px-4 py-2">
             <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
               <span>Use ↑↓ to navigate, ↵ to select, Esc to close</span>
-              <span>{results.length} result{results.length !== 1 ? 's' : ''}</span>
+              <span>{results?.length || 0} result{results?.length || 0 !== 1 ? 's' : ''}</span>
             </div>
           </div>
         )}

@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
       success: true,
       symbol,
       expirations,
-      count: expirations.length,
+      count: expirations?.length || 0,
       timestamp: new Date().toISOString()
     })
     

@@ -360,7 +360,7 @@ function generateSpreadStrategies(
   if (marketConditions.trendDirection === 'bullish') {
     const liquidCalls = calls.filter(c => c.volume >= 10 && c.openInterest >= 100)
     
-    for (let i = 0; i < liquidCalls.length - 1; i++) {
+    for (let i = 0; i < liquidCalls?.length || 0 - 1; i++) {
       const longCall = liquidCalls[i]
       const shortCall = liquidCalls[i + 1]
       
@@ -421,9 +421,9 @@ function generateSpreadStrategies(
     const otmPuts = liquidPuts.filter(p => p.strike < underlyingPrice * 0.95)
     const otmCalls = liquidCalls.filter(c => c.strike > underlyingPrice * 1.05)
     
-    if (otmPuts.length >= 2 && otmCalls.length >= 2) {
-      const shortPut = otmPuts[otmPuts.length - 1] // Highest strike OTM put
-      const longPut = otmPuts[otmPuts.length - 2] // Lower strike for protection
+    if (otmPuts?.length || 0 >= 2 && otmCalls?.length || 0 >= 2) {
+      const shortPut = otmPuts[otmPuts?.length || 0 - 1] // Highest strike OTM put
+      const longPut = otmPuts[otmPuts?.length || 0 - 2] // Lower strike for protection
       const shortCall = otmCalls[0] // Lowest strike OTM call
       const longCall = otmCalls[1] // Higher strike for protection
       
@@ -670,7 +670,7 @@ function calculateStrategyMetrics(legs: StrategyLeg[], underlyingPrice: number):
   }
   
   // Calculate breakevens (simplified)
-  if (legs.length === 1) {
+  if (legs?.length || 0 === 1) {
     const leg = legs[0]
     if (leg.optionType === 'call') {
       breakevens.push(leg.strike! + netCost)
@@ -679,7 +679,7 @@ function calculateStrategyMetrics(legs: StrategyLeg[], underlyingPrice: number):
     }
   }
   
-  const probabilityOfProfit = legs.reduce((sum, leg) => sum + leg.delta, 0) / legs.length
+  const probabilityOfProfit = legs.reduce((sum, leg) => sum + leg.delta, 0) / legs?.length || 0
   const expectedValue = netCost * -1 // Simplified
   const returnOnCapital = maxLoss > 0 ? (expectedValue / maxLoss) * 100 : 0
   const daysToExpiry = Math.min(...legs.filter(leg => leg.expiration).map(leg => {
@@ -694,7 +694,7 @@ function calculateStrategyMetrics(legs: StrategyLeg[], underlyingPrice: number):
     netDebit,
     netCredit,
     breakevens,
-    profitRange: breakevens.length === 2 ? { lower: breakevens[0], upper: breakevens[1] } : null,
+    profitRange: breakevens?.length || 0 === 2 ? { lower: breakevens[0], upper: breakevens[1] } : null,
     probabilityOfProfit: Math.max(0, Math.min(1, probabilityOfProfit)),
     expectedValue,
     returnOnCapital,
@@ -756,7 +756,7 @@ function assessStrategyRisk(strategy: OptimizedStrategy): StrategyRiskProfile {
     volatilityRisk: Math.abs(totalVega) > 100 ? 'high' : Math.abs(totalVega) > 50 ? 'medium' : 'low',
     directionalRisk: Math.abs(totalDelta) > 0.5 ? 'high' : Math.abs(totalDelta) > 0.25 ? 'medium' : 'low',
     assignmentRisk: shortLegs.some(leg => leg.optionType === 'call' || leg.optionType === 'put') ? 'medium' : 'none',
-    earlyExerciseRisk: shortLegs.length > 0 ? 'medium' : 'low'
+    earlyExerciseRisk: shortLegs?.length || 0 > 0 ? 'medium' : 'low'
   } as any
 }
 
@@ -770,12 +770,12 @@ function assessStrategyLiquidity(strategy: OptimizedStrategy, liquidityProfile: 
     constrainingFactor: leg.liquidityScore < 50 ? 'Low volume/OI' : 'Good liquidity'
   }))
   
-  const avgLiquidityScore = legLiquidity.reduce((sum, leg) => sum + leg.liquidityScore, 0) / legLiquidity.length
+  const avgLiquidityScore = legLiquidity.reduce((sum, leg) => sum + leg.liquidityScore, 0) / legLiquidity?.length || 0
   const minLiquidityScore = Math.min(...legLiquidity.map(leg => leg.liquidityScore))
   
   let executionComplexity: StrategyLiquidityAssessment['executionComplexity']
-  if (strategy.legs.length === 1) executionComplexity = 'simple'
-  else if (strategy.legs.length <= 2) executionComplexity = 'moderate'
+  if (strategy.legs?.length || 0 === 1) executionComplexity = 'simple'
+  else if (strategy.legs?.length || 0 <= 2) executionComplexity = 'moderate'
   else executionComplexity = 'complex'
   
   return {
@@ -979,7 +979,7 @@ function calculateStructuralEdge(strategy: OptimizedStrategy, marketConditions: 
   if (totalTheta > 0) edge += 15 // Positive theta is generally good
   
   // Liquidity edge
-  const avgLiquidityScore = strategy.legs.reduce((sum, leg) => sum + leg.liquidityScore, 0) / strategy.legs.length
+  const avgLiquidityScore = strategy.legs.reduce((sum, leg) => sum + leg.liquidityScore, 0) / strategy.legs?.length || 0
   if (avgLiquidityScore > 80) edge += 10
   
   return Math.max(0, Math.min(100, edge))
@@ -989,7 +989,7 @@ function calculateStructuralEdge(strategy: OptimizedStrategy, marketConditions: 
  * Generate execution guidance
  */
 function generateExecutionGuidance(strategy: OptimizedStrategy, liquidityProfile: LiquidityProfile): ExecutionGuidance {
-  const avgLiquidityScore = strategy.legs.reduce((sum, leg) => sum + leg.liquidityScore, 0) / strategy.legs.length
+  const avgLiquidityScore = strategy.legs.reduce((sum, leg) => sum + leg.liquidityScore, 0) / strategy.legs?.length || 0
   
   let recommendedOrderType: ExecutionGuidance['recommendedOrderType']
   if (avgLiquidityScore >= 80) recommendedOrderType = 'limit'
@@ -1006,8 +1006,8 @@ function generateExecutionGuidance(strategy: OptimizedStrategy, liquidityProfile
   }
   
   let legSequencing: ExecutionGuidance['legSequencing']
-  if (strategy.legs.length === 1) legSequencing = 'simultaneous'
-  else if (strategy.legs.length === 2) legSequencing = 'simultaneous'
+  if (strategy.legs?.length || 0 === 1) legSequencing = 'simultaneous'
+  else if (strategy.legs?.length || 0 === 2) legSequencing = 'simultaneous'
   else legSequencing = 'sequential'
   
   const estimatedFillTime = avgLiquidityScore >= 80 ? '< 1 minute' : 

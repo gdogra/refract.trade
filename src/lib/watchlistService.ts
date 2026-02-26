@@ -57,10 +57,10 @@ class WatchlistService {
   }
 
   removeFromWatchlist(symbol: string): boolean {
-    const initialLength = this.watchlist.length
+    const initialLength = this.watchlist?.length || 0
     this.watchlist = this.watchlist.filter(item => item.symbol !== symbol.toUpperCase())
     
-    if (this.watchlist.length < initialLength) {
+    if (this.watchlist?.length || 0 < initialLength) {
       this.saveToLocalStorage()
       this.notifyListeners()
       return true

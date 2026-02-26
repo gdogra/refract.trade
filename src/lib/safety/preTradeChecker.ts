@@ -56,14 +56,14 @@ export async function runPreTradeCheck(
   })
 
   const scores = Object.values(checks).map(c => c.score)
-  const avgScore = scores.reduce((a, b) => a + b, 0) / scores.length
+  const avgScore = scores.reduce((a, b) => a + b, 0) / scores?.length || 0
 
   let overallScore: 'green' | 'yellow' | 'red'
   if (avgScore >= 80) overallScore = 'green'
   else if (avgScore >= 60) overallScore = 'yellow'
   else overallScore = 'red'
 
-  const canProceed = blockers.length === 0
+  const canProceed = blockers?.length || 0 === 0
 
   return {
     overallScore,
@@ -173,7 +173,7 @@ async function checkRevengeTrading(params: TradeCheckParams): Promise<CheckResul
     { timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), realizedPnL: 125, quantity: 1 }, // 2 hours ago, win
   ]
 
-  if (recentTrades.length < 1) {
+  if (recentTrades?.length || 0 < 1) {
     return { status: 'pass', score: 100, message: 'First trade' }
   }
 
@@ -182,7 +182,7 @@ async function checkRevengeTrading(params: TradeCheckParams): Promise<CheckResul
   const minutesSince = timeSinceLastTrade / (1000 * 60)
 
   if (lastTrade.realizedPnL && lastTrade.realizedPnL < 0) {
-    const avgSize = recentTrades.map(t => t.quantity).reduce((a, b) => a + b, 0) / recentTrades.length
+    const avgSize = recentTrades.map(t => t.quantity).reduce((a, b) => a + b, 0) / recentTrades?.length || 0
 
     if (params.quantity > avgSize * 1.5 && minutesSince < 30) {
       return {
@@ -253,7 +253,7 @@ async function checkRules(params: TradeCheckParams): Promise<CheckResult> {
     }
   }
 
-  if (violations.length > 0) {
+  if (violations?.length || 0 > 0) {
     const hasBlockers = rules.some(r => violations.includes(r.name) && r.action === 'block')
     
     return {

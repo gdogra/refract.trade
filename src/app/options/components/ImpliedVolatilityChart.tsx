@@ -101,7 +101,7 @@ export default function ImpliedVolatilityChart({ symbol }: ImpliedVolatilityChar
                 {/* Call skew */}
                 <path
                   d={`M ${ivData.skew.calls.map((point, i) => 
-                    `${i * (100 / (ivData.skew.calls.length - 1))},${100 - ((point.iv - 0.2) / 0.15) * 100}`
+                    `${i * (100 / (ivData.skew.calls?.length || 0 - 1))},${100 - ((point.iv - 0.2) / 0.15) * 100}`
                   ).join(' L ')}`}
                   stroke="#3b82f6"
                   strokeWidth="1"
@@ -111,7 +111,7 @@ export default function ImpliedVolatilityChart({ symbol }: ImpliedVolatilityChar
                 {/* Put skew */}
                 <path
                   d={`M ${ivData.skew.puts.map((point, i) => 
-                    `${i * (100 / (ivData.skew.puts.length - 1))},${100 - ((point.iv - 0.2) / 0.15) * 100}`
+                    `${i * (100 / (ivData.skew.puts?.length || 0 - 1))},${100 - ((point.iv - 0.2) / 0.15) * 100}`
                   ).join(' L ')}`}
                   stroke="#ef4444"
                   strokeWidth="1"
@@ -227,7 +227,7 @@ export default function ImpliedVolatilityChart({ symbol }: ImpliedVolatilityChar
               <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
                 <path
                   d={`M ${ivData.history.map((point, i) => 
-                    `${i * (100 / (ivData.history.length - 1))},${100 - ((point.iv - 0.2) / 0.1) * 100}`
+                    `${i * (100 / (ivData.history?.length || 0 - 1))},${100 - ((point.iv - 0.2) / 0.1) * 100}`
                   ).join(' L ')}`}
                   stroke="#8b5cf6"
                   strokeWidth="1"
@@ -238,7 +238,7 @@ export default function ImpliedVolatilityChart({ symbol }: ImpliedVolatilityChar
                 {/* Fill area under curve */}
                 <path
                   d={`M ${ivData.history.map((point, i) => 
-                    `${i * (100 / (ivData.history.length - 1))},${100 - ((point.iv - 0.2) / 0.1) * 100}`
+                    `${i * (100 / (ivData.history?.length || 0 - 1))},${100 - ((point.iv - 0.2) / 0.1) * 100}`
                   ).join(' L ')} L 100,100 L 0,100 Z`}
                   fill="rgba(139, 92, 246, 0.1)"
                 />

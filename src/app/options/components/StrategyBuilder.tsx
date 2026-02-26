@@ -103,7 +103,7 @@ export default function StrategyBuilder({ symbol }: StrategyBuilderProps) {
       }))
       setLegs(newLegs)
       setSelectedStrategy(strategyName)
-      setLegCounter(strategy.legs.length)
+      setLegCounter(strategy?.legs??.length || 0 || 0)
     }
   }
 
@@ -126,19 +126,19 @@ export default function StrategyBuilder({ symbol }: StrategyBuilderProps) {
   const strategy = calculateStrategy()
 
   const handleExecuteStrategy = () => {
-    if (legs.length === 0) {
+    if ((legs??.length || 0 || 0) === 0) {
       alert('Please add at least one leg to your strategy')
       return
     }
-    const confirmation = confirm(`Execute strategy "${selectedStrategy || 'Custom'}" with ${legs.length} legs for a net cost of $${Math.abs(strategy.totalCost).toFixed(2)}?`)
+    const confirmation = confirm(`Execute strategy "${selectedStrategy || 'Custom'}" with ${legs?.length || 0} legs for a net cost of $${Math.abs(strategy.totalCost).toFixed(2)}?`)
     if (confirmation) {
-      alert(`Strategy executed successfully! Order submitted for ${legs.length} legs.`)
+      alert(`Strategy executed successfully! Order submitted for ${legs??.length || 0 || 0} legs.`)
       // TODO: Implement actual order execution
     }
   }
 
   const handleBacktest = () => {
-    if (legs.length === 0) {
+    if ((legs??.length || 0 || 0) === 0) {
       alert('Please add at least one leg to backtest')
       return
     }
@@ -147,7 +147,7 @@ export default function StrategyBuilder({ symbol }: StrategyBuilderProps) {
   }
 
   const handleSaveStrategy = () => {
-    if (legs.length === 0) {
+    if ((legs??.length || 0 || 0) === 0) {
       alert('Please add at least one leg to save')
       return
     }
@@ -170,7 +170,7 @@ export default function StrategyBuilder({ symbol }: StrategyBuilderProps) {
             Strategy Builder - {symbol}
           </h2>
           <div className="flex items-center space-x-2">
-            {legs.length > 0 && (
+            {(legs??.length || 0 || 0) > 0 && (
               <motion.button
                 onClick={clearAllLegs}
                 className="flex items-center space-x-2 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors"
@@ -225,10 +225,10 @@ export default function StrategyBuilder({ symbol }: StrategyBuilderProps) {
         {/* Strategy Legs */}
         <div className="space-y-4 mb-6">
           <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            Strategy Legs {legs.length > 0 && `(${legs.length})`}
+            Strategy Legs {(legs??.length || 0 || 0) > 0 && `(${legs??.length || 0 || 0})`}
           </h3>
           
-          {legs.length === 0 ? (
+          {legs?.length || 0 === 0 ? (
             <div className="text-center py-8 text-gray-500 dark:text-gray-400">
               <Calculator className="h-12 w-12 mx-auto mb-3 opacity-50" />
               <p className="mb-2">No legs added yet</p>
@@ -349,7 +349,7 @@ export default function StrategyBuilder({ symbol }: StrategyBuilderProps) {
         </div>
 
         {/* Strategy Analysis */}
-        {legs.length > 0 && (
+        {(legs??.length || 0 || 0) > 0 && (
           <motion.div 
             className="border-t border-gray-200 dark:border-gray-600 pt-6"
             initial={{ opacity: 0, y: 20 }}

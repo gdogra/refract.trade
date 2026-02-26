@@ -290,7 +290,7 @@ export default function AlphaAssistant() {
 
       {/* Queries History */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {queries.length === 0 && !isProcessing && (
+        {queries?.length || 0 === 0 && !isProcessing && (
           <div className="text-center py-8">
             <Sparkles className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
@@ -375,7 +375,7 @@ export default function AlphaAssistant() {
                 </div>
 
                 {/* Action Items */}
-                {queryItem.response.actionItems.length > 0 && (
+                {queryItem.response.actionItems?.length || 0 > 0 && (
                   <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
                     <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Action Items:</h4>
                     <div className="space-y-1">
@@ -433,7 +433,7 @@ export default function AlphaAssistant() {
           </Button>
         </div>
         
-        {queries.length === 0 && (
+        {queries?.length || 0 === 0 && (
           <div className="mt-2 flex flex-wrap gap-1">
             {suggestedQueries.slice(0, 2).map((query) => (
               <button

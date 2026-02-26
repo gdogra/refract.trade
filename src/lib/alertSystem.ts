@@ -412,7 +412,7 @@ class AlertSystem {
           return daysToExpiry <= 7 && daysToExpiry >= 0
         })
         
-        if (expiringPositions.length > 0) {
+        if (expiringPositions?.length || 0 > 0) {
           ruleTriggered = true
           affectedPositions = expiringPositions.map(p => p.id)
           details.affectedPositions = affectedPositions
@@ -434,7 +434,7 @@ class AlertSystem {
           return moneyness > 0.05 // 5% ITM
         })
         
-        if (assignmentRisk.length > 0) {
+        if (assignmentRisk?.length || 0 > 0) {
           ruleTriggered = true
           affectedPositions = assignmentRisk.map(p => p.id)
           details.affectedPositions = affectedPositions
@@ -444,7 +444,7 @@ class AlertSystem {
       case AlertType.VOLATILITY_SPIKE:
         // Check for significant IV changes
         const volSpikes = await this.detectVolatilitySpikes(positions)
-        if (volSpikes.length > 0) {
+        if (volSpikes?.length || 0 > 0) {
           ruleTriggered = true
           affectedPositions = volSpikes
           details.affectedPositions = affectedPositions
@@ -546,7 +546,7 @@ class AlertSystem {
     })
 
     // Calculate additional metrics
-    metrics.concentrationRisk = positions.length > 0 ? metrics.maxSinglePositionRisk / metrics.totalValue : 0
+    metrics.concentrationRisk = positions?.length || 0 > 0 ? metrics.maxSinglePositionRisk / metrics.totalValue : 0
     metrics.liquidityScore = this.calculateLiquidityScore(positions)
     metrics.correlationRisk = this.calculateCorrelationRisk(positions)
     
@@ -569,14 +569,14 @@ class AlertSystem {
       return Math.min(score, 100)
     })
     
-    return scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 50
+    return scores?.length || 0 > 0 ? scores.reduce((a, b) => a + b, 0) / scores?.length || 0 : 50
   }
 
   private calculateCorrelationRisk(positions: Position[]): number {
     // Simplified correlation risk - percentage of positions in same symbol
     const symbols = new Set(positions.map(p => p.symbol))
     const uniqueSymbols = symbols.size
-    const totalPositions = positions.length
+    const totalPositions = positions?.length || 0
     
     if (totalPositions === 0) return 0
     
@@ -621,22 +621,22 @@ class AlertSystem {
         break
         
       case AlertType.EXPIRATION_WARNING:
-        title = `${affectedPositions.length} Position(s) Expiring Soon`
-        message = `You have ${affectedPositions.length} position(s) expiring in ${details.timeToExpiry} days. Review for potential assignment risk or profit-taking opportunities.`
+        title = `${affectedPositions?.length || 0} Position(s) Expiring Soon`
+        message = `You have ${affectedPositions?.length || 0} position(s) expiring in ${details.timeToExpiry} days. Review for potential assignment risk or profit-taking opportunities.`
         severity = details.timeToExpiry! <= 3 ? AlertSeverity.HIGH : AlertSeverity.MEDIUM
         details.recommendedAction = 'Review positions for assignment risk and consider closing or rolling'
         break
         
       case AlertType.ASSIGNMENT_RISK:
         title = 'High Assignment Risk Detected'
-        message = `${affectedPositions.length} short position(s) have high assignment probability. Consider closing or rolling to avoid unwanted assignment.`
+        message = `${affectedPositions?.length || 0} short position(s) have high assignment probability. Consider closing or rolling to avoid unwanted assignment.`
         severity = AlertSeverity.HIGH
         details.recommendedAction = 'Close or roll positions to later expiration'
         break
         
       case AlertType.VOLATILITY_SPIKE:
         title = 'Volatility Spike Detected'
-        message = `Significant volatility increase detected in ${affectedPositions.length} position(s). This may affect your Greeks and P&L.`
+        message = `Significant volatility increase detected in ${affectedPositions?.length || 0} position(s). This may affect your Greeks and P&L.`
         severity = AlertSeverity.MEDIUM
         details.recommendedAction = 'Review vega exposure and consider vol hedging'
         break
@@ -674,7 +674,7 @@ class AlertSystem {
     if (rule.type === AlertType.ASSIGNMENT_RISK) confidence += 0.15
     
     // Decrease confidence for volatile market conditions
-    const avgImpliedVol = positions.reduce((sum, p) => sum + p.impliedVol, 0) / positions.length
+    const avgImpliedVol = positions.reduce((sum, p) => sum + p.impliedVol, 0) / positions?.length || 0
     if (avgImpliedVol > 0.4) confidence -= 0.1 // High vol = lower confidence
     
     return Math.max(0.1, Math.min(1.0, confidence))
@@ -691,10 +691,10 @@ class AlertSystem {
     
     // Clean up old alerts (keep last 100 per user)
     const userAlerts = this.alerts.filter(a => a.userId === alert.userId)
-    if (userAlerts.length > 100) {
+    if (userAlerts?.length || 0 > 100) {
       const alertsToRemove = userAlerts
         .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime())
-        .slice(0, userAlerts.length - 100)
+        .slice(0, userAlerts?.length || 0 - 100)
       
       alertsToRemove.forEach(alertToRemove => {
         const index = this.alerts.findIndex(a => a.id === alertToRemove.id)
