@@ -27,13 +27,14 @@ export default function Watchlist() {
   const [newSymbol, setNewSymbol] = useState('')
   const [isAddingSymbol, setIsAddingSymbol] = useState(false)
 
-  const formatPrice = (price: number) => `$${price.toFixed(2)}`
+  const formatPrice = (price: number) => `$${(price || 0).toFixed(2)}`
   const formatChange = (change: number, changePercent: number) => {
     const sign = change >= 0 ? '+' : ''
-    return `${sign}${change.toFixed(2)} (${sign}${changePercent.toFixed(2)}%)`
+    return `${sign}${(change || 0).toFixed(2)} (${sign}${(changePercent || 0).toFixed(2)}%)`
   }
 
   const formatLargeNumber = (num: number) => {
+    if (!num || num < 0) return '$0'
     if (num >= 1e12) return `$${(num / 1e12).toFixed(2)}T`
     if (num >= 1e9) return `$${(num / 1e9).toFixed(2)}B`
     if (num >= 1e6) return `${(num / 1e6).toFixed(1)}M`
@@ -201,7 +202,7 @@ export default function Watchlist() {
                         </div>
                         <div className="flex items-center space-x-2">
                           <Activity className="h-4 w-4" />
-                          <span>P/E: {item.pe.toFixed(1)}</span>
+                          <span>P/E: {(item.pe || 0).toFixed(1)}</span>
                         </div>
                       </div>
 
@@ -228,7 +229,7 @@ export default function Watchlist() {
                     <div className="md:hidden mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                       <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
                         <span>Volume: {formatLargeNumber(item.volume)}</span>
-                        <span>P/E: {item.pe.toFixed(1)}</span>
+                        <span>P/E: {(item.pe || 0).toFixed(1)}</span>
                         <span>Market Cap: {formatLargeNumber(item.marketCap)}</span>
                       </div>
                     </div>

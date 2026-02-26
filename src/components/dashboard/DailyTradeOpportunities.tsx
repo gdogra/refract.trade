@@ -514,7 +514,7 @@ function OpportunityRow({ opportunity, index }: { opportunity: TradeOpportunity;
                 <TooltipTrigger>
                   <div className="flex justify-between">
                     <span>Δ:</span>
-                    <span>{opportunity.delta.toFixed(3)}</span>
+                    <span>{(opportunity.delta || 0).toFixed(3)}</span>
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -525,7 +525,7 @@ function OpportunityRow({ opportunity, index }: { opportunity: TradeOpportunity;
                 <TooltipTrigger>
                   <div className="flex justify-between">
                     <span>Θ:</span>
-                    <span>{opportunity.theta.toFixed(3)}</span>
+                    <span>{(opportunity.theta || 0).toFixed(3)}</span>
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -594,7 +594,7 @@ function OpportunityDetails({ opportunity }: { opportunity: TradeOpportunity }) 
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Risk/Reward:</span>
-              <span className="font-medium">{opportunity.riskRewardRatio.toFixed(2)}:1</span>
+              <span className="font-medium">{(opportunity.riskRewardRatio || 0).toFixed(2)}:1</span>
             </div>
           </div>
         </div>
@@ -604,15 +604,15 @@ function OpportunityDetails({ opportunity }: { opportunity: TradeOpportunity }) 
           <div className="space-y-1 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-600">Delta:</span>
-              <span className="font-medium">{opportunity.delta.toFixed(3)}</span>
+              <span className="font-medium">{(opportunity.delta || 0).toFixed(3)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Gamma:</span>
-              <span className="font-medium">{opportunity.gamma.toFixed(3)}</span>
+              <span className="font-medium">{(opportunity.gamma || 0).toFixed(3)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Vega:</span>
-              <span className="font-medium">{opportunity.vega.toFixed(3)}</span>
+              <span className="font-medium">{(opportunity.vega || 0).toFixed(3)}</span>
             </div>
           </div>
         </div>
@@ -622,7 +622,7 @@ function OpportunityDetails({ opportunity }: { opportunity: TradeOpportunity }) 
           <div className="space-y-1 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-600">IV:</span>
-              <span className="font-medium">{(opportunity.impliedVolatility * 100).toFixed(1)}%</span>
+              <span className="font-medium">{((opportunity.impliedVolatility || 0) * 100).toFixed(1)}%</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Liquidity:</span>

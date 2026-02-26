@@ -287,7 +287,7 @@ export default function Analytics() {
                           <div className="grid grid-cols-2 gap-4">
                             <div className="text-center">
                               <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                                ${(portfolioData.totalValue / 1000).toFixed(1)}K
+                                ${((portfolioData?.totalValue || 0) / 1000).toFixed(1)}K
                               </div>
                               <div className="text-sm text-gray-600 dark:text-gray-400">Total Value</div>
                             </div>
