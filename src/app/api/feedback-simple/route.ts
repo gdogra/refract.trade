@@ -26,13 +26,7 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
     
-    // Only validate email/name if both are empty (allows for session-based submission)
-    if ((!email || email.trim() === '') && (!name || name.trim() === '')) {
-      return NextResponse.json({
-        success: false,
-        error: 'Email and name are required for feedback submission'
-      }, { status: 400 })
-    }
+    // Note: Email and name validation removed - we'll use fallback values for anonymous users
     
     // Parse system info
     let systemInfo = null
