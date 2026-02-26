@@ -210,7 +210,7 @@ export default function PositionsList() {
                 Total Positions
               </span>
               <span className="font-medium">
-                {summary.totalPositions}
+                {summary?.totalPositions || 0}
               </span>
             </div>
             <div className="flex justify-between">
@@ -218,7 +218,7 @@ export default function PositionsList() {
                 Portfolio Value
               </span>
               <span className="font-medium">
-                {formatCurrency(summary.totalValue)}
+                {formatCurrency(summary?.totalValue || 0)}
               </span>
             </div>
             <div className="flex justify-between">
@@ -226,18 +226,18 @@ export default function PositionsList() {
                 Total P&L
               </span>
               <span className={`font-semibold ${
-                summary.totalPnl >= 0 ? 'text-green-600' : 'text-red-600'
+                (summary?.totalPnl || 0) >= 0 ? 'text-green-600' : 'text-red-600'
               }`}>
-                {formatCurrency(summary.totalPnl)} ({formatPercentage(summary.totalPnlPercent)})
+                {formatCurrency(summary?.totalPnl || 0)} ({formatPercentage(summary?.totalPnlPercent || 0)})
               </span>
             </div>
-            {summary.expiringThisWeek > 0 && (
+            {(summary?.expiringThisWeek || 0) > 0 && (
               <div className="flex justify-between">
                 <span className="text-gray-600 dark:text-gray-400">
                   Expiring This Week
                 </span>
                 <span className="font-medium text-amber-600">
-                  {summary.expiringThisWeek}
+                  {summary?.expiringThisWeek || 0}
                 </span>
               </div>
             )}

@@ -277,7 +277,7 @@ export default function PositionManagement({
     switch (sortBy) {
       case 'pnl': return b.percentGain - a.percentGain
       case 'quality': return getQualityNumericValue(b.tradeQuality) - getQualityNumericValue(a.tradeQuality)
-      case 'risk': return Math.abs(b.riskMetrics.maxLoss) - Math.abs(a.riskMetrics.maxLoss)
+      case 'risk': return Math.abs(b.riskMetrics?.maxLoss || 0) - Math.abs(a.riskMetrics?.maxLoss || 0)
       case 'time': return a.daysToExpiry - b.daysToExpiry
       default: return 0
     }
@@ -394,7 +394,7 @@ export default function PositionManagement({
                     
                     <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                       <div className={cn("text-lg font-bold",
-                        position.riskMetrics.timeDecayDaily > 0 ? 'text-green-600' : 'text-red-600'
+                        (position.riskMetrics?.timeDecayDaily || 0) > 0 ? 'text-green-600' : 'text-red-600'
                       )}>
                         ${(position.riskMetrics?.timeDecayDaily || 0).toFixed(0)}
                       </div>
@@ -488,7 +488,7 @@ export default function PositionManagement({
                         <div className="flex items-center justify-between text-sm mt-1">
                           <span className="text-blue-700">Hold vs Close Score:</span>
                           <span className="font-medium text-blue-900">
-                            Hold {exitIntel.riskAdjustedHoldVsClose.holdScore} • Close {exitIntel.riskAdjustedHoldVsClose.closeScore}
+                            Hold {exitIntel.riskAdjustedHoldVsClose?.holdScore || 0} • Close {exitIntel.riskAdjustedHoldVsClose?.closeScore || 0}
                           </span>
                         </div>
                       </div>
@@ -624,7 +624,7 @@ export default function PositionManagement({
                             <div className="flex justify-between text-sm">
                               <span className="text-gray-600">Theta:</span>
                               <span className={cn("font-medium",
-                                position.currentGreeks.theta > 0 ? 'text-green-600' : 'text-red-600'
+                                (position.currentGreeks?.theta || 0) > 0 ? 'text-green-600' : 'text-red-600'
                               )}>
                                 {(position.currentGreeks?.theta || 0).toFixed(1)}
                               </span>
@@ -668,17 +668,17 @@ export default function PositionManagement({
                             <div className="space-y-2">
                               <div className="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
                                 <p className="text-sm font-medium text-blue-900 dark:text-blue-200 mb-1">
-                                  Recommendation: {exitIntel.riskAdjustedHoldVsClose.recommendation.toUpperCase()}
+                                  Recommendation: {(exitIntel.riskAdjustedHoldVsClose?.recommendation || 'hold').toUpperCase()}
                                 </p>
                                 <p className="text-xs text-blue-800 dark:text-blue-300">
-                                  {exitIntel.riskAdjustedHoldVsClose.reasoning}
+                                  {exitIntel.riskAdjustedHoldVsClose?.reasoning || 'No specific reasoning available'}
                                 </p>
                               </div>
                               
                               <div className="text-sm">
                                 <div className="flex justify-between mb-1">
                                   <span className="text-gray-600">Time Guidance:</span>
-                                  <span className="font-medium">{exitIntel.timeToCloseGuidance}</span>
+                                  <span className="font-medium">{exitIntel.timeToCloseGuidance || 'No guidance available'}</span>
                                 </div>
                                 <div className="flex justify-between">
                                   <span className="text-gray-600">Optimal Range:</span>

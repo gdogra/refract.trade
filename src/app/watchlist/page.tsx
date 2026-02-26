@@ -184,13 +184,13 @@ export default function Watchlist() {
                           {formatPrice(item.price)}
                         </div>
                         <div className={`flex items-center text-sm ${
-                          item.change >= 0 ? 'text-green-600' : 'text-red-600'
+                          (item.change || 0) >= 0 ? 'text-green-600' : 'text-red-600'
                         }`}>
-                          {item.change >= 0 ? 
+                          {(item.change || 0) >= 0 ? 
                             <TrendingUp className="h-4 w-4 mr-1" /> : 
                             <TrendingDown className="h-4 w-4 mr-1" />
                           }
-                          <span>{formatChange(item.change, item.changePercent)}</span>
+                          <span>{formatChange(item.change || 0, item.changePercent || 0)}</span>
                         </div>
                       </div>
 
@@ -198,7 +198,7 @@ export default function Watchlist() {
                       <div className="hidden md:flex flex-col space-y-2 text-sm text-gray-600 dark:text-gray-400">
                         <div className="flex items-center space-x-2">
                           <Volume className="h-4 w-4" />
-                          <span>Volume: {formatLargeNumber(item.volume)}</span>
+                          <span>Volume: {formatLargeNumber(item.volume || 0)}</span>
                         </div>
                         <div className="flex items-center space-x-2">
                           <Activity className="h-4 w-4" />
@@ -228,9 +228,9 @@ export default function Watchlist() {
                     {/* Mobile Metrics */}
                     <div className="md:hidden mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                       <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
-                        <span>Volume: {formatLargeNumber(item.volume)}</span>
+                        <span>Volume: {formatLargeNumber(item.volume || 0)}</span>
                         <span>P/E: {(item.pe || 0).toFixed(1)}</span>
-                        <span>Market Cap: {formatLargeNumber(item.marketCap)}</span>
+                        <span>Market Cap: {formatLargeNumber(item.marketCap || 0)}</span>
                       </div>
                     </div>
                   </CardContent>
@@ -264,7 +264,7 @@ export default function Watchlist() {
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-green-600">
-                      {watchlist.filter(item => item.change > 0).length}
+                      {watchlist.filter(item => (item.change || 0) > 0).length}
                     </div>
                     <div className="text-sm text-gray-600 dark:text-gray-400">
                       Gaining
@@ -272,7 +272,7 @@ export default function Watchlist() {
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-red-600">
-                      {watchlist.filter(item => item.change < 0).length}
+                      {watchlist.filter(item => (item.change || 0) < 0).length}
                     </div>
                     <div className="text-sm text-gray-600 dark:text-gray-400">
                       Losing
@@ -280,7 +280,7 @@ export default function Watchlist() {
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-purple-600">
-                      {((watchlist.reduce((sum, item) => sum + item.changePercent, 0) / watchlist.length) || 0).toFixed(2)}%
+                      {((watchlist.reduce((sum, item) => sum + (item.changePercent || 0), 0) / watchlist.length) || 0).toFixed(2)}%
                     </div>
                     <div className="text-sm text-gray-600 dark:text-gray-400">
                       Avg Change

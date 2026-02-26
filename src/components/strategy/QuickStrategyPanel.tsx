@@ -235,12 +235,12 @@ export default function QuickStrategyPanel({
               <span>Top Strategies</span>
             </div>
             <Badge variant="secondary" className="text-xs">
-              {analysis.strategies.length} found
+              {analysis?.strategies?.length || 0} found
             </Badge>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          {analysis.strategies.map((strategy, index) => (
+          {(analysis?.strategies || []).map((strategy, index) => (
             <motion.div
               key={index}
               className="p-3 border rounded-lg hover:shadow-sm transition-shadow cursor-pointer"
@@ -327,7 +327,7 @@ export default function QuickStrategyPanel({
             </div>
           )}
 
-          {analysis.strategies.length === 0 && (
+          {(analysis?.strategies?.length || 0) === 0 && (
             <div className="p-2 bg-gray-50 border border-gray-200 rounded text-xs text-gray-600 text-center">
               No clear opportunities identified
             </div>

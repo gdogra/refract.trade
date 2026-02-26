@@ -127,11 +127,11 @@ export default function AdminPortal() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {stats.totalUsers.toLocaleString()}
+                    {(stats?.totalUsers || 0).toLocaleString()}
                   </p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Total Users</p>
                   <p className="text-xs text-green-600">
-                    {stats.activeUsers} active
+                    {stats?.activeUsers || 0} active
                   </p>
                 </div>
               </div>
@@ -187,11 +187,11 @@ export default function AdminPortal() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                    ${stats.revenue.toLocaleString()}
+                    ${(stats?.revenue || 0).toLocaleString()}
                   </p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Revenue (MTD)</p>
                   <p className="text-xs text-red-600">
-                    ${stats.refundsIssued} refunded
+                    ${stats?.refundsIssued || 0} refunded
                   </p>
                 </div>
               </div>

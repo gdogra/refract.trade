@@ -114,12 +114,12 @@ export function DailyTradeOpportunities() {
     
     let filtered = opportunities.filter(opp => {
       if (filters.portfolioOnly && !opp.inPortfolio) return false
-      if (filters.minBid && opp.bid < filters.minBid) return false
-      if (filters.maxAsk && opp.ask > filters.maxAsk) return false
-      if (filters.minVolume && opp.volume < filters.minVolume) return false
-      if (filters.minOpenInterest && opp.openInterest < filters.minOpenInterest) return false
-      if (filters.minDelta && Math.abs(opp.delta) < filters.minDelta) return false
-      if (filters.maxDelta && Math.abs(opp.delta) > filters.maxDelta) return false
+      if (filters.minBid && (opp.bid || 0) < filters.minBid) return false
+      if (filters.maxAsk && (opp.ask || 0) > filters.maxAsk) return false
+      if (filters.minVolume && (opp.volume || 0) < filters.minVolume) return false
+      if (filters.minOpenInterest && (opp.openInterest || 0) < filters.minOpenInterest) return false
+      if (filters.minDelta && Math.abs(opp.delta || 0) < filters.minDelta) return false
+      if (filters.maxDelta && Math.abs(opp.delta || 0) > filters.maxDelta) return false
       if (filters.strategyType && opp.strategy !== filters.strategyType) return false
       
       return true
@@ -132,8 +132,8 @@ export function DailyTradeOpportunities() {
       if (!a.inPortfolio && b.inPortfolio) return 1
       
       // Then sort by selected criteria
-      const aValue = a[sortBy]
-      const bValue = b[sortBy]
+      const aValue = a[sortBy] || 0
+      const bValue = b[sortBy] || 0
       
       if (typeof aValue === 'number' && typeof bValue === 'number') {
         return sortDirection === 'desc' ? bValue - aValue : aValue - bValue
@@ -481,16 +481,16 @@ function OpportunityRow({ opportunity, index }: { opportunity: TradeOpportunity;
         
         <td className="px-3 py-2 text-right">
           <div className="text-sm space-y-0.5">
-            <div className="text-green-600">${opportunity.bid}</div>
-            <div className="text-red-600">${opportunity.ask}</div>
-            <div className="font-medium">${opportunity.last}</div>
+            <div className="text-green-600">${(opportunity.bid || 0).toFixed(2)}</div>
+            <div className="text-red-600">${(opportunity.ask || 0).toFixed(2)}</div>
+            <div className="font-medium">${(opportunity.last || 0).toFixed(2)}</div>
           </div>
         </td>
         
         <td className="px-3 py-2 text-right">
           <div className="text-sm">
-            <div className="font-medium">${opportunity.strike}</div>
-            <div className="text-xs text-gray-500">{opportunity.daysToExpiry}d</div>
+            <div className="font-medium">${(opportunity.strike || 0).toFixed(0)}</div>
+            <div className="text-xs text-gray-500">{opportunity.daysToExpiry || 0}d</div>
           </div>
         </td>
         
@@ -498,11 +498,11 @@ function OpportunityRow({ opportunity, index }: { opportunity: TradeOpportunity;
           <div className="text-sm space-y-0.5">
             <div className="flex items-center justify-end gap-1">
               <Volume2 className="h-3 w-3 text-gray-400" />
-              {opportunity.volume.toLocaleString()}
+              {(opportunity.volume || 0).toLocaleString()}
             </div>
             <div className="flex items-center justify-end gap-1">
               <Eye className="h-3 w-3 text-gray-400" />
-              {opportunity.openInterest.toLocaleString()}
+              {(opportunity.openInterest || 0).toLocaleString()}
             </div>
           </div>
         </td>
@@ -539,10 +539,10 @@ function OpportunityRow({ opportunity, index }: { opportunity: TradeOpportunity;
         <td className="px-3 py-2 text-right">
           <div className="flex flex-col items-end gap-1">
             <div className={`text-sm font-bold ${
-              opportunity.opportunityScore >= 80 ? 'text-green-600' :
-              opportunity.opportunityScore >= 60 ? 'text-yellow-600' : 'text-gray-600'
+              (opportunity.opportunityScore || 0) >= 80 ? 'text-green-600' :
+              (opportunity.opportunityScore || 0) >= 60 ? 'text-yellow-600' : 'text-gray-600'
             }`}>
-              {opportunity.opportunityScore}
+              {opportunity.opportunityScore || 0}
             </div>
             <div className="text-xs text-gray-500">
               {(opportunity.probabilityOfProfit || 0).toFixed(0)}% PoP
@@ -586,11 +586,11 @@ function OpportunityDetails({ opportunity }: { opportunity: TradeOpportunity }) 
           <div className="space-y-1 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-600">Max Profit:</span>
-              <span className="text-green-600 font-medium">${opportunity.maxProfit}</span>
+              <span className="text-green-600 font-medium">${(opportunity.maxProfit || 0).toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Max Loss:</span>
-              <span className="text-red-600 font-medium">${opportunity.maxLoss}</span>
+              <span className="text-red-600 font-medium">${Math.abs(opportunity.maxLoss || 0).toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Risk/Reward:</span>
@@ -627,10 +627,10 @@ function OpportunityDetails({ opportunity }: { opportunity: TradeOpportunity }) 
             <div className="flex justify-between">
               <span className="text-gray-600">Liquidity:</span>
               <span className={`font-medium ${
-                opportunity.liquidityScore >= 80 ? 'text-green-600' : 
-                opportunity.liquidityScore >= 60 ? 'text-yellow-600' : 'text-red-600'
+                (opportunity.liquidityScore || 0) >= 80 ? 'text-green-600' : 
+                (opportunity.liquidityScore || 0) >= 60 ? 'text-yellow-600' : 'text-red-600'
               }`}>
-                {opportunity.liquidityScore}/100
+                {opportunity.liquidityScore || 0}/100
               </span>
             </div>
           </div>
@@ -641,15 +641,15 @@ function OpportunityDetails({ opportunity }: { opportunity: TradeOpportunity }) 
           <div className="space-y-1 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-600">Expiration:</span>
-              <span className="font-medium">{opportunity.expiration}</span>
+              <span className="font-medium">{opportunity.expiration || 'N/A'}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Timing Score:</span>
               <span className={`font-medium ${
-                opportunity.timingScore >= 80 ? 'text-green-600' : 
-                opportunity.timingScore >= 60 ? 'text-yellow-600' : 'text-red-600'
+                (opportunity.timingScore || 0) >= 80 ? 'text-green-600' : 
+                (opportunity.timingScore || 0) >= 60 ? 'text-yellow-600' : 'text-red-600'
               }`}>
-                {opportunity.timingScore}/100
+                {opportunity.timingScore || 0}/100
               </span>
             </div>
           </div>
@@ -659,13 +659,13 @@ function OpportunityDetails({ opportunity }: { opportunity: TradeOpportunity }) 
       {/* Analysis */}
       <div>
         <h4 className="font-medium text-sm mb-2">Analysis & Reasoning</h4>
-        <p className="text-sm text-gray-700 mb-3">{opportunity.reasoning}</p>
+        <p className="text-sm text-gray-700 mb-3">{opportunity.reasoning || 'No analysis available'}</p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <h5 className="font-medium text-sm text-green-700 mb-1">Catalysts</h5>
             <ul className="text-sm text-gray-600 space-y-0.5">
-              {opportunity.catalysts.map((catalyst, index) => (
+              {(opportunity.catalysts || []).map((catalyst, index) => (
                 <li key={index} className="flex items-start gap-2">
                   <span className="text-green-500 mt-1">•</span>
                   {catalyst}
@@ -677,7 +677,7 @@ function OpportunityDetails({ opportunity }: { opportunity: TradeOpportunity }) 
           <div>
             <h5 className="font-medium text-sm text-red-700 mb-1">Risk Factors</h5>
             <ul className="text-sm text-gray-600 space-y-0.5">
-              {opportunity.risks.map((risk, index) => (
+              {(opportunity.risks || []).map((risk, index) => (
                 <li key={index} className="flex items-start gap-2">
                   <span className="text-red-500 mt-1">•</span>
                   {risk}
@@ -692,7 +692,7 @@ function OpportunityDetails({ opportunity }: { opportunity: TradeOpportunity }) 
       <div>
         <h4 className="font-medium text-sm mb-2">Sources & References</h4>
         <div className="flex flex-wrap gap-2">
-          {opportunity.sources.map((source, index) => (
+          {(opportunity.sources || []).map((source, index) => (
             <Badge key={index} variant="outline" className="text-xs">
               {source}
             </Badge>

@@ -292,8 +292,8 @@ export default function Analytics() {
                               <div className="text-sm text-gray-600 dark:text-gray-400">Total Value</div>
                             </div>
                             <div className="text-center">
-                              <div className={`text-2xl font-bold ${portfolioData.totalPnL >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                                ${portfolioData.totalPnL > 0 ? '+' : ''}${portfolioData.totalPnL}
+                              <div className={`text-2xl font-bold ${(portfolioData.totalPnL || 0) >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                                ${(portfolioData.totalPnL || 0) > 0 ? '+' : ''}${portfolioData.totalPnL || 0}
                               </div>
                               <div className="text-sm text-gray-600 dark:text-gray-400">Unrealized P&L</div>
                             </div>
@@ -466,8 +466,8 @@ export default function Analytics() {
                   id: pos.id,
                   symbol: pos.symbol,
                   strategy: pos.strategyType,
-                  entryDate: pos.entryDate.toISOString().split('T')[0],
-                  daysInTrade: Math.ceil((Date.now() - pos.entryDate.getTime()) / (1000 * 60 * 60 * 24)),
+                  entryDate: pos.entryDate ? pos.entryDate.toISOString().split('T')[0] : 'Unknown',
+                  daysInTrade: pos.entryDate ? Math.ceil((Date.now() - pos.entryDate.getTime()) / (1000 * 60 * 60 * 24)) : 0,
                   currentValue: pos.quantity * pos.entryPrice * 100,
                   unrealizedPnL: pos.unrealizedPnl || 0,
                   delta: pos.delta || 0,

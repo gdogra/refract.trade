@@ -92,8 +92,8 @@ export default function GreeksChart({ symbol }: GreeksChartProps) {
               <svg className="w-full h-full">
                 {/* Call delta */}
                 <path
-                  d={`M ${greeksData.delta.call.map((point, i) => 
-                    `${i * (100 / (greeksData.delta.call.length - 1))} ${100 - (point.value + 1) * 50}`
+                  d={`M ${(greeksData?.delta?.call || []).map((point, i) => 
+                    `${i * (100 / ((greeksData?.delta?.call?.length || 1) - 1))} ${100 - ((point?.value || 0) + 1) * 50}`
                   ).join(' L ')}`}
                   stroke="#3b82f6"
                   strokeWidth="2"
@@ -101,8 +101,8 @@ export default function GreeksChart({ symbol }: GreeksChartProps) {
                 />
                 {/* Put delta */}
                 <path
-                  d={`M ${greeksData.delta.put.map((point, i) => 
-                    `${i * (100 / (greeksData.delta.put.length - 1))} ${100 - (point.value + 1) * 50}`
+                  d={`M ${(greeksData?.delta?.put || []).map((point, i) => 
+                    `${i * (100 / ((greeksData?.delta?.put?.length || 1) - 1))} ${100 - ((point?.value || 0) + 1) * 50}`
                   ).join(' L ')}`}
                   stroke="#ef4444"
                   strokeWidth="2"
@@ -149,8 +149,8 @@ export default function GreeksChart({ symbol }: GreeksChartProps) {
               {/* Gamma curve */}
               <svg className="w-full h-full">
                 <path
-                  d={`M ${greeksData.gamma.map((point, i) => 
-                    `${i * (100 / (greeksData.gamma.length - 1))} ${100 - (point.value / 0.05) * 100}`
+                  d={`M ${(greeksData?.gamma || []).map((point, i) => 
+                    `${i * (100 / ((greeksData?.gamma?.length || 1) - 1))} ${100 - ((point?.value || 0) / 0.05) * 100}`
                   ).join(' L ')}`}
                   stroke="#10b981"
                   strokeWidth="2"
@@ -194,8 +194,8 @@ export default function GreeksChart({ symbol }: GreeksChartProps) {
               {/* Theta curves */}
               <svg className="w-full h-full">
                 <path
-                  d={`M ${greeksData.theta.call.map((point, i) => 
-                    `${i * (100 / (greeksData.theta.call.length - 1))} ${100 - Math.abs(point.value / 35) * 100}`
+                  d={`M ${(greeksData?.theta?.call || []).map((point, i) => 
+                    `${i * (100 / ((greeksData?.theta?.call?.length || 1) - 1))} ${100 - Math.abs((point?.value || 0) / 35) * 100}`
                   ).join(' L ')}`}
                   stroke="#ef4444"
                   strokeWidth="2"
@@ -234,8 +234,8 @@ export default function GreeksChart({ symbol }: GreeksChartProps) {
               {/* Vega curve */}
               <svg className="w-full h-full">
                 <path
-                  d={`M ${greeksData.vega.map((point, i) => 
-                    `${i * (100 / (greeksData.vega.length - 1))} ${100 - (point.value / 100) * 100}`
+                  d={`M ${(greeksData?.vega || []).map((point, i) => 
+                    `${i * (100 / ((greeksData?.vega?.length || 1) - 1))} ${100 - ((point?.value || 0) / 100) * 100}`
                   ).join(' L ')}`}
                   stroke="#8b5cf6"
                   strokeWidth="2"

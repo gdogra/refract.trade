@@ -116,7 +116,7 @@ export default function SettingsPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      {section.items.map((item, itemIndex) => (
+                      {(section?.items || []).map((item, itemIndex) => (
                         <motion.div
                           key={item.label}
                           className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"

@@ -21,12 +21,12 @@ export default function Portfolio() {
       
       // Use only option positions from orderService
       const combinedPositions = optionPositions.map(pos => ({
-        symbol: `${pos.symbol} ${pos.strike}${pos.type.charAt(0).toUpperCase()}`,
+        symbol: `${pos.symbol || 'Unknown'} ${pos.strike || 0}${(pos.type || 'call').charAt(0).toUpperCase()}`,
         quantity: pos.quantity,
         avgPrice: pos.avgPrice,
         currentPrice: pos.avgPrice,
-        change: pos.pnl / (pos.quantity * 100),
-        changePercent: (pos.pnl / Math.abs(pos.totalCost)) * 100,
+        change: (pos.pnl || 0) / ((pos.quantity || 0) * 100),
+        changePercent: ((pos.pnl || 0) / Math.abs(pos.totalCost || 1)) * 100,
         value: pos.currentValue,
         type: 'option'
       }))
@@ -57,7 +57,7 @@ export default function Portfolio() {
   // Trading handler - only sell since these are owned positions
   const handleSellPosition = (position: any) => {
     // Extract symbol and option details from position
-    const symbolMatch = position.symbol.match(/^([A-Z]+)\s+(\d+)([CP])$/)
+    const symbolMatch = (position.symbol || '').match(/^([A-Z]+)\s+(\d+)([CP])$/)
     if (!symbolMatch) return
     
     const [, symbol, strike, type] = symbolMatch
@@ -220,19 +220,19 @@ export default function Portfolio() {
                           {position.quantity}
                         </td>
                         <td className="py-4 px-4 text-right text-gray-600 dark:text-gray-400">
-                          ${position.avgPrice.toFixed(2)}
+                          ${(position.avgPrice || 0).toFixed(2)}
                         </td>
                         <td className="py-4 px-4 text-right font-medium text-gray-900 dark:text-white">
-                          ${position.currentPrice.toFixed(2)}
+                          ${(position.currentPrice || 0).toFixed(2)}
                         </td>
                         <td className={`py-4 px-4 text-right font-medium ${
                           position.change >= 0 ? 'text-green-600' : 'text-red-600'
                         }`}>
-                          {position.change >= 0 ? '+' : ''}${position.change.toFixed(2)} 
-                          ({position.changePercent >= 0 ? '+' : ''}{position.changePercent.toFixed(1)}%)
+                          {(position.change || 0) >= 0 ? '+' : ''}${(position.change || 0).toFixed(2)} 
+                          ({(position.changePercent || 0) >= 0 ? '+' : ''}{(position.changePercent || 0).toFixed(1)}%)
                         </td>
                         <td className="py-4 px-4 text-right font-medium text-gray-900 dark:text-white">
-                          ${position.value.toLocaleString()}
+                          ${(position.value || 0).toLocaleString()}
                         </td>
                         <td className="py-4 px-4 text-center">
                           <motion.button
