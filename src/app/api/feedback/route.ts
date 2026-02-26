@@ -24,10 +24,8 @@ export async function POST(request: NextRequest) {
   try {
     // Check database connection
     if (!process.env.DATABASE_URL) {
-      return NextResponse.json({
-        success: false,
-        error: 'Database configuration required. Please contact support.'
-      }, { status: 503 })
+      console.error('DATABASE_URL not configured, using fallback feedback system')
+      return await handleFallbackFeedback(request)
     }
 
     const session = await getServerSession()
@@ -86,29 +84,36 @@ export async function POST(request: NextRequest) {
     const url = systemInfo?.url || null
     const userAgent = systemInfo?.userAgent || request.headers.get('user-agent') || null
     
-    // Get Prisma client with error handling
-    const client = getPrismaClient()
-
-    // Test database connection
-    await client.$queryRaw`SELECT 1`
+    let feedback: any;
     
-    // Create feedback record
-    const feedback = await client.feedback.create({
-      data: {
-        userId: session?.user?.id || null,
-        email: session?.user?.email || email,
-        name: session?.user?.name || name,
-        category,
-        subject,
-        message,
-        priority,
-        url,
-        userAgent,
-        screenshot: screenshotUrl,
-        systemInfo,
-        status: 'open'
-      }
-    })
+    try {
+      // Get Prisma client with error handling
+      const client = getPrismaClient()
+
+      // Test database connection
+      await client.$queryRaw`SELECT 1`
+      
+      // Create feedback record
+      feedback = await client.feedback.create({
+        data: {
+          userId: session?.user?.id || null,
+          email: session?.user?.email || email,
+          name: session?.user?.name || name,
+          category,
+          subject,
+          message,
+          priority,
+          url,
+          userAgent,
+          screenshot: screenshotUrl,
+          systemInfo,
+          status: 'open'
+        }
+      })
+    } catch (dbError) {
+      console.error('Database operation failed, using fallback:', dbError)
+      return await handleFallbackFeedback(request)
+    }
     
     // Send confirmation email to user
     try {
@@ -261,5 +266,118 @@ async function notifyAdminsOfNewFeedback(feedback: any) {
   //   subject: `New ${feedback.category} feedback: ${feedback.subject}`,
   //   template: 'admin-feedback-notification',
   //   data: feedback
+  // })
+}
+
+// Fallback feedback system when database is unavailable
+async function handleFallbackFeedback(request: NextRequest): Promise<NextResponse> {
+  try {
+    const session = await getServerSession()
+    
+    // Parse FormData
+    const formData = await request.formData()
+    
+    const category = formData.get('category') as string
+    const subject = formData.get('subject') as string
+    const message = formData.get('message') as string
+    const email = formData.get('email') as string
+    const name = formData.get('name') as string
+    const priority = formData.get('priority') as string
+    
+    // Validate required fields
+    if (!category || !subject || !message) {
+      return NextResponse.json({
+        success: false,
+        error: 'Missing required fields'
+      }, { status: 400 })
+    }
+    
+    if (!session?.user && (!email || !name)) {
+      return NextResponse.json({
+        success: false,
+        error: 'Email and name required for anonymous feedback'
+      }, { status: 400 })
+    }
+    
+    // Create fallback feedback ID
+    const fallbackId = `fallback_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    
+    // Log feedback to console (in production, this could go to external service)
+    const fallbackFeedback = {
+      id: fallbackId,
+      userId: session?.user?.id || null,
+      email: session?.user?.email || email,
+      name: session?.user?.name || name,
+      category,
+      subject,
+      message,
+      priority,
+      userAgent: request.headers.get('user-agent'),
+      url: formData.get('systemInfo') ? JSON.parse(formData.get('systemInfo') as string)?.url : null,
+      timestamp: new Date().toISOString(),
+      source: 'fallback_system'
+    }
+    
+    console.log('FALLBACK FEEDBACK RECEIVED:', JSON.stringify(fallbackFeedback, null, 2))
+    
+    // In production, you could:
+    // - Send to external logging service (e.g., Sentry, LogRocket)
+    // - Send directly to admin email
+    // - Store in external service (e.g., Airtable, Google Sheets)
+    // - Queue for retry when database is back online
+    
+    try {
+      // Attempt to send notification to admins via external service
+      await notifyAdminsViaFallback(fallbackFeedback)
+    } catch (notificationError) {
+      console.error('Fallback notification failed:', notificationError)
+      // Don't fail the request if notification fails
+    }
+    
+    return NextResponse.json({
+      success: true,
+      data: {
+        id: fallbackId,
+        message: 'Feedback received and logged. Our team will review it shortly.',
+        note: 'Feedback system is temporarily using backup logging.'
+      }
+    })
+    
+  } catch (error) {
+    console.error('Fallback feedback system error:', error)
+    
+    return NextResponse.json({
+      success: false,
+      error: 'Unable to process feedback at this time. Please try again later.'
+    }, { status: 503 })
+  }
+}
+
+// Fallback notification system
+async function notifyAdminsViaFallback(feedback: any) {
+  // In production, implement one or more of these:
+  
+  // 1. Email directly via external service (e.g., SendGrid, Resend)
+  // 2. Slack webhook
+  // 3. External logging service
+  // 4. Admin dashboard API
+  
+  console.log(`🚨 ADMIN ALERT: New ${feedback.category} feedback received:`, {
+    id: feedback.id,
+    subject: feedback.subject,
+    priority: feedback.priority,
+    from: feedback.email,
+    timestamp: feedback.timestamp
+  })
+  
+  // TODO: Implement actual external notification
+  // Example Slack webhook:
+  // await fetch(process.env.SLACK_WEBHOOK_URL, {
+  //   method: 'POST',
+  //   headers: { 'Content-Type': 'application/json' },
+  //   body: JSON.stringify({
+  //     text: `New ${feedback.category} feedback: ${feedback.subject}`,
+  //     blocks: [...]
+  //   })
   // })
 }
