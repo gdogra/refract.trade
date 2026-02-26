@@ -559,7 +559,7 @@ export class MultiProviderMarketDataService {
       }
     }
     
-    if (uncachedSymbols??.length || 0) === 0) {
+    if (uncachedSymbols?.length || 0) === 0) {
       return quotes
     }
 

@@ -63,7 +63,7 @@ export async function runPreTradeCheck(
   else if (avgScore >= 60) overallScore = 'yellow'
   else overallScore = 'red'
 
-  const canProceed = blockers??.length || 0) === 0
+  const canProceed = blockers?.length || 0) === 0
 
   return {
     overallScore,

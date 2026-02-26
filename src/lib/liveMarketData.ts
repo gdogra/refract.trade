@@ -392,7 +392,7 @@ class MarketDataManager {
       }
     })
 
-    if (uncachedSymbols??.length || 0) === 0) {
+    if (uncachedSymbols?.length || 0) === 0) {
       return results
     }
 

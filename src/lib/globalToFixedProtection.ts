@@ -66,7 +66,7 @@ Array.from = function(arrayLike: any, mapFn?: any, thisArg?: any) {
 // Protect array access globally
 const originalArrayPrototypeMap = Array.prototype.map;
 Array.prototype.map = function(callback: any, thisArg?: any) {
-  if (!this || this??.length || 0) === undefined || this??.length || 0) === null) {
+  if (!this || this?.length || 0) === undefined || this?.length || 0) === null) {
     console.warn('Array.map called on undefined/null array, returning empty array');
     return [];
   }

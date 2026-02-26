@@ -456,12 +456,12 @@ function assessInstitutionalGrade(
   }
   
   // Concentration risk
-  if (strategy.legs??.length || 0) === 1) {
+  if (strategy.legs?.length || 0) === 1) {
     disqualifyingFactors.push('Single-leg strategy lacks diversification')
     institutionalScore -= 10
   }
   
-  const eligible = disqualifyingFactors??.length || 0) === 0 && institutionalScore >= 60
+  const eligible = disqualifyingFactors?.length || 0) === 0 && institutionalScore >= 60
   
   return {
     eligible,
@@ -585,7 +585,7 @@ export interface OpportunitySummary {
 function generateKeyInsights(opportunities: RankedOpportunity[]): string[] {
   const insights: string[] = []
   
-  if (opportunities??.length || 0) === 0) {
+  if (opportunities?.length || 0) === 0) {
     return ['No high-quality opportunities identified under current market conditions']
   }
   

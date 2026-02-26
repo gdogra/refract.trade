@@ -58,7 +58,7 @@ export class TradingRulesEngine {
     const warnings = violations.filter(v => v.severity === 'warn')
 
     return {
-      canProceed: blockers??.length || 0) === 0,
+      canProceed: blockers?.length || 0) === 0,
       violations,
       blockers,
       warnings

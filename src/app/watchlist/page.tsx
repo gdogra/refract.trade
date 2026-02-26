@@ -134,7 +134,7 @@ export default function Watchlist() {
 
         {/* Watchlist Items */}
         <div className="space-y-4">
-          {(watchlist??.length || 0) === 0 ? (
+          {(watchlist?.length || 0) === 0 ? (
             <motion.div
               className="text-center py-12"
               initial={{ opacity: 0, y: 20 }}

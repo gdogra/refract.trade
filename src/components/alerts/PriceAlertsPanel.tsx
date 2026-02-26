@@ -248,7 +248,7 @@ export default function PriceAlertsPanel({
 
           {/* Active Alerts List */}
           <div className="space-y-2">
-            {(alerts??.length || 0) === 0 ? (
+            {(alerts?.length || 0) === 0 ? (
               <div className="text-center py-6 text-gray-500">
                 <Bell className="h-8 w-8 mx-auto mb-2 opacity-50" />
                 <p className="text-sm">No active price alerts</p>

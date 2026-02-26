@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
     // Get user's positions (mock data for now - integrate with your position management system)
     const positions = await getUserPositions(session.user.id)
     
-    if (positions??.length || 0) === 0) {
+    if ((positions?.length || 0) === 0) {
       return NextResponse.json({
         success: true,
         data: {

@@ -119,7 +119,7 @@ class PortfolioRiskEngine {
   async calculateRisk(positions: Position[]): Promise<PortfolioRiskMetrics> {
     const startTime = Date.now()
     
-    if (positions??.length || 0) === 0) {
+    if (positions?.length || 0) === 0) {
       return this.getEmptyRiskMetrics(startTime)
     }
 
@@ -211,7 +211,7 @@ class PortfolioRiskEngine {
   private calculatePortfolioGreeks(positions: Array<Position & { greeks?: Greeks; impliedVol?: number }>): any {
     const optionsPositions = positions.filter(p => p.type !== 'stock' && p.greeks)
     
-    if (optionsPositions??.length || 0) === 0) {
+    if (optionsPositions?.length || 0) === 0) {
       return {
         netDelta: 0,
         netGamma: 0,

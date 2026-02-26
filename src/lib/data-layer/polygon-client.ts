@@ -77,7 +77,7 @@ class PolygonClient {
     try {
       const data = await this.rateLimitedFetch(url)
       
-      if (!data.results || data.results??.length || 0) === 0) {
+      if (!data.results || data.results?.length || 0) === 0) {
         throw new Error(`No data found for symbol ${symbol}`)
       }
 

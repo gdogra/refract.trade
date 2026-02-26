@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { TrendingUp, TrendingDown, Calendar, AlertTriangle, RefreshCw, Clock } from 'lucide-react'

@@ -316,7 +316,7 @@ export function ContextualHelp({ isOpen, onClose, helpPoints }: ContextualHelpPr
     }
   }, [isOpen, helpPoints])
   
-  if (!isOpen || helpPoints??.length || 0) === 0) return null
+  if (!isOpen || helpPoints?.length || 0) === 0) return null
   
   const currentPoint = helpPoints[currentStep]
   const position = elementPositions[currentPoint.id]

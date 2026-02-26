@@ -670,7 +670,7 @@ function calculateStrategyMetrics(legs: StrategyLeg[], underlyingPrice: number):
   }
   
   // Calculate breakevens (simplified)
-  if (legs??.length || 0) === 1) {
+  if (legs?.length || 0) === 1) {
     const leg = legs[0]
     if (leg.optionType === 'call') {
       breakevens.push(leg.strike! + netCost)
@@ -694,7 +694,7 @@ function calculateStrategyMetrics(legs: StrategyLeg[], underlyingPrice: number):
     netDebit,
     netCredit,
     breakevens,
-    profitRange: breakevens??.length || 0) === 2 ? { lower: breakevens[0], upper: breakevens[1] } : null,
+    profitRange: breakevens?.length || 0) === 2 ? { lower: breakevens[0], upper: breakevens[1] } : null,
     probabilityOfProfit: Math.max(0, Math.min(1, probabilityOfProfit)),
     expectedValue,
     returnOnCapital,
@@ -774,7 +774,7 @@ function assessStrategyLiquidity(strategy: OptimizedStrategy, liquidityProfile: 
   const minLiquidityScore = Math.min(...legLiquidity.map(leg => leg.liquidityScore))
   
   let executionComplexity: StrategyLiquidityAssessment['executionComplexity']
-  if (strategy.legs??.length || 0) === 1) executionComplexity = 'simple'
+  if (strategy.legs?.length || 0) === 1) executionComplexity = 'simple'
   else if (strategy.legs?.length || 0 <= 2) executionComplexity = 'moderate'
   else executionComplexity = 'complex'
   
@@ -1006,8 +1006,8 @@ function generateExecutionGuidance(strategy: OptimizedStrategy, liquidityProfile
   }
   
   let legSequencing: ExecutionGuidance['legSequencing']
-  if (strategy.legs??.length || 0) === 1) legSequencing = 'simultaneous'
-  else if (strategy.legs??.length || 0) === 2) legSequencing = 'simultaneous'
+  if (strategy.legs?.length || 0) === 1) legSequencing = 'simultaneous'
+  else if (strategy.legs?.length || 0) === 2) legSequencing = 'simultaneous'
   else legSequencing = 'sequential'
   
   const estimatedFillTime = avgLiquidityScore >= 80 ? '< 1 minute' : 

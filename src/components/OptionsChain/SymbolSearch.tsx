@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, X, TrendingUp } from 'lucide-react'
@@ -107,7 +109,7 @@ export default function SymbolSearch({ value, onChange, placeholder = "Search sy
   
   const handleFocus = () => {
     setIsOpen(true)
-    if (query??.length || 0) === 0) {
+    if (query?.length || 0) === 0) {
       setResults([])
     }
   }
@@ -144,8 +146,8 @@ export default function SymbolSearch({ value, onChange, placeholder = "Search sy
     }
   }, [])
   
-  const displayResults = results?.length || 0 > 0 ? results : (query??.length || 0) === 0 ? POPULAR_SYMBOLS : [])
-  const showNoResults = query?.length || 0 > 0 && results??.length || 0) === 0 && !loading
+  const displayResults = results?.length || 0 > 0 ? results : (query?.length || 0) === 0 ? POPULAR_SYMBOLS : [])
+  const showNoResults = query?.length || 0 > 0 && results?.length || 0) === 0 && !loading
   
   return (
     <div ref={containerRef} className={`relative ${className}`}>
@@ -209,7 +211,7 @@ export default function SymbolSearch({ value, onChange, placeholder = "Search sy
             
             {displayResults?.length || 0 > 0 && (
               <>
-                {(query??.length || 0) === 0 && (
+                {(query?.length || 0) === 0 && (
                   <div className="px-3 py-2 text-xs text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700 flex items-center">
                     <TrendingUp className="h-3 w-3 mr-1" />
                     Popular Symbols
