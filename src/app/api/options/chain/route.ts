@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getOptionsChain } from '@/lib/options/yahooOptions'
+import { getStockData } from '@/lib/realMarketData'
 
 export async function GET(request: NextRequest) {
   try {
@@ -49,7 +50,20 @@ export async function GET(request: NextRequest) {
     let optionsChain
     
     try {
+      // Get options chain from Yahoo Finance
       optionsChain = await getOptionsChain(symbol, expiration || undefined)
+      
+      // Override the underlying price with real-time Alpha Vantage data
+      try {
+        const realTimeData = await getStockData(symbol)
+        const yahooPrice = optionsChain.underlyingPrice
+        optionsChain.underlyingPrice = realTimeData.price
+        console.log(`✅ Updated ${symbol} price from Yahoo Finance $${yahooPrice} to real-time Alpha Vantage price: $${realTimeData.price}`)
+      } catch (priceError) {
+        console.warn(`Failed to get real-time price for ${symbol}, using Yahoo Finance price:`, priceError)
+        // Keep the Yahoo Finance price as fallback
+      }
+      
     } catch (error) {
       console.error(`Failed to get real options data for ${symbol}:`, error)
       
