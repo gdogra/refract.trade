@@ -945,7 +945,7 @@ function calculateTradeQualityScore(
     overallScore,
     numericScore: Math.round(numericScore),
     components,
-    reasoning: `Score based on ${Object.entries(components).map(([key, value]) => `${key}: ${value.toFixed(0)}`).join(', ')}`,
+    reasoning: `Score based on ${Object.entries(components).map(([key, value]) => `${key}: ${(value || 0).toFixed(0)}`).join(', ')}`,
     improvements
   }
 }

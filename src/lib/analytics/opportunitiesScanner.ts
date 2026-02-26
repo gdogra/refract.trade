@@ -499,7 +499,7 @@ async function generateMonitoringEngine(
   const watchlist: WatchlistItem[] = opportunities.slice(0, 20).map(opp => ({
     symbol: opp.symbol,
     addedAt: new Date(),
-    reasons: [`High RAOS: ${opp.raos.toFixed(1)}`, `${opp.strategy.type} opportunity`],
+    reasons: [`High RAOS: ${(opp.raos || 0).toFixed(1)}`, `${opp.strategy.type} opportunity`],
     currentRAOS: opp.raos,
     triggerConditions: [
       {
@@ -597,7 +597,7 @@ function calculatePortfolioHealth(
     riskFactors.push({
       type: 'concentration',
       severity: 'high',
-      description: `High directional exposure: ${totalGreeks.netDelta.toFixed(0)} delta`,
+      description: `High directional exposure: ${(totalGreeks?.netDelta || 0).toFixed(0)} delta`,
       impact: 'Portfolio sensitive to market direction',
       recommendation: 'Consider delta hedging or balancing positions',
       quantification: Math.abs(totalGreeks.netDelta)
@@ -608,7 +608,7 @@ function calculatePortfolioHealth(
     riskFactors.push({
       type: 'time_decay',
       severity: 'medium',
-      description: `High time decay: $${Math.abs(totalGreeks.totalTheta).toFixed(0)}/day`,
+      description: `High time decay: $${Math.abs(totalGreeks?.totalTheta || 0).toFixed(0)}/day`,
       impact: 'Significant daily portfolio decay',
       recommendation: 'Monitor time decay and consider adjustments',
       quantification: Math.abs(totalGreeks.totalTheta)

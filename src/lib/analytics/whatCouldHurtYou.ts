@@ -605,7 +605,9 @@ export class ScenarioImpactVisualizer {
    * Generate plain English explanation of scenario impact
    */
   static generatePlainEnglishImpact(scenario: AdverseScenario): string {
-    const lossPercent = (scenario.potentialLoss / scenario.impactAnalysis.portfolioLossPercent * 100).toFixed(0)
+    const lossPercent = scenario.impactAnalysis?.portfolioLossPercent 
+      ? (scenario.potentialLoss / scenario.impactAnalysis.portfolioLossPercent * 100).toFixed(0)
+      : '0'
     const timeframe = scenario.timeframe
     const recovery = scenario.impactAnalysis.timeToRecover
     

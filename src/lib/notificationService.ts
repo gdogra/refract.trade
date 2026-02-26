@@ -120,7 +120,7 @@ class NotificationService {
     this.addNotification({
       type: 'order',
       title: 'Order Filled',
-      message: `Your ${symbol} order has been filled at $${price.toFixed(2)}`,
+      message: `Your ${symbol} order has been filled at $${(price || 0).toFixed(2)}`,
       data: { symbol, orderId, price }
     })
   }
@@ -129,7 +129,7 @@ class NotificationService {
     this.addNotification({
       type: 'alert',
       title: 'Price Alert',
-      message: `${symbol} has moved ${direction} $${price.toFixed(2)}`,
+      message: `${symbol} has moved ${direction} $${(price || 0).toFixed(2)}`,
       data: { symbol, price, direction }
     })
   }

@@ -82,7 +82,7 @@ export default function QuickStrategyPanel({
         type: 'neutral',
         confidence: 0.85,
         description: 'Iron Condor or Credit Spreads',
-        reasoning: `IV rank at ${ivRank.toFixed(0)}% - options are overpriced`,
+        reasoning: `IV rank at ${(ivRank || 0).toFixed(0)}% - options are overpriced`,
         riskLevel: 'medium'
       })
     }
@@ -94,7 +94,7 @@ export default function QuickStrategyPanel({
         type: skew > 0 ? 'bullish' : 'bearish',
         confidence: 0.75,
         description: 'Exploit skew inefficiency',
-        reasoning: `${Math.abs(skew * 100).toFixed(1)}% skew creates arbitrage opportunity`,
+        reasoning: `${Math.abs((skew || 0) * 100).toFixed(1)}% skew creates arbitrage opportunity`,
         riskLevel: 'medium'
       })
     }
@@ -106,7 +106,7 @@ export default function QuickStrategyPanel({
         type: 'bullish',
         confidence: 0.65,
         description: 'Heavy put buying suggests oversold',
-        reasoning: `Put/Call volume ratio: ${putCallVolumeRatio.toFixed(2)} indicates fear`,
+        reasoning: `Put/Call volume ratio: ${(putCallVolumeRatio || 0).toFixed(2)} indicates fear`,
         riskLevel: 'medium'
       })
     } else if (putCallVolumeRatio < 0.7) {
@@ -115,7 +115,7 @@ export default function QuickStrategyPanel({
         type: 'bearish',
         confidence: 0.70,
         description: 'Heavy call buying suggests tops',
-        reasoning: `Low put/call ratio (${putCallVolumeRatio.toFixed(2)}) indicates complacency`,
+        reasoning: `Low put/call ratio (${(putCallVolumeRatio || 0).toFixed(2)}) indicates complacency`,
         riskLevel: 'low'
       })
     }
@@ -204,7 +204,7 @@ export default function QuickStrategyPanel({
           {/* Key Metrics */}
           <div className="grid grid-cols-2 gap-3">
             <div className="text-center p-3 bg-purple-50 rounded-lg">
-              <div className="text-lg font-bold text-purple-600">{analysis.ivRank.toFixed(0)}%</div>
+              <div className="text-lg font-bold text-purple-600">{(analysis?.ivRank || 0).toFixed(0)}%</div>
               <div className="text-xs text-gray-600">IV Rank</div>
             </div>
             <div className="text-center p-3 bg-blue-50 rounded-lg">
@@ -220,7 +220,7 @@ export default function QuickStrategyPanel({
               <Badge variant="outline">{analysis.marketCondition}</Badge>
             </div>
             <div className="mt-2 text-xs text-gray-600">
-              P/C Volume Ratio: {analysis.putCallVolumeRatio.toFixed(2)}
+              P/C Volume Ratio: {(analysis?.putCallVolumeRatio || 0).toFixed(2)}
             </div>
           </div>
         </CardContent>
@@ -263,7 +263,7 @@ export default function QuickStrategyPanel({
                 </div>
                 <div className="flex items-center space-x-1">
                   <Badge variant="outline" className="text-xs">
-                    {(strategy.confidence * 100).toFixed(0)}%
+                    {((strategy?.confidence || 0) * 100).toFixed(0)}%
                   </Badge>
                   <Badge className={`${getRiskColor(strategy.riskLevel)} text-xs`}>
                     {strategy.riskLevel}
@@ -349,12 +349,12 @@ export default function QuickStrategyPanel({
             size="sm" 
             className="w-full text-xs"
             onClick={() => {
-              const alertPrice = prompt(`Set price alert for ${symbol}:`, underlyingPrice.toFixed(2))
+              const alertPrice = prompt(`Set price alert for ${symbol}:`, (underlyingPrice || 0).toFixed(2))
               if (alertPrice && !isNaN(parseFloat(alertPrice))) {
                 try {
                   priceAlertsManager.addAlert(symbol, parseFloat(alertPrice), underlyingPrice)
                   const direction = parseFloat(alertPrice) > underlyingPrice ? 'above' : 'below'
-                  alert(`Price alert set for ${symbol} ${direction} $${parseFloat(alertPrice).toFixed(2)}`)
+                  alert(`Price alert set for ${symbol} ${direction} $${(parseFloat(alertPrice) || 0).toFixed(2)}`)
                 } catch (error) {
                   alert('Failed to set price alert')
                 }
