@@ -141,10 +141,10 @@ export default function PositionsList() {
                 {position.greeks && (
                   <div className="flex items-center space-x-4 text-xs">
                     <span className="text-gray-600 dark:text-gray-400">
-                      Δ: {position.greeks.delta >= 0 ? '+' : ''}{position.greeks.delta.toFixed(2)}
+                      Δ: {(position.greeks?.delta || 0) >= 0 ? '+' : ''}{(position.greeks?.delta || 0).toFixed(2)}
                     </span>
                     <span className="text-gray-600 dark:text-gray-400">
-                      Θ: {position.greeks.theta >= 0 ? '+' : ''}{position.greeks.theta.toFixed(2)}
+                      Θ: {(position.greeks?.theta || 0) >= 0 ? '+' : ''}{(position.greeks?.theta || 0).toFixed(2)}
                     </span>
                   </div>
                 )}

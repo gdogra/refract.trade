@@ -253,28 +253,28 @@ export default function RiskMetricsPanel() {
             <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3">
               <div className="text-xs text-blue-600 dark:text-blue-400">Delta</div>
               <div className="text-lg font-bold text-blue-700 dark:text-blue-300">
-                {riskMetrics?.greeks.delta.toFixed(3)}
+                {(riskMetrics?.greeks?.delta || 0).toFixed(3)}
               </div>
             </div>
             
             <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3">
               <div className="text-xs text-green-600 dark:text-green-400">Gamma</div>
               <div className="text-lg font-bold text-green-700 dark:text-green-300">
-                {riskMetrics?.greeks.gamma.toFixed(3)}
+                {(riskMetrics?.greeks?.gamma || 0).toFixed(3)}
               </div>
             </div>
             
             <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-3">
               <div className="text-xs text-red-600 dark:text-red-400">Theta</div>
               <div className="text-lg font-bold text-red-700 dark:text-red-300">
-                ${riskMetrics?.greeks.theta.toFixed(2)}
+                ${(riskMetrics?.greeks?.theta || 0).toFixed(2)}
               </div>
             </div>
             
             <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-3">
               <div className="text-xs text-purple-600 dark:text-purple-400">Vega</div>
               <div className="text-lg font-bold text-purple-700 dark:text-purple-300">
-                ${riskMetrics?.greeks.vega.toFixed(2)}
+                ${(riskMetrics?.greeks?.vega || 0).toFixed(2)}
               </div>
             </div>
           </div>
@@ -295,11 +295,11 @@ export default function RiskMetricsPanel() {
                     {scenario.scenario}
                   </div>
                   <div className="text-xs text-gray-500 dark:text-gray-400">
-                    {(scenario.probability * 100).toFixed(1)}% prob.
+                    {((scenario?.probability || 0) * 100).toFixed(1)}% prob.
                   </div>
                 </div>
                 <div className="text-sm font-semibold text-red-600">
-                  ${Math.abs(scenario.impact).toLocaleString()} loss
+                  ${Math.abs(scenario?.impact || 0).toLocaleString()} loss
                 </div>
               </div>
             ))}
