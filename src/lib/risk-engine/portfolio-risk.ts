@@ -188,16 +188,19 @@ class PortfolioRiskEngine {
         const timeToExpiry = getTimeToExpiry(position.expiry)
         
         if (timeToExpiry > 0) {
-          const greeksInput: GreeksInput = {
+          // Prepare input for Greeks calculation
+          const inputForGreeks: GreeksInput = {
             spotPrice: enrichedPosition.currentPrice,
             strike: position.strike,
-            timeToExpiry,
+            timeToExpiry: timeToExpiry,
             riskFreeRate: 0.05,
             volatility: 0.25 // Default IV, should be fetched from market
           }
 
-          (enrichedPosition as any).greeks = calculateGreeks(greeksInput, position.type === 'call')
-          ;(enrichedPosition as any).impliedVol = greeksInput.volatility
+          // Calculate and assign Greeks
+          const calculatedGreeks = calculateGreeks(inputForGreeks, position.type === 'call')
+          ;(enrichedPosition as any).greeks = calculatedGreeks
+          ;(enrichedPosition as any).impliedVol = inputForGreeks.volatility
         }
       }
 
