@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
         NEXT_PUBLIC_ENABLE_REAL_DATA: process.env.NEXT_PUBLIC_ENABLE_REAL_DATA,
         NEXT_PUBLIC_MARKET_DATA_PROVIDER: process.env.NEXT_PUBLIC_MARKET_DATA_PROVIDER,
         hasAlphaVantageKey: !!process.env.ALPHA_VANTAGE_API_KEY,
-        alphaVantageKeyLength: process.env.ALPHA_VANTAGE_API_KEY??.length || 0 || 0,
+        alphaVantageKeyLength: process.env.ALPHA_VANTAGE_API_KEY?.length || 0,
       },
       serviceInfo: marketDataService.getServiceInfo(),
       providerStatus: marketDataService.getProviderStatus(),

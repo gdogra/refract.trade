@@ -99,11 +99,11 @@ export default function SymbolSearch({ selectedSymbol, onSymbolChange }: SymbolS
       // Add dynamic symbol search for any ticker not in our predefined list
       const upperQuery = query.toUpperCase()
       const isSymbolQuery = /^[A-Z]{1,5}$/i.test(query.trim())
-      const symbolExists = (filteredSymbols??.length || 0 || 0) > 0 && filteredSymbols?.some(result => 
+      const symbolExists = (filteredSymbols?.length || 0) > 0 && filteredSymbols?.some(result => 
         result.symbol.toUpperCase() === upperQuery
       )
       
-      if (isSymbolQuery && !symbolExists && (query?.trim()??.length || 0 || 0) >= 1) {
+      if (isSymbolQuery && !symbolExists && (query?.trim()?.length || 0) >= 1) {
         // Try to fetch real price for unknown symbols
         try {
           const response = await fetch(`/api/options/quote?symbol=${upperQuery}`)
@@ -155,7 +155,7 @@ export default function SymbolSearch({ selectedSymbol, onSymbolChange }: SymbolS
       
       return symbolsWithPrices.slice(0, 8)
     },
-    enabled: (query??.length || 0 || 0) > 0
+    enabled: (query?.length || 0) > 0
   })
 
   const popularSymbols = [
@@ -253,7 +253,7 @@ export default function SymbolSearch({ selectedSymbol, onSymbolChange }: SymbolS
                   exit={{ opacity: 0, y: -10, scale: 0.95 }}
                   transition={{ duration: 0.2 }}
                 >
-                  {(query??.length || 0 || 0) > 0 && searchResults && Array.isArray(searchResults) && (searchResults??.length || 0 || 0) > 0 && (
+                  {(query?.length || 0) > 0 && searchResults && Array.isArray(searchResults) && (searchResults?.length || 0) > 0 && (
                     <div className="p-2">
                       <div className="text-xs text-gray-500 dark:text-gray-400 px-3 py-2 font-medium">
                         SEARCH RESULTS
@@ -297,7 +297,7 @@ export default function SymbolSearch({ selectedSymbol, onSymbolChange }: SymbolS
                     </div>
                   )}
 
-                  {(query??.length || 0 || 0) === 0 && (
+                  {(query?.length || 0) === 0 && (
                     <div className="p-2">
                       <div className="text-xs text-gray-500 dark:text-gray-400 px-3 py-2 font-medium">
                         POPULAR SYMBOLS
