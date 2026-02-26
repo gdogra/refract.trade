@@ -1,4 +1,5 @@
 import './globals.css'
+import '@/lib/globalToFixedProtection'
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import { Providers } from './providers'

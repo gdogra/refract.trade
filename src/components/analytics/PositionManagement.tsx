@@ -361,10 +361,10 @@ export default function PositionManagement({
                       <div className={cn("text-2xl font-bold",
                         position.percentGain >= 0 ? 'text-green-600' : 'text-red-600'
                       )}>
-                        {position.percentGain >= 0 ? '+' : ''}{position.percentGain.toFixed(1)}%
+                        {(position.percentGain || 0) >= 0 ? '+' : ''}{(position.percentGain || 0).toFixed(1)}%
                       </div>
                       <div className="text-sm text-gray-500">
-                        ${position.unrealizedPnL >= 0 ? '+' : ''}{position.unrealizedPnL.toFixed(0)} P&L
+                        ${(position.unrealizedPnL || 0) >= 0 ? '+' : ''}{(position.unrealizedPnL || 0).toFixed(0)} P&L
                       </div>
                     </div>
                   </div>
@@ -387,7 +387,7 @@ export default function PositionManagement({
                     
                     <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                       <div className="text-lg font-bold text-gray-900 dark:text-white">
-                        {(position.riskMetrics.probabilityOfProfit * 100).toFixed(0)}%
+                        {((position.riskMetrics?.probabilityOfProfit || 0) * 100).toFixed(0)}%
                       </div>
                       <div className="text-xs text-gray-500">Prob of Profit</div>
                     </div>
@@ -396,7 +396,7 @@ export default function PositionManagement({
                       <div className={cn("text-lg font-bold",
                         position.riskMetrics.timeDecayDaily > 0 ? 'text-green-600' : 'text-red-600'
                       )}>
-                        ${position.riskMetrics.timeDecayDaily.toFixed(0)}
+                        ${(position.riskMetrics?.timeDecayDaily || 0).toFixed(0)}
                       </div>
                       <div className="text-xs text-gray-500">Daily Theta</div>
                     </div>
@@ -482,7 +482,7 @@ export default function PositionManagement({
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-blue-700">Optimal Take Profit Range:</span>
                           <span className="font-medium text-blue-900">
-                            ${exitIntel.optimalTakeProfitRange.min.toFixed(2)} - ${exitIntel.optimalTakeProfitRange.max.toFixed(2)}
+                            ${(exitIntel.optimalTakeProfitRange?.min || 0).toFixed(2)} - ${(exitIntel.optimalTakeProfitRange?.max || 0).toFixed(2)}
                           </span>
                         </div>
                         <div className="flex items-center justify-between text-sm mt-1">
@@ -534,7 +534,7 @@ export default function PositionManagement({
                               score >= 60 ? 'text-blue-600' :
                               score >= 40 ? 'text-yellow-600' : 'text-red-600'
                             )}>
-                              {score.toFixed(0)}
+                              {(score || 0).toFixed(0)}
                             </div>
                             <div className="text-xs text-gray-500 capitalize">
                               {component.replace(/([A-Z])/g, ' $1').trim()}
@@ -615,23 +615,23 @@ export default function PositionManagement({
                           <div className="space-y-2">
                             <div className="flex justify-between text-sm">
                               <span className="text-gray-600">Delta:</span>
-                              <span className="font-medium">{position.currentGreeks.delta.toFixed(2)}</span>
+                              <span className="font-medium">{(position.currentGreeks?.delta || 0).toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between text-sm">
                               <span className="text-gray-600">Gamma:</span>
-                              <span className="font-medium">{position.currentGreeks.gamma.toFixed(3)}</span>
+                              <span className="font-medium">{(position.currentGreeks?.gamma || 0).toFixed(3)}</span>
                             </div>
                             <div className="flex justify-between text-sm">
                               <span className="text-gray-600">Theta:</span>
                               <span className={cn("font-medium",
                                 position.currentGreeks.theta > 0 ? 'text-green-600' : 'text-red-600'
                               )}>
-                                {position.currentGreeks.theta.toFixed(1)}
+                                {(position.currentGreeks?.theta || 0).toFixed(1)}
                               </span>
                             </div>
                             <div className="flex justify-between text-sm">
                               <span className="text-gray-600">Vega:</span>
-                              <span className="font-medium">{position.currentGreeks.vega.toFixed(1)}</span>
+                              <span className="font-medium">{(position.currentGreeks?.vega || 0).toFixed(1)}</span>
                             </div>
                           </div>
                         </div>
@@ -643,20 +643,20 @@ export default function PositionManagement({
                             <div className="flex justify-between text-sm">
                               <span className="text-gray-600">Max Loss:</span>
                               <span className="font-medium text-red-600">
-                                ${Math.abs(position.riskMetrics.maxLoss).toFixed(0)}
+                                ${Math.abs(position.riskMetrics?.maxLoss || 0).toFixed(0)}
                               </span>
                             </div>
                             <div className="flex justify-between text-sm">
                               <span className="text-gray-600">Breakeven:</span>
-                              <span className="font-medium">${position.riskMetrics.breakeven.toFixed(2)}</span>
+                              <span className="font-medium">${(position.riskMetrics?.breakeven || 0).toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between text-sm">
                               <span className="text-gray-600">Entry Price:</span>
-                              <span className="font-medium">${position.entryPrice.toFixed(2)}</span>
+                              <span className="font-medium">${(position.entryPrice || 0).toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between text-sm">
                               <span className="text-gray-600">Current Value:</span>
-                              <span className="font-medium">${position.currentValue.toFixed(2)}</span>
+                              <span className="font-medium">${(position.currentValue || 0).toFixed(2)}</span>
                             </div>
                           </div>
                         </div>
@@ -683,7 +683,7 @@ export default function PositionManagement({
                                 <div className="flex justify-between">
                                   <span className="text-gray-600">Optimal Range:</span>
                                   <span className="font-medium">
-                                    ${exitIntel.optimalTakeProfitRange.min.toFixed(2)} - ${exitIntel.optimalTakeProfitRange.max.toFixed(2)}
+                                    ${(exitIntel.optimalTakeProfitRange?.min || 0).toFixed(2)} - ${(exitIntel.optimalTakeProfitRange?.max || 0).toFixed(2)}
                                   </span>
                                 </div>
                               </div>
