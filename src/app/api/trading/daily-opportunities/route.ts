@@ -167,7 +167,7 @@ async function getUserPortfolioSymbols(userId: string): Promise<string[]> {
       .eq('user_id', userId)
       .eq('is_active', true)
     
-    if (positions && positions?.length || 0 > 0) {
+    if (positions && (positions?.length || 0) > 0) {
       return Array.from(new Set(positions.map(p => p.symbol)))
     }
   } catch (error) {
