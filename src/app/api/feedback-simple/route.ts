@@ -26,10 +26,11 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
     
-    if (!email || !name) {
+    // Only validate email/name if both are empty (allows for session-based submission)
+    if ((!email || email.trim() === '') && (!name || name.trim() === '')) {
       return NextResponse.json({
         success: false,
-        error: 'Email and name are required'
+        error: 'Email and name are required for feedback submission'
       }, { status: 400 })
     }
     
@@ -47,8 +48,8 @@ export async function POST(request: NextRequest) {
     // Create feedback object
     const feedback = {
       id: feedbackId,
-      email,
-      name,
+      email: email || 'anonymous@user.local',
+      name: name || 'Anonymous User',
       category,
       subject,
       message,
