@@ -4,6 +4,7 @@
  */
 
 import { getPolygonClient, PolygonQuote } from './polygon-client'
+import { getFinnhubClient } from './finnhub-client'
 import { getCache } from './redis-cache'
 import { getStockData } from '@/lib/realMarketData'
 import { calculateGreeks, GreeksInput, Greeks } from '@/lib/greeks'
@@ -12,7 +13,7 @@ export interface EnrichedQuote extends PolygonQuote {
   sector?: string
   marketCap?: number
   pe?: number
-  source: 'polygon' | 'alpha_vantage' | 'fallback'
+  source: 'polygon' | 'finnhub' | 'alpha_vantage' | 'fallback'
   cached: boolean
 }
 
@@ -62,6 +63,7 @@ export interface EnrichedOptionsChain {
 
 class DataService {
   private polygonClient = getPolygonClient()
+  private finnhubClient = getFinnhubClient()
   private cache = getCache()
   private riskFreeRate = 0.05 // 5% default risk-free rate
 
@@ -87,30 +89,42 @@ class DataService {
         cached: false
       }
     } catch (error) {
-      console.warn(`Polygon failed for ${symbol}, trying Alpha Vantage:`, error)
+      console.warn(`Polygon failed for ${symbol}, trying Finnhub:`, error)
       
       try {
-        // Fallback to Alpha Vantage
-        const alphaData = await getStockData(symbol)
+        // Try Finnhub as first fallback
+        const finnhubQuote = await this.finnhubClient.getQuote(symbol)
         quote = {
-          symbol,
-          price: alphaData.price,
-          change: alphaData.change,
-          changePercent: alphaData.changePercent,
-          volume: alphaData.volume,
-          high: alphaData.price * 1.02, // Estimate
-          low: alphaData.price * 0.98,  // Estimate
-          open: alphaData.price - alphaData.change,
-          close: alphaData.price,
-          timestamp: Date.now(),
-          marketCap: alphaData.marketCap,
-          sector: alphaData.sector,
-          source: 'alpha_vantage' as const,
+          ...finnhubQuote,
+          source: 'finnhub' as const,
           cached: false
         }
-      } catch (alphaError) {
-        console.error(`All providers failed for ${symbol}:`, alphaError)
-        throw new Error(`Unable to fetch quote for ${symbol}: All providers failed`)
+      } catch (finnhubError) {
+        console.warn(`Finnhub failed for ${symbol}, trying Alpha Vantage:`, finnhubError)
+        
+        try {
+          // Final fallback to Alpha Vantage
+          const alphaData = await getStockData(symbol)
+          quote = {
+            symbol,
+            price: alphaData.price,
+            change: alphaData.change,
+            changePercent: alphaData.changePercent,
+            volume: alphaData.volume,
+            high: alphaData.price * 1.02, // Estimate
+            low: alphaData.price * 0.98,  // Estimate
+            open: alphaData.price - alphaData.change,
+            close: alphaData.price,
+            timestamp: Date.now(),
+            marketCap: alphaData.marketCap,
+            sector: alphaData.sector,
+            source: 'alpha_vantage' as const,
+            cached: false
+          }
+        } catch (alphaError) {
+          console.error(`All providers failed for ${symbol}:`, alphaError)
+          throw new Error(`Unable to fetch quote for ${symbol}: All providers failed`)
+        }
       }
     }
 
@@ -328,11 +342,13 @@ class DataService {
   // Health check for all services
   async healthCheck(): Promise<{
     polygon: boolean
+    finnhub: boolean
     cache: boolean
     alphaVantage: boolean
   }> {
     const results = {
       polygon: false,
+      finnhub: false,
       cache: false,
       alphaVantage: false
     }
@@ -342,6 +358,12 @@ class DataService {
       results.polygon = true
     } catch (error) {
       console.warn('Polygon health check failed:', error)
+    }
+
+    try {
+      results.finnhub = await this.finnhubClient.healthCheck()
+    } catch (error) {
+      console.warn('Finnhub health check failed:', error)
     }
 
     try {

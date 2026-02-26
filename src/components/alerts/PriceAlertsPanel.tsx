@@ -327,7 +327,7 @@ export default function PriceAlertsPanel({
           )}
 
           {/* Notification Status */}
-          {'Notification' in window && Notification.permission === 'granted' && (
+          {typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted' && (
             <div className="flex items-center space-x-2 text-xs text-green-600">
               <CheckCircle className="h-3 w-3" />
               <span>Browser notifications enabled</span>

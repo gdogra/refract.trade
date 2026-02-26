@@ -50,6 +50,10 @@ class PolygonClient {
   }
 
   private async rateLimitedFetch(url: string): Promise<any> {
+    if (!this.apiKey) {
+      throw new Error('Polygon API key not configured')
+    }
+    
     const response = await fetch(url, {
       headers: {
         'Authorization': `Bearer ${this.apiKey}`,
@@ -159,10 +163,7 @@ let polygonClient: PolygonClient | null = null
 
 export function getPolygonClient(): PolygonClient {
   if (!polygonClient) {
-    const apiKey = process.env.POLYGON_API_KEY
-    if (!apiKey) {
-      throw new Error('POLYGON_API_KEY environment variable is required')
-    }
+    const apiKey = process.env.POLYGON_API_KEY || ''
     polygonClient = new PolygonClient(apiKey)
   }
   return polygonClient
