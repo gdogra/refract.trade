@@ -2,7 +2,23 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { PrismaClient } from '@prisma/client'
 
-const prisma = new PrismaClient()
+// Lazy initialize Prisma to handle connection issues gracefully
+let prisma: PrismaClient | null = null
+
+function getPrismaClient(): PrismaClient {
+  if (!prisma) {
+    try {
+      prisma = new PrismaClient({
+        log: ['error'],
+        errorFormat: 'minimal',
+      })
+    } catch (error) {
+      console.error('Failed to initialize Prisma client:', error)
+      throw new Error('Database initialization failed')
+    }
+  }
+  return prisma
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -70,8 +86,14 @@ export async function POST(request: NextRequest) {
     const url = systemInfo?.url || null
     const userAgent = systemInfo?.userAgent || request.headers.get('user-agent') || null
     
+    // Get Prisma client with error handling
+    const client = getPrismaClient()
+
+    // Test database connection
+    await client.$queryRaw`SELECT 1`
+    
     // Create feedback record
-    const feedback = await prisma.feedback.create({
+    const feedback = await client.feedback.create({
       data: {
         userId: session?.user?.id || null,
         email: session?.user?.email || email,
@@ -141,8 +163,11 @@ export async function GET(request: NextRequest) {
       }, { status: 401 })
     }
     
+    // Get Prisma client with error handling
+    const client = getPrismaClient()
+    
     // Get user's feedback history
-    const feedback = await prisma.feedback.findMany({
+    const feedback = await client.feedback.findMany({
       where: {
         OR: [
           { userId: session.user.id },
@@ -216,7 +241,8 @@ async function sendFeedbackConfirmationEmail(feedback: any) {
 
 // Helper function to notify admins
 async function notifyAdminsOfNewFeedback(feedback: any) {
-  const adminUsers = await prisma.user.findMany({
+  const client = getPrismaClient()
+  const adminUsers = await client.user.findMany({
     where: { isAdmin: true },
     select: { id: true, email: true, name: true }
   })
